@@ -1,0 +1,16 @@
+#compiled program
+FelixShader
+
+#object files
+*.o
+
+# qt files
+*.pro.user*
+.qmake*
+
+#shadow build stuff?
+build*
+
+#makefile
+Makefile
+
