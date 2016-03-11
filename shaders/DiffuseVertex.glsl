@@ -9,7 +9,7 @@ void main()
 {
   gl_Position = vec4(inPosition, 1.0);
 
-  iGlobalTime = time * 0.05;
+  iGlobalTime = time * 0.01;
 
 }
 

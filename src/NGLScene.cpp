@@ -43,6 +43,7 @@ void NGLScene::resizeGL(int _w , int _h)
 {
   m_width=_w*devicePixelRatio();
   m_height=_h*devicePixelRatio();
+  ngl::ShaderLib::instance()->setRegisteredUniform("iResolution", ngl::Vec3(m_width, m_height, 1.0));
 }
 
 
@@ -92,7 +93,7 @@ void NGLScene::initializeGL()
   shader->setRegisteredUniform("lightDiffuse", 1.0f, 1.0f, 1.0f, 1.0f);
   shader->setRegisteredUniform("ambientLightDirection", 0.5f, 1.0f, 0.5f);
 
-  startTimer(40);
+  startTimer(16);
 
 }
 
@@ -214,7 +215,7 @@ void NGLScene::timerEvent(QTimerEvent *)
     QPoint p = this->mapFromGlobal(QCursor::pos());
     //std::cout << p.x() << ", " << p.y() << std::endl;
     mouseData[0] = p.x();
-    mouseData[1] = 720.0-p.y();
+    mouseData[1] = m_height-p.y();
     mouseData[2] = 1.0; //mouse is pressed
   }
   else{
