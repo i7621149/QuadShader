@@ -5,10 +5,12 @@ in float iGlobalTime;
 
 uniform vec4 iMouse;
 uniform vec3 iResolution;
+uniform sampler2D iChannel0;
+
 
 vec2 fragCoord = gl_FragCoord.xy;
 
-/*
+
 vec4 circle(vec2 uv, vec2 center, float rad, vec3 color)
 {
   if(length(center-uv) < rad) return vec4(color, 1.0);
@@ -37,7 +39,6 @@ void main()
   vec4 layer2 = circle(uv, center, radius, red);
   fragColor = mix(layer1, layer2, layer2.a);
 }
-*/
 
 /*
 const int max_iterations = 45;
@@ -52,18 +53,9 @@ const float rayStep = furDepth * 2.0 / float(furLayers);
 const float furThreshold = 0.4;
 const float uvScale = 0.5;
 
-const vec2 iResolution = vec2(1024.0, 720.0);
-
 float r = 1.;
 float rotation = 60. * (iGlobalTime);
 float elevation = 0.25 * cos(iGlobalTime * 2.5);
-
-
-
-float rand(vec2 co){
-    return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
-}
-
 
 
 mat3 rotX(float g) {
@@ -105,10 +97,8 @@ vec2 cartesianToSpherical(vec3 p) {
 float furDensity(vec3 pos) {
   vec2 uv = cartesianToSpherical(pos.xzy);
   //vec4 tex = texture2D(iChannel0, uv * uvScale);
-  vec4 tex = vec4(rand(uv));
   //float density = smoothstep(furThreshold, 1.0, tex.x);
   float density = 1.0;
-
   pos.y -= elevation;
   vec3 p = pos;
   p *= rotY(rotation);
@@ -204,7 +194,7 @@ vec3 ray_dir( float fov, vec2 size, vec2 pos ) {
 
 void main()
 {
-  vec3 rd = ray_dir(60.0, iResolution.xy, gl_FragCoord.xy );
+  vec3 rd = ray_dir(60.0, iResolution.xy, fragCoord.xy );
 
   vec3 eye = vec3( .0, .0, -2.8 );
 
@@ -239,7 +229,7 @@ void main()
   fragColor = vec4(2. * color, 1.0 );
 }
 */
-
+/*
 // Bump up the iterations!
 // More iterations means more detail + aliasing
 #define ITERATIONS 20
@@ -251,7 +241,7 @@ void main() {
 
     float time = iGlobalTime * 2. + 15.;
     vec2 res = iResolution.xy;
-  vec2 uv = fragCoord.xy / res - vec2(.5) + look;
+    vec2 uv = fragCoord.xy / res - vec2(.5) + look;
     uv *= vec2(res.x / res.y, 1.) * 4. * scale;
 
     float len = dot(uv, uv) * .3 - .4;
@@ -264,5 +254,13 @@ void main() {
     float val = z.r * .06 + .3;
     val -= smoothstep(.1, -.3, len) * 1.5 + len * .3 - .4;
     fragColor = vec4(vec3(max(val, .1)), 1.);
-
 }
+*/
+/*
+void main()
+{
+  vec2 uv = fragCoord.xy / iResolution.xy;
+  vec4 color = texture2D(iChannel0, uv);
+  fragColor = color;
+}
+*/

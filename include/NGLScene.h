@@ -102,6 +102,8 @@ private:
 
     bool m_mouseDown;
 
+    void loadTexture(const std::string &file);
+
     //char *m_image;
 };
 

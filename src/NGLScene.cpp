@@ -65,39 +65,60 @@ void NGLScene::initializeGL()
 
   //instance of shader manager
   ngl::ShaderLib *shader = ngl::ShaderLib::instance();
-  shader->createShaderProgram("diffuse");
+  shader->createShaderProgram("quad");
 
   //attatch two shader stages to the shader
-  shader->attachShader("diffuseVertex", ngl::ShaderType::VERTEX);
-  shader->attachShader("diffuseFragment", ngl::ShaderType::FRAGMENT);
+  shader->attachShader("quadVertex", ngl::ShaderType::VERTEX);
+  shader->attachShader("quadFragment", ngl::ShaderType::FRAGMENT);
 
   //load the shaders text source
-  shader->loadShaderSource("diffuseVertex", "shaders/DiffuseVertex.glsl");
-  shader->loadShaderSource("diffuseFragment", "shaders/DiffuseFragment.glsl");
+  shader->loadShaderSource("quadVertex", "shaders/QuadVertex.glsl");
+  shader->loadShaderSource("quadFragment", "shaders/QuadFragment.glsl");
 
   //compile source code
-  shader->compileShader("diffuseVertex");
-  shader->compileShader("diffuseFragment");
+  shader->compileShader("quadVertex");
+  shader->compileShader("quadFragment");
 
   //attach to created program
-  shader->attachShaderToProgram("diffuse", "diffuseVertex");
-  shader->attachShaderToProgram("diffuse", "diffuseFragment");
+  shader->attachShaderToProgram("quad", "quadVertex");
+  shader->attachShaderToProgram("quad", "quadFragment");
 
   //link it up
-  shader->linkProgramObject("diffuse");
+  shader->linkProgramObject("quad");
   //tell shader to use it
-  shader->use("diffuse");
+  shader->use("quad");
 
-  shader->setRegisteredUniform("color", 1.0f, 0.0f, 0.0f, 1.0f);
-  shader->setRegisteredUniform("lightPos", 0.0f, 2.0f, 0.0f);
-  shader->setRegisteredUniform("lightDiffuse", 1.0f, 1.0f, 1.0f, 1.0f);
-  shader->setRegisteredUniform("ambientLightDirection", 0.5f, 1.0f, 0.5f);
+  loadTexture("quentin.jpg");
 
   startTimer(16);
 
 }
 
+void NGLScene::loadTexture(const std::string &file)
+{
+  QImage image;
+  bool loaded=image.load("textures/quentin.jpg");
+  if(loaded == true)
+  {
+    int width=image.width();
+    int height=image.height();
 
+    unsigned char *data = new unsigned char[ width*height*3];
+    unsigned int index=0;
+    QRgb colour;
+    for( int y=0; y<height; ++y)
+    {
+      for( int x=0; x<width; ++x)
+      {
+        colour=image.pixel(x,y);
+
+        data[index++]=qRed(colour);
+        data[index++]=qGreen(colour);
+        data[index++]=qBlue(colour);
+      }
+    }
+  }
+}
 
 void NGLScene::paintGL()
 {
