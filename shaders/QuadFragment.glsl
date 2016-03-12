@@ -1,16 +1,21 @@
 #version 400 core
 
-out vec4 fragColor;
-in float iGlobalTime;
+//rename coordinate globally, simple solution to reatin compatibility with shadertoy
+#define fragCoord gl_FragCoord
 
+// ouput
+out vec4 fragColor;
+
+//input, not properly set yet
+uniform float iGlobalTime;
+
+//inputs set in correct format
 uniform vec4 iMouse;
 uniform vec3 iResolution;
 uniform sampler2D iChannel0;
 
 
-vec2 fragCoord = gl_FragCoord.xy;
-
-
+/*
 vec4 circle(vec2 uv, vec2 center, float rad, vec3 color)
 {
   if(length(center-uv) < rad) return vec4(color, 1.0);
@@ -19,7 +24,7 @@ vec4 circle(vec2 uv, vec2 center, float rad, vec3 color)
 
 void main()
 {
-  vec2 uv = gl_FragCoord.xy;
+  vec2 uv = fragCoord.xy;
   uv.x /= 1024.0;
   uv.x *= 1024.0/720.0;
   uv.y /= 720.0;
@@ -39,7 +44,7 @@ void main()
   vec4 layer2 = circle(uv, center, radius, red);
   fragColor = mix(layer1, layer2, layer2.a);
 }
-
+*/
 /*
 const int max_iterations = 45;
 const float stop_threshold = 0.001;
@@ -229,7 +234,7 @@ void main()
   fragColor = vec4(2. * color, 1.0 );
 }
 */
-/*
+
 // Bump up the iterations!
 // More iterations means more detail + aliasing
 #define ITERATIONS 20
@@ -255,7 +260,7 @@ void main() {
     val -= smoothstep(.1, -.3, len) * 1.5 + len * .3 - .4;
     fragColor = vec4(vec3(max(val, .1)), 1.);
 }
-*/
+
 /*
 void main()
 {

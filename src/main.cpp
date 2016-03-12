@@ -5,16 +5,16 @@ basic OpenGL demo modified from http://qt-project.org/doc/qt-5.0/qtgui/openglwin
 #include <iostream>
 #include "NGLScene.h"
 
-
-
 int main(int argc, char **argv)
 {
+  //our application
   QGuiApplication app(argc, argv);
-  // create an OpenGL format specifier
+  //need to set format so create container to set info required
   QSurfaceFormat format;
-  // set the number of samples for multisampling
-  // will need to enable glEnable(GL_MULTISAMPLE); once we have a context
-  format.setSamples(4);
+
+  //setting samples for better quality image
+  //set to 1 for testing
+  format.setSamples(1);
   #if defined( __APPLE__)
     // at present mac osx Mountain Lion only supports GL3.2
     // the new mavericks will have GL 4.x so can change
@@ -25,21 +25,24 @@ int main(int argc, char **argv)
     format.setMajorVersion(4);
     format.setMinorVersion(3);
   #endif
-  // now we are going to set to CoreProfile OpenGL so we can't use and old Immediate mode GL
+  //set to core only so that deprecated functions are avoided easily
   format.setProfile(QSurfaceFormat::CoreProfile);
-  // now set the depth buffer to 24 bits
+
   format.setDepthBufferSize(24);
-  // now we are going to create our scene window
+  //creating context
   NGLScene window;
-  // and set the OpenGL format
+  //set format specified
   window.setFormat(format);
-  // we can now query the version to see if it worked
+
+
+  //print version to check success
   std::cout<<"Profile is "<<format.majorVersion()<<" "<<format.minorVersion()<<"\n";
-  // set the window size
-  window.resize(1024, 720);
-  // and finally show
+
+  //resize and show the window
+  window.resize(500, 281);
   window.show();
 
+  //run the application
   return app.exec();
 }
 

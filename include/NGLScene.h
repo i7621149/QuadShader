@@ -6,6 +6,11 @@
 #include <ngl/Transformation.h>
 #include <ngl/Text.h>
 #include <QOpenGLWindow>
+
+#include <QOpenGLTexture>
+
+#include <QTime>
+
 //----------------------------------------------------------------------------------------------------------------------
 /// @file NGLScene.h
 /// @brief this class inherits from the Qt OpenGLWindow and allows us to use NGL to draw OpenGL
@@ -90,8 +95,6 @@ private:
 
     void timerEvent(QTimerEvent *);
 
-    int m_currentMatID;
-
     GLuint m_vaoID;
 
     int m_mode;
@@ -104,9 +107,9 @@ private:
 
     void loadTexture(const std::string &file);
 
-    //char *m_image;
+    QOpenGLTexture *m_texture;
+
+    QTime m_globalTime;
 };
-
-
 
 #endif

@@ -1,3 +1,4 @@
+
 #include <QMouseEvent>
 #include <QGuiApplication>
 
@@ -10,25 +11,23 @@
 
 #include <cstdlib>
 
-
-
-NGLScene::NGLScene()
+NGLScene::NGLScene() :
+  m_mode(0),
+  m_time(0),
+  m_mouseDown(false),
+  m_texture(nullptr),
+  m_globalTime(QTime::currentTime())
 {
-  // re-size the widget to that of the parent (in this case the GLFrame passed in on construction)
   setTitle("Shader Tests");
-
-  m_time = 0;
-
-  m_mode = 0;
-
-  m_mouseDown = false;
   //m_image = new char[WIDTH*HEIGHT*3*sizeof(char)];
+  m_globalTime.start();
 }
 
 
 NGLScene::~NGLScene()
 {
   std::cout<<"Shutting down NGL, removing VAO's and Shaders\n";
+  delete m_texture;
 }
 
 void NGLScene::resizeGL(QResizeEvent *_event)
@@ -88,8 +87,6 @@ void NGLScene::initializeGL()
   //tell shader to use it
   shader->use("quad");
 
-  loadTexture("quentin.jpg");
-
   startTimer(16);
 
 }
@@ -118,6 +115,8 @@ void NGLScene::loadTexture(const std::string &file)
       }
     }
   }
+  m_texture = new QOpenGLTexture(image);
+
 }
 
 void NGLScene::paintGL()
@@ -231,6 +230,10 @@ void NGLScene::timerEvent(QTimerEvent *)
   ngl::ShaderLib *shader=ngl::ShaderLib::instance();
   shader->setRegisteredUniform("time", m_time);
 
+  std::cout << m_globalTime.elapsed() << ", "<< m_time << std::endl;
+
+  float globalSeconds = m_globalTime.elapsed()/1000.0;
+  shader->setRegisteredUniform("iGlobalTime", globalSeconds);
   ngl::Vec4 mouseData;
   if(m_mouseDown){
     QPoint p = this->mapFromGlobal(QCursor::pos());
