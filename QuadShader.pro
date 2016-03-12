@@ -26,6 +26,7 @@ INCLUDEPATH +=./include
 DESTDIR=./
 # add the glsl shader files
 OTHER_FILES += README.md \
+               TODO.txt \
                ./shaders/*.glsl
 # were are going to default to a console app
 CONFIG += console

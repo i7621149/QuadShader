@@ -39,7 +39,7 @@ int main(int argc, char **argv)
   std::cout<<"Profile is "<<format.majorVersion()<<" "<<format.minorVersion()<<"\n";
 
   //resize and show the window
-  window.resize(500, 281);
+  window.resize(1024, 720);
   window.show();
 
   //run the application

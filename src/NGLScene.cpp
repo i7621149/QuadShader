@@ -12,15 +12,14 @@
 #include <cstdlib>
 
 NGLScene::NGLScene() :
-  m_mode(0),
-  m_time(0),
+  m_frame(0),
   m_mouseDown(false),
   m_texture(nullptr),
-  m_globalTime(QTime::currentTime())
+  m_globalTime(QDate::currentDate(), QTime::currentTime())
 {
   setTitle("Shader Tests");
   //m_image = new char[WIDTH*HEIGHT*3*sizeof(char)];
-  m_globalTime.start();
+
 }
 
 
@@ -121,13 +120,15 @@ void NGLScene::loadTexture(const std::string &file)
 
 void NGLScene::paintGL()
 {
+  m_frame++;
+  ngl::ShaderLib::instance()->setRegisteredUniform("iFrame", m_frame);
   // clear the screen and depth buffer
   glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   glViewport(0,0,m_width,m_height);
-  ngl::VAOPrimitives *prim = ngl::VAOPrimitives::instance();
+  //ngl::VAOPrimitives *prim = ngl::VAOPrimitives::instance();
   glBindVertexArray(m_vaoID);		// select first bind the array
   glDrawArrays(GL_TRIANGLES, 0, 6);	// draw object
 }
@@ -202,38 +203,47 @@ void NGLScene::keyPressEvent(QKeyEvent *_event)
   // this method is called every time the main window recives a key event.
   // we then switch on the key value and set the camera in the GLWindow
 
-  ngl::ShaderLib *shader = ngl::ShaderLib::instance();
-  int newMode = m_mode;
+  //ngl::ShaderLib *shader = ngl::ShaderLib::instance();
+  //int newMode = m_mode;
   switch (_event->key())
   {
   // escape key to quite
     case Qt::Key_Escape : QGuiApplication::exit(EXIT_SUCCESS); break;
     case Qt::Key_W : glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); break;
     case Qt::Key_S : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); break;
+    /*
     case Qt::Key_0 : newMode = 0; break;
     case Qt::Key_1 : newMode = 1; break;
     case Qt::Key_2 : newMode = 2; break;
     case Qt::Key_3 : newMode = 3; break;
+    */
     default : break;
   }
+  /*
   // finally update the GLWindow and re-draw
   if(newMode != m_mode){
     m_mode = newMode;
     shader->setRegisteredUniform("mode", m_mode);
   }
+  */
   update();
 }
 
 void NGLScene::timerEvent(QTimerEvent *)
 {
-  m_time++;
   ngl::ShaderLib *shader=ngl::ShaderLib::instance();
-  shader->setRegisteredUniform("time", m_time);
 
-  std::cout << m_globalTime.elapsed() << ", "<< m_time << std::endl;
-
-  float globalSeconds = m_globalTime.elapsed()/1000.0;
+  //getting seconds by dividing milliseconds by 1000
+  float globalSeconds = m_globalTime.time().elapsed()/1000.0;
   shader->setRegisteredUniform("iGlobalTime", globalSeconds);
+
+  QDate date = m_globalTime.date();
+  float dateYear = date.year();
+  float dateMonth = date.month();
+  float dateDay = date.day();
+  float dateSeconds = (m_globalTime.time().msecsSinceStartOfDay() + m_globalTime.time().elapsed()) / 1000.0;
+  shader->setRegisteredUniform("iDate", dateYear, dateMonth, dateDay, dateSeconds);
+
   ngl::Vec4 mouseData;
   if(m_mouseDown){
     QPoint p = this->mapFromGlobal(QCursor::pos());

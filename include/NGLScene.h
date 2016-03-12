@@ -9,7 +9,7 @@
 
 #include <QOpenGLTexture>
 
-#include <QTime>
+#include <QDateTime>
 
 //----------------------------------------------------------------------------------------------------------------------
 /// @file NGLScene.h
@@ -97,9 +97,7 @@ private:
 
     GLuint m_vaoID;
 
-    int m_mode;
-
-    int m_time;
+    int m_frame;
 
     void createQuad();
 
@@ -109,7 +107,7 @@ private:
 
     QOpenGLTexture *m_texture;
 
-    QTime m_globalTime;
+    QDateTime m_globalTime;
 };
 
 #endif
