@@ -1,7 +1,7 @@
 #version 400 core
 
 //define fragCoord globally, simple solution to reatin compatibility with shadertoy
-#define fragCoord gl_FragCoord
+vec2 fragCoord = gl_FragCoord.xy;
 
 // ouput
 out vec4 fragColor;
@@ -11,17 +11,18 @@ out vec4 fragColor;
 //inputs are uniforms set in correct format for shadertoy to interface with
 uniform vec3 iResolution;
 uniform float iGlobalTime;
-//uniform float iTimeDelta;
+uniform float iTimeDelta;
 
 //currently frame rate is locked to 60fps, probably should be variable or something
 //incremented every time the frame renders, in paintGL
 uniform int iFrame;
 
-//uniform float ChannelTime[4];
+//uniform float iChannelTime[4];
+//uniform float iChannelResolution[4];
 uniform vec4 iMouse;
 
 //need to set up multiple channels, maybe they ought to be flexible, although this could be done outside of shader
-//uniform sampler2D iChannel0;
+uniform sampler2D iChannel0;
 
 //date works correctly, using QDateTime variable
 uniform vec4 iDate;
@@ -287,7 +288,7 @@ void main() {
 //----------------------------------------------------------------------------------------------------------------//
 
 //----------------------------------------------------------------------------------------------------------------//
-
+/*
 // Created by inigo quilez - iq/2013
 // License Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
 
@@ -368,15 +369,15 @@ void main()
 
   fragColor = vec4( col,1.0 );
 }
-
+*/
 //----------------------------------------------------------------------------------------------------------------//
 
 //----------------------------------------------------------------------------------------------------------------//
-/*
+
 void main()
 {
   vec2 uv = fragCoord.xy / iResolution.xy;
-  vec4 color = texture2D(iChannel0, uv);
-  fragColor = color;
+
+  fragColor =  texture2D(iChannel0, uv);
 }
-*/
+

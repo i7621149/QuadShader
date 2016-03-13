@@ -107,7 +107,9 @@ private:
 
     QOpenGLTexture *m_texture;
 
-    QDateTime m_globalTime;
+    QDateTime m_dateTime;
+
+    int m_lastFrameTime;
 };
 
 #endif

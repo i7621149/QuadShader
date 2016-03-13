@@ -15,7 +15,8 @@ NGLScene::NGLScene() :
   m_frame(0),
   m_mouseDown(false),
   m_texture(nullptr),
-  m_globalTime(QDate::currentDate(), QTime::currentTime())
+  m_dateTime(QDate::currentDate(), QTime::currentTime()),
+  m_lastFrameTime(0)
 {
   setTitle("Shader Tests");
   //m_image = new char[WIDTH*HEIGHT*3*sizeof(char)];
@@ -131,6 +132,11 @@ void NGLScene::paintGL()
   //ngl::VAOPrimitives *prim = ngl::VAOPrimitives::instance();
   glBindVertexArray(m_vaoID);		// select first bind the array
   glDrawArrays(GL_TRIANGLES, 0, 6);	// draw object
+
+  float renderTime = (m_dateTime.time().elapsed() - m_lastFrameTime) / 1000.0;
+  ngl::ShaderLib::instance()->setRegisteredUniform("iTimeDelta", renderTime);
+  //std::cout << renderTime << std::endl;
+  m_lastFrameTime = m_dateTime.time().elapsed();
 }
 
 void NGLScene::createQuad()
@@ -180,6 +186,7 @@ void NGLScene::mousePressEvent ( QMouseEvent * _event)
     m_mouseDown = true;
     //std::cout << "click!" << std::endl;
   }
+  //update();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -189,6 +196,7 @@ void NGLScene::mouseReleaseEvent ( QMouseEvent * _event )
     m_mouseDown = false;
     //std::cout << "unclick!" << std::endl;
   }
+  //update();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -226,7 +234,7 @@ void NGLScene::keyPressEvent(QKeyEvent *_event)
     shader->setRegisteredUniform("mode", m_mode);
   }
   */
-  update();
+  //update();
 }
 
 void NGLScene::timerEvent(QTimerEvent *)
@@ -234,14 +242,14 @@ void NGLScene::timerEvent(QTimerEvent *)
   ngl::ShaderLib *shader=ngl::ShaderLib::instance();
 
   //getting seconds by dividing milliseconds by 1000
-  float globalSeconds = m_globalTime.time().elapsed()/1000.0;
+  float globalSeconds = m_dateTime.time().elapsed()/1000.0;
   shader->setRegisteredUniform("iGlobalTime", globalSeconds);
 
-  QDate date = m_globalTime.date();
+  QDate date = m_dateTime.date();
   float dateYear = date.year();
   float dateMonth = date.month();
   float dateDay = date.day();
-  float dateSeconds = (m_globalTime.time().msecsSinceStartOfDay() + m_globalTime.time().elapsed()) / 1000.0;
+  float dateSeconds = (m_dateTime.time().msecsSinceStartOfDay() + m_dateTime.time().elapsed()) / 1000.0;
   shader->setRegisteredUniform("iDate", dateYear, dateMonth, dateDay, dateSeconds);
 
   ngl::Vec4 mouseData;
