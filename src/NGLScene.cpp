@@ -88,13 +88,13 @@ void NGLScene::initializeGL()
   shader->use("quad");
 
   createQuad();
-  loadTexture();
+  loadTexture(shader->getProgramID("quad"));
 
   startTimer(16);
 
 }
 
-void NGLScene::loadTexture()
+void NGLScene::loadTexture(GLuint _progID)
 {
   QImage image;
   bool loaded=image.load("/home/i7621149/CA1/images/tex12.png");
@@ -118,16 +118,31 @@ void NGLScene::loadTexture()
       }
     }
 
+//    tex1
 
-    glGenTextures(1,&m_textureName);
+  //  glActiveTexture(GL_TEXTURE0);
+
+
+    //glGenTextures(1,&m_textureName);
     glBindTexture(GL_TEXTURE_2D,m_textureName);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+
+
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
     glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,width,height,0,GL_RGB,GL_UNSIGNED_BYTE,data);
 
     glGenerateMipmap(GL_TEXTURE_2D); //  Allocate the mipmaps
 
+    glUseProgram(_progID);
+
+    GLuint texLocaction;
+    texLocaction = glGetUniformLocation(_progID, "iChannel0");
+    glUniform1i(texLocaction, 0);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_textureName);
   }
 }
 

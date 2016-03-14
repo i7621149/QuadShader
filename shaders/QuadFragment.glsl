@@ -123,8 +123,9 @@ vec2 cartesianToSpherical(vec3 p) {
 float furDensity(vec3 pos) {
   vec2 uv = cartesianToSpherical(pos.xzy);
   vec4 tex = texture2D(iChannel0, uv * uvScale);
+
   float density = smoothstep(furThreshold, 1.0, tex.x);
-  //float density = 1.0;
+
   pos.y -= elevation;
   vec3 p = pos;
   p *= rotY(rotation);

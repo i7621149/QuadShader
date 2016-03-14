@@ -103,7 +103,7 @@ private:
 
     bool m_mouseDown;
 
-    void loadTexture();
+    void loadTexture(GLuint _progID);
 
     //QOpenGLTexture *m_texture;
 
