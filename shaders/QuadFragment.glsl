@@ -23,6 +23,7 @@ uniform vec4 iMouse;
 
 //need to set up multiple channels, maybe they ought to be flexible, although this could be done outside of shader
 uniform sampler2D iChannel0;
+uniform sampler2D iChannel1;
 
 //date works correctly, using QDateTime variable
 uniform vec4 iDate;
