@@ -14,7 +14,7 @@
 NGLScene::NGLScene() :
   m_frame(0),
   m_mouseDown(false),
-  m_texture(nullptr),
+  //m_texture(nullptr),
   m_dateTime(QDate::currentDate(), QTime::currentTime()),
   m_lastFrameTime(0)
 {
@@ -27,7 +27,7 @@ NGLScene::NGLScene() :
 NGLScene::~NGLScene()
 {
   std::cout<<"Shutting down NGL, removing VAO's and Shaders\n";
-  delete m_texture;
+  //delete m_texture;
 }
 
 void NGLScene::resizeGL(QResizeEvent *_event)
@@ -57,7 +57,7 @@ void NGLScene::initializeGL()
   glEnable(GL_DEPTH_TEST);
   // enable multisampling for smoother drawing
   glEnable(GL_MULTISAMPLE);
-  createQuad();
+
 
   //create sphere on initialize
   ngl::VAOPrimitives::instance()->createSphere("mySphere", 1.0, 100);
@@ -87,14 +87,17 @@ void NGLScene::initializeGL()
   //tell shader to use it
   shader->use("quad");
 
+  createQuad();
+  loadTexture();
+
   startTimer(16);
 
 }
 
-void NGLScene::loadTexture(const std::string &file)
+void NGLScene::loadTexture()
 {
   QImage image;
-  bool loaded=image.load("textures/quentin.jpg");
+  bool loaded=image.load("/home/i7621149/CA1/images/tex12.png");
   if(loaded == true)
   {
     int width=image.width();
@@ -114,9 +117,18 @@ void NGLScene::loadTexture(const std::string &file)
         data[index++]=qBlue(colour);
       }
     }
-  }
-  m_texture = new QOpenGLTexture(image);
 
+
+    glGenTextures(1,&m_textureName);
+    glBindTexture(GL_TEXTURE_2D,m_textureName);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+
+    glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,width,height,0,GL_RGB,GL_UNSIGNED_BYTE,data);
+
+    glGenerateMipmap(GL_TEXTURE_2D); //  Allocate the mipmaps
+
+  }
 }
 
 void NGLScene::paintGL()

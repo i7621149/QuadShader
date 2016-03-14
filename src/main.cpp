@@ -13,8 +13,7 @@ int main(int argc, char **argv)
   QSurfaceFormat format;
 
   //setting samples for better quality image
-  //set to 1 for testing
-  format.setSamples(1);
+  format.setSamples(4);
   #if defined( __APPLE__)
     // at present mac osx Mountain Lion only supports GL3.2
     // the new mavericks will have GL 4.x so can change
@@ -45,6 +44,3 @@ int main(int argc, char **argv)
   //run the application
   return app.exec();
 }
-
-
-

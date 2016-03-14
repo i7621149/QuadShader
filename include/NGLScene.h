@@ -103,13 +103,15 @@ private:
 
     bool m_mouseDown;
 
-    void loadTexture(const std::string &file);
+    void loadTexture();
 
-    QOpenGLTexture *m_texture;
+    //QOpenGLTexture *m_texture;
 
     QDateTime m_dateTime;
 
     int m_lastFrameTime;
+
+    GLuint m_textureName;
 };
 
 #endif
