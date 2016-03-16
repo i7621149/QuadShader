@@ -36,7 +36,7 @@ uniform vec4 iDate;
 //----------------------------------------------------------------------------------------------------------------//
 
 //----------------------------------------------------------------------------------------------------------------//
-/*
+
 vec4 circle(vec2 uv, vec2 center, float rad, vec3 color)
 {
   if(length(center-uv) < rad) return vec4(color, 1.0);
@@ -65,7 +65,7 @@ void main()
   vec4 layer2 = circle(uv, center, radius, red);
   fragColor = mix(layer1, layer2, layer2.a);
 }
-*/
+
 //----------------------------------------------------------------------------------------------------------------//
 
 //----------------------------------------------------------------------------------------------------------------//
@@ -415,7 +415,7 @@ void main()
 // Created by inigo quilez - 2015
 // License Creative Commons Attribution-NonCommercial-ShareAlike 3.0
 
-
+/*
 #define AA 1
 
 float sdSphere( in vec3 p, in vec4 s )
@@ -1219,4 +1219,4 @@ void main()
 
     fragColor = vec4( col, 1.0 );
 }
-
+*/

@@ -2,14 +2,18 @@
 #define SHADERLIBPRO_H__
 
 #include <ngl/ShaderLib.h>
-
-class ShaderLibPro : public ngl::ShaderLib
+#include <ngl/Singleton.h>
+/*
+class ShaderLibPro : public ngl::Singleton<ShaderLibPro>
 {
-  friend class ngl::ShaderLib;
+  friend class ngl::Singleton<ShaderLibPro>;
 public :
 
 private :
+  ShaderLib();
+  ~ShaderLib();
+  ngl::ShaderLib m_shaderLib;
 
 };
-
+*/
 #endif

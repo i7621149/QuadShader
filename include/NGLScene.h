@@ -26,92 +26,98 @@
 
 class NGLScene : public QOpenGLWindow
 {
-  public:
-    //----------------------------------------------------------------------------------------------------------------------
-    /// @brief ctor for our NGL drawing class
-    /// @param [in] parent the parent window to the class
-    //----------------------------------------------------------------------------------------------------------------------
-    NGLScene();
-    //----------------------------------------------------------------------------------------------------------------------
-    /// @brief dtor must close down ngl and release OpenGL resources
-    //----------------------------------------------------------------------------------------------------------------------
-    ~NGLScene();
-    //----------------------------------------------------------------------------------------------------------------------
-    /// @brief the initialize class is called once when the window is created and we have a valid GL context
-    /// use this to setup any default GL stuff
-    //----------------------------------------------------------------------------------------------------------------------
-    void initializeGL();
-    //----------------------------------------------------------------------------------------------------------------------
-    /// @brief this is called everytime we want to draw the scene
-    //----------------------------------------------------------------------------------------------------------------------
-    void paintGL();
+public:
+  //----------------------------------------------------------------------------------------------------------------------
+  /// @brief ctor for our NGL drawing class
+  /// @param [in] parent the parent window to the class
+  //----------------------------------------------------------------------------------------------------------------------
+  NGLScene();
+  //----------------------------------------------------------------------------------------------------------------------
+  /// @brief dtor must close down ngl and release OpenGL resources
+  //----------------------------------------------------------------------------------------------------------------------
+  ~NGLScene();
+  //----------------------------------------------------------------------------------------------------------------------
+  /// @brief the initialize class is called once when the window is created and we have a valid GL context
+  /// use this to setup any default GL stuff
+  //----------------------------------------------------------------------------------------------------------------------
+  void initializeGL();
+  //----------------------------------------------------------------------------------------------------------------------
+  /// @brief this is called everytime we want to draw the scene
+  //----------------------------------------------------------------------------------------------------------------------
+  void paintGL();
 
 private:
-    //----------------------------------------------------------------------------------------------------------------------
-    /// @brief this is called everytime we resize the window
-    //----------------------------------------------------------------------------------------------------------------------
-    // Qt 5.5.1 must have this implemented and uses it
-    void resizeGL(QResizeEvent *_event);
-    // Qt 5.x uses this instead! http://doc.qt.io/qt-5/qopenglwindow.html#resizeGL
-    void resizeGL(int _w, int _h);
+  //----------------------------------------------------------------------------------------------------------------------
+  /// @brief this is called everytime we resize the window
+  //----------------------------------------------------------------------------------------------------------------------
+  // Qt 5.5.1 must have this implemented and uses it
+  void resizeGL(QResizeEvent *_event);
+  // Qt 5.x uses this instead! http://doc.qt.io/qt-5/qopenglwindow.html#resizeGL
+  void resizeGL(int _w, int _h);
 
-    //----------------------------------------------------------------------------------------------------------------------
-    /// @brief Qt Event called when a key is pressed
-    /// @param [in] _event the Qt event to query for size etc
-    //----------------------------------------------------------------------------------------------------------------------
-    void keyPressEvent(QKeyEvent *_event);
-    //----------------------------------------------------------------------------------------------------------------------
-    /// @brief this method is called every time a mouse is moved
-    /// @param _event the Qt Event structure
-    //----------------------------------------------------------------------------------------------------------------------
-    void mouseMoveEvent (QMouseEvent * _event );
-    //----------------------------------------------------------------------------------------------------------------------
-    /// @brief this method is called everytime the mouse button is pressed
-    /// inherited from QObject and overridden here.
-    /// @param _event the Qt Event structure
-    //----------------------------------------------------------------------------------------------------------------------
-    void mousePressEvent ( QMouseEvent *_event);
-    //----------------------------------------------------------------------------------------------------------------------
-    /// @brief this method is called everytime the mouse button is released
-    /// inherited from QObject and overridden here.
-    /// @param _event the Qt Event structure
-    //----------------------------------------------------------------------------------------------------------------------
-    void mouseReleaseEvent ( QMouseEvent *_event );
+  //----------------------------------------------------------------------------------------------------------------------
+  /// @brief Qt Event called when a key is pressed
+  /// @param [in] _event the Qt event to query for size etc
+  //----------------------------------------------------------------------------------------------------------------------
+  void keyPressEvent(QKeyEvent *_event);
+  //----------------------------------------------------------------------------------------------------------------------
+  /// @brief this method is called every time a mouse is moved
+  /// @param _event the Qt Event structure
+  //----------------------------------------------------------------------------------------------------------------------
+  void mouseMoveEvent (QMouseEvent * _event );
+  //----------------------------------------------------------------------------------------------------------------------
+  /// @brief this method is called everytime the mouse button is pressed
+  /// inherited from QObject and overridden here.
+  /// @param _event the Qt Event structure
+  //----------------------------------------------------------------------------------------------------------------------
+  void mousePressEvent ( QMouseEvent *_event);
+  //----------------------------------------------------------------------------------------------------------------------
+  /// @brief this method is called everytime the mouse button is released
+  /// inherited from QObject and overridden here.
+  /// @param _event the Qt Event structure
+  //----------------------------------------------------------------------------------------------------------------------
+  void mouseReleaseEvent ( QMouseEvent *_event );
 
-    //----------------------------------------------------------------------------------------------------------------------
-    /// @brief this method is called everytime the mouse wheel is moved
-    /// inherited from QObject and overridden here.
-    /// @param _event the Qt Event structure
-    //----------------------------------------------------------------------------------------------------------------------
-    void wheelEvent( QWheelEvent *_event);
-    //----------------------------------------------------------------------------------------------------------------------
-    /// @brief window width
-    //----------------------------------------------------------------------------------------------------------------------
-    int m_width;
-    //----------------------------------------------------------------------------------------------------------------------
-    /// @brief window height
-    //----------------------------------------------------------------------------------------------------------------------
-    int m_height;
+  //----------------------------------------------------------------------------------------------------------------------
+  /// @brief this method is called everytime the mouse wheel is moved
+  /// inherited from QObject and overridden here.
+  /// @param _event the Qt Event structure
+  //----------------------------------------------------------------------------------------------------------------------
+  void wheelEvent( QWheelEvent *_event);
+  //----------------------------------------------------------------------------------------------------------------------
+  /// @brief window width
+  //----------------------------------------------------------------------------------------------------------------------
+  int m_width;
+  //----------------------------------------------------------------------------------------------------------------------
+  /// @brief window height
+  //----------------------------------------------------------------------------------------------------------------------
+  int m_height;
 
-    void timerEvent(QTimerEvent *);
+  void timerEvent(QTimerEvent *);
 
-    GLuint m_vaoID;
+  GLuint m_vaoID;
 
-    int m_frame;
+  int m_frame;
 
-    void createQuad();
+  void createQuad();
 
-    bool m_mouseDown;
+  bool m_mouseDown;
+  //----------------------------------------------------------------------------------------------------------------------
+  /// @brief called for loading textures
+  /// can be used with ShaderLib, as long as .getProgramID() is called to get the _progID.
+  /// @param _progID the id of the shader program to use
+  /// @param _textureFile the location of the texture to use
+  /// @param _channelNum the texture unit to use
+  //----------------------------------------------------------------------------------------------------------------------
 
-    void loadTexture(GLuint _progID, std::string textureFile, int channelNum);
+  //Could just use a vector of textures? And find which ones are empty, and have a remove texture function?
+  void loadTexture(GLuint _progID, std::string _textureFile, int _channelNum);
 
-    //QOpenGLTexture *m_texture;
+  QDateTime m_dateTime;
 
-    QDateTime m_dateTime;
+  int m_lastFrameTime;
 
-    int m_lastFrameTime;
-
-    GLuint m_textures[4];
+  GLuint m_textures[4];
 };
 
 #endif

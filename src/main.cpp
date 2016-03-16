@@ -14,13 +14,12 @@ int main(int argc, char **argv)
 
   //setting samples for better quality image
   format.setSamples(4);
+  //set gl version
   #if defined( __APPLE__)
-    // at present mac osx Mountain Lion only supports GL3.2
-    // the new mavericks will have GL 4.x so can change
     format.setMajorVersion(4);
     format.setMinorVersion(1);
   #else
-    // with luck we have the latest GL version so set to this
+    //latest version
     format.setMajorVersion(4);
     format.setMinorVersion(3);
   #endif
@@ -33,9 +32,8 @@ int main(int argc, char **argv)
   //set format specified
   window.setFormat(format);
 
-
   //print version to check success
-  std::cout<<"Profile is "<<format.majorVersion()<<" "<<format.minorVersion()<<"\n";
+  std::cout << "Profile is " << format.majorVersion() << " " << format.minorVersion() << "\n";
 
   //resize and show the window
   window.resize(1024, 720);

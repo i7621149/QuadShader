@@ -1,4 +1,3 @@
-
 #include <QMouseEvent>
 #include <QGuiApplication>
 
@@ -15,7 +14,6 @@
 NGLScene::NGLScene() :
   m_frame(0),
   m_mouseDown(false),
-  //m_texture(nullptr),
   m_dateTime(QDate::currentDate(), QTime::currentTime()),
   m_lastFrameTime(0)
 {
@@ -23,7 +21,6 @@ NGLScene::NGLScene() :
   //m_image = new char[WIDTH*HEIGHT*3*sizeof(char)];
 
 }
-
 
 NGLScene::~NGLScene()
 {
@@ -59,12 +56,12 @@ void NGLScene::initializeGL()
   // enable multisampling for smoother drawing
   glEnable(GL_MULTISAMPLE);
 
-
   //create sphere on initialize
   ngl::VAOPrimitives::instance()->createSphere("mySphere", 1.0, 100);
 
   //instance of shader manager
   ngl::ShaderLib *shader = ngl::ShaderLib::instance();
+
   shader->createShaderProgram("quad");
 
   //attatch two shader stages to the shader
@@ -88,7 +85,6 @@ void NGLScene::initializeGL()
   //tell shader to use it
   shader->use("quad");
 
-
   glGenTextures(4, m_textures);
 
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -97,8 +93,7 @@ void NGLScene::initializeGL()
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-
-  //loadTexture(shader->getProgramID("quad"), "/home/i7621149/CA1/images/tex12.png", 0);
+  loadTexture(shader->getProgramID("quad"), "/home/i7621149/CA1/images/tex12.png", 0);
   loadTexture(shader->getProgramID("quad"), "/home/i7621149/CA1/images/tex19.png", 1);
   loadTexture(shader->getProgramID("quad"), "/home/i7621149/CA1/images/tex09.png", 2);
   loadTexture(shader->getProgramID("quad"), "/home/i7621149/CA1/images/tex16.png", 3);
@@ -106,14 +101,13 @@ void NGLScene::initializeGL()
   createQuad();
 
   startTimer(16);
-
 }
 
-void NGLScene::loadTexture(GLuint _progID, std::string textureFile, int channelNum)
+void NGLScene::loadTexture(GLuint _progID, std::string _textureFile, int _channelNum)
 {
   //from one of jon's things?
   QImage image;
-  bool loaded=image.load(textureFile.c_str());
+  bool loaded=image.load(_textureFile.c_str());
   if(loaded == true)
   {
     int width=image.width();
@@ -134,19 +128,20 @@ void NGLScene::loadTexture(GLuint _progID, std::string textureFile, int channelN
       }
     }
 
-    glActiveTexture(GL_TEXTURE0 + channelNum);
-    glBindTexture(GL_TEXTURE_2D, m_textures[channelNum]);
+    glActiveTexture(GL_TEXTURE0 + _channelNum);
+    glBindTexture(GL_TEXTURE_2D, m_textures[_channelNum]);
     glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,width,height,0,GL_RGB,GL_UNSIGNED_BYTE,data);
     glGenerateMipmap(GL_TEXTURE_2D); //  Allocate the mipmaps
     //calculate channel name
 
     std::ostringstream convertStream;
-    convertStream << channelNum;
+    convertStream << _channelNum;
     std::string channelName = "iChannel" + convertStream.str();
     std::cout << channelName.c_str() << std::endl;
 
     GLuint texLocation = glGetUniformLocation(_progID, channelName.c_str());
-    glUniform1i(texLocation, channelNum);
+    glUniform1i(texLocation, _channelNum);
+    delete[] data;
   }
 }
 
