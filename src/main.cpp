@@ -1,6 +1,6 @@
-/****************************************************************************
-basic OpenGL demo modified from http://qt-project.org/doc/qt-5.0/qtgui/openglwindow.html
-****************************************************************************/
+/********************************************************************************************************
+OpenGL setup, using QtGui and NGL, modified from http://qt-project.org/doc/qt-5.0/qtgui/openglwindow.html
+*********************************************************************************************************/
 #include <QtGui/QGuiApplication>
 #include <iostream>
 #include "NGLScene.h"

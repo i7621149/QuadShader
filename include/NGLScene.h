@@ -103,7 +103,7 @@ private:
 
     bool m_mouseDown;
 
-    void loadTexture(GLuint _progID);
+    void loadTexture(GLuint _progID, std::string textureFile, int channelNum);
 
     //QOpenGLTexture *m_texture;
 
@@ -111,7 +111,7 @@ private:
 
     int m_lastFrameTime;
 
-    GLuint m_textureName;
+    GLuint m_textures[4];
 };
 
 #endif

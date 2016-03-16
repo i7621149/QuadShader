@@ -7,8 +7,8 @@
 #include <ngl/ShaderLib.h>
 #include <ngl/VAOPrimitives.h>
 #include <iostream>
+#include <sstream>
 #include <ngl/NGLStream.h>
-
 #include <cstdlib>
 
 NGLScene::NGLScene() :
@@ -87,14 +87,26 @@ void NGLScene::initializeGL()
   //tell shader to use it
   shader->use("quad");
 
+
+  glGenTextures(4, m_textures);
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+
+  loadTexture(shader->getProgramID("quad"), "/home/i7621149/CA1/images/tex12.png", 0);
+  //loadTexture(shader->getProgramID("quad"), "/home/i7621149/CA1/images/music.png", 1);
+
   createQuad();
-  loadTexture(shader->getProgramID("quad"));
 
   startTimer(16);
 
 }
 
-void NGLScene::loadTexture(GLuint _progID)
+void NGLScene::loadTexture(GLuint _progID, std::string textureFile, int channelNum)
 {
   QImage image;
   bool loaded=image.load("/home/i7621149/CA1/images/tex12.png");
@@ -117,32 +129,42 @@ void NGLScene::loadTexture(GLuint _progID)
         data[index++]=qBlue(colour);
       }
     }
+    QImage image1;
+    image1.load("/home/i7621149/CA1/images/music.png");
+    unsigned char *data1 = new unsigned char[ width*height*3];
+    unsigned int index1=0;
+    QRgb colour1;
+    for( int y=0; y<height; ++y)
+    {
+      for( int x=0; x<width; ++x)
+      {
+        colour1=image1.pixel(x,y);
 
-//    tex1
-
-  //  glActiveTexture(GL_TEXTURE0);
-
-
-    //glGenTextures(1,&m_textureName);
-    glBindTexture(GL_TEXTURE_2D,m_textureName);
-
-
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-
-    glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,width,height,0,GL_RGB,GL_UNSIGNED_BYTE,data);
-
-    glGenerateMipmap(GL_TEXTURE_2D); //  Allocate the mipmaps
-
-    glUseProgram(_progID);
-
-    GLuint texLocaction;
-    texLocaction = glGetUniformLocation(_progID, "iChannel0");
-    glUniform1i(texLocaction, 0);
+        data1[index1++]=qRed(colour1);
+        data1[index1++]=qGreen(colour1);
+        data1[index1++]=qBlue(colour1);
+      }
+    }
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_textureName);
+    glBindTexture(GL_TEXTURE_2D, m_textures[0]);
+    glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,width,height,0,GL_RGB,GL_UNSIGNED_BYTE,data);
+    glGenerateMipmap(GL_TEXTURE_2D); //  Allocate the mipmaps
+
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, m_textures[1]);
+    glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,width,height,0,GL_RGB,GL_UNSIGNED_BYTE,data1);
+    glGenerateMipmap(GL_TEXTURE_2D); //  Allocate the mipmaps, do i need to call twice?
+
+    //calculate channel name
+    //std::ostringstream convertStream;
+    //convertStream << channelNum;
+    //std::string channelName = "iChannel" + convertStream.str();
+    //std::cout << channelName.c_str() << std::endl;
+    GLuint texLocation = glGetUniformLocation(_progID, "iChannel0");
+    GLuint texLocation1 = glGetUniformLocation(_progID, "iChannel1");
+    glUniform1i(texLocation, 0);
+    glUniform1i(texLocation1, 1);
   }
 }
 
