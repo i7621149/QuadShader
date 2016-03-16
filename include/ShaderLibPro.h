@@ -3,8 +3,9 @@
 
 #include <ngl/ShaderLib.h>
 
-class ShaderLibPro
+class ShaderLibPro : public ngl::ShaderLib
 {
+  friend class ngl::ShaderLib;
 public :
 
 private :

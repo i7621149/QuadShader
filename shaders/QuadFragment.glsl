@@ -69,7 +69,7 @@ void main()
 //----------------------------------------------------------------------------------------------------------------//
 
 //----------------------------------------------------------------------------------------------------------------//
-
+/*
 const int max_iterations = 45;
 const float stop_threshold = 0.001;
 const float grad_step = 0.001;
@@ -125,7 +125,7 @@ vec2 cartesianToSpherical(vec3 p) {
 
 float furDensity(vec3 pos) {
   vec2 uv = cartesianToSpherical(pos.xzy);
-  vec4 tex = texture2D(iChannel0, uv * uvScale);
+  vec4 tex = texture2D(iChannel1, uv * uvScale);
 
   float density = smoothstep(furThreshold, 1.0, tex.x);
   //float density = 1.0;
@@ -258,7 +258,7 @@ void main()
 
   fragColor = vec4(2. * color, 1.0 );
 }
-
+*/
 //----------------------------------------------------------------------------------------------------------------//
 
 //----------------------------------------------------------------------------------------------------------------//
@@ -411,7 +411,7 @@ void main()
 
 
 
-/*
+
 // Created by inigo quilez - 2015
 // License Creative Commons Attribution-NonCommercial-ShareAlike 3.0
 
@@ -1219,4 +1219,4 @@ void main()
 
     fragColor = vec4( col, 1.0 );
 }
-*/
+
