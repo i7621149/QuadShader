@@ -1,0 +1,8 @@
+FIX void ShaderLibPro::newShaderProgram(std::string _progName, std::string _fragFile, std::string _vertFile )
+
+
+Be able to switch between different shaders
+
+GEO shader
+Buffers
+Shadows

@@ -1,5 +1,5 @@
 #version 410 core
-//very simple shader for quad
+//very simple shader, can be changed
 layout (location = 0) in vec3  inPosition;
 
 void main()

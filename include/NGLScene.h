@@ -6,10 +6,8 @@
 #include <ngl/Transformation.h>
 #include <ngl/Text.h>
 #include <QOpenGLWindow>
-
 #include <QOpenGLTexture>
-
-#include <QDateTime>
+#include <QTime>
 
 //----------------------------------------------------------------------------------------------------------------------
 /// @file NGLScene.h
@@ -23,7 +21,6 @@
 /// @brief our main glwindow widget for NGL applications all drawing elements are
 /// put in this file
 //----------------------------------------------------------------------------------------------------------------------
-
 class NGLScene : public QOpenGLWindow
 {
 public:
@@ -54,7 +51,6 @@ private:
   void resizeGL(QResizeEvent *_event);
   // Qt 5.x uses this instead! http://doc.qt.io/qt-5/qopenglwindow.html#resizeGL
   void resizeGL(int _w, int _h);
-
   //----------------------------------------------------------------------------------------------------------------------
   /// @brief Qt Event called when a key is pressed
   /// @param [in] _event the Qt event to query for size etc
@@ -77,7 +73,6 @@ private:
   /// @param _event the Qt Event structure
   //----------------------------------------------------------------------------------------------------------------------
   void mouseReleaseEvent ( QMouseEvent *_event );
-
   //----------------------------------------------------------------------------------------------------------------------
   /// @brief this method is called everytime the mouse wheel is moved
   /// inherited from QObject and overridden here.
@@ -110,14 +105,11 @@ private:
   /// @param _channelNum the texture unit to use
   //----------------------------------------------------------------------------------------------------------------------
 
-  //Could just use a vector of textures? And find which ones are empty, and have a remove texture function?
-  void loadTexture(GLuint _progID, std::string _textureFile, int _channelNum);
-
-  QDateTime m_dateTime;
+  QTime m_time;
 
   int m_lastFrameTime;
 
-  GLuint m_textures[4];
+  GLuint m_textures[8];
 };
 
 #endif
