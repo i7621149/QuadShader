@@ -52,7 +52,7 @@ void NGLScene::initializeGL()
 
   ShaderLibPro *shader = ShaderLibPro::instance();
   // using shaderLibPro to generate simple vert/frag shaders
-  shader->newShaderProgram("base", "shaders/QuadVertex.glsl", "shaders/BaseFragment.glsl");
+  shader->newShaderProgram("base", "shaders/NewFragment.glsl", "shaders/QuadVertex.glsl");
   // generate texture unit ids
   glGenTextures(8, m_textures);
   // load textures to the 4 active texture units
@@ -207,10 +207,10 @@ void NGLScene::timerEvent(QTimerEvent *)
     //std::cout << p.x() << ", " << p.y() << std::endl;
     mouseData[0] = p.x();
     mouseData[1] = m_height-p.y();
-    mouseData[2] = 1.0; //mouse is pressed
+    mouseData[2] = 1.0; // mouse is pressed
   }
   else{
-    mouseData[2] = 0.0; //mouse is not pressed
+    mouseData[2] = 0.0; // mouse is not pressed
   }
   ngl::ShaderLib::instance()->setRegisteredUniform("iMouse", mouseData);
 

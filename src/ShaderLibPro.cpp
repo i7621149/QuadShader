@@ -2,6 +2,7 @@
 
 #include <QImage>
 #include <sstream>
+#include <fstream>
 
 ShaderLibPro::ShaderLibPro() :
   m_shader(ngl::ShaderLib::instance())
@@ -14,32 +15,37 @@ ShaderLibPro::~ShaderLibPro()
 
 }
 
-void ShaderLibPro::newShaderProgram(std::string _progName, std::string _fragFile, std::string _vertFile )
+void ShaderLibPro::newShaderProgram(const std::string &_progName, const std::string &_fragFile, const std::string &_vertFile)
 {
   ngl::ShaderLib* shader = ngl::ShaderLib::instance();
+  std::string fragShader = _progName + "Frag";
+  std::string vertShader = _progName + "Vert";
+  std::cout << fragShader << ", " << vertShader << std::endl;
 
   shader->createShaderProgram(_progName);
 
-  shader->attachShader("quadVertex", ngl::ShaderType::VERTEX);
-  shader->attachShader("quadFragment", ngl::ShaderType::FRAGMENT);
+  shader->attachShader(vertShader, ngl::ShaderType::VERTEX);
+  shader->attachShader(fragShader, ngl::ShaderType::FRAGMENT);
 
   // load the shaders text source
-  shader->loadShaderSource("quadVertex", "shaders/QuadVertex.glsl");
-  shader->loadShaderSource("quadFragment", "shaders/BaseFragment.glsl");
+  shader->loadShaderSource(vertShader, _vertFile);
+
+  std::string fragShaderSource = loadShaderSource("shaders/BaseFragment.glsl") + loadShaderSource(_fragFile) + "\0";
+  shader->loadShaderSourceFromString(fragShader, fragShaderSource);
 
   // compile source code
-  shader->compileShader("quadVertex");
-  shader->compileShader("quadFragment");
+  shader->compileShader(vertShader);
+  shader->compileShader(fragShader);
 
   // attach to created program
-  shader->attachShaderToProgram("base", "quadVertex");
-  shader->attachShaderToProgram("base", "quadFragment");
+  shader->attachShaderToProgram(_progName, vertShader);
+  shader->attachShaderToProgram(_progName, fragShader);
 
   // link it up
-  shader->linkProgramObject("base");
+  shader->linkProgramObject(_progName);
 }
 
-void ShaderLibPro::useShaderProgram(std::string _progName)
+void ShaderLibPro::useShaderProgram(const std::string &_progName)
 {
   ngl::ShaderLib::instance()->use(_progName);
 }
@@ -103,6 +109,28 @@ void ShaderLibPro::loadTexture(std::string _progName, std::string _textureFile, 
     delete[] data;
   }
   else{
-    std::cout << _textureFile << " was not found" << std::endl;
+    std::cerr << _textureFile << " was not found" << std::endl;
+    exit(EXIT_FAILURE);
   }
+}
+
+// just loading text from files
+std::string ShaderLibPro::loadShaderSource(const std::string &_fileName)
+{
+
+  std::ifstream shaderSource(_fileName.c_str());
+  if(!shaderSource.is_open()){
+    std::cerr << _fileName << " was not found" << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
+  // this is loading the file
+  std::string source = std::string(std::istreambuf_iterator<char>(shaderSource),
+                                   std::istreambuf_iterator<char>()
+                                   );
+  shaderSource.close();
+  // testing that we've got the text from the file
+  std::cout << source << std::endl;
+
+  return source;
 }

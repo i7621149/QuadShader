@@ -1,7 +1,6 @@
 // Created by inigo quilez - 2015
 // License Creative Commons Attribution-NonCommercial-ShareAlike 3.0
 
-
 #define AA 1
 
 float sdSphere( in vec3 p, in vec4 s )
