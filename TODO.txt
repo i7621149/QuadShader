@@ -1,8 +1,6 @@
-FIX void ShaderLibPro::newShaderProgram(std::string _progName, std::string _fragFile, std::string _vertFile )
-
-
-Be able to switch between different shaders
+Buffers
+Compile shaders at runtime // use a button to load and compile textures to channels and switch to new compiled shader
+UI switch
 
 GEO shader
-Buffers
-Shadows
+shadows

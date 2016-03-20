@@ -14,7 +14,9 @@ NGLScene::NGLScene() :
   m_frame(0),
   m_mouseDown(false),
   m_time(QTime::currentTime()),
-  m_lastFrameTime(0)
+  m_lastFrameTime(0),
+  m_textures(4, 0),
+  m_currentShader("default")
 {
   setTitle("Felix's Shader");
 }
@@ -56,20 +58,26 @@ void NGLScene::initializeGL()
   // this allows for automatic generation and compilation of shaders, plus loading texture easily
   ShaderLibPro *shader = ShaderLibPro::instance();
   // using shaderLibPro to generate simple vert/frag shaders
+  shader->newShaderProgram("default", "shaders/DefaultQuadFragment.glsl");
+
   shader->newShaderProgram("snail", "shaders/SnailFragment.glsl");
   shader->newShaderProgram("text", "shaders/TextInfoFragment.glsl");
 
+  // make sure current shader is clearly set
+  setCurrentShader("snail");
+
 
   // generate texture unit ids
-  glGenTextures(4, m_textures);
+  glGenTextures(4, &(m_textures[0]));
   // load textures to the 4 active texture units
-  shader->loadTexture("snail", "/home/i7621149/CA1/images/tex12.png", m_textures, 0);
-  shader->loadTexture("snail", "/home/i7621149/CA1/images/tex19.png", m_textures, 1);
-  shader->loadTexture("snail", "/home/i7621149/CA1/images/tex09.png", m_textures, 2);
-  shader->loadTexture("snail", "/home/i7621149/CA1/images/tex16.png", m_textures, 3);
+  loadTextureToShader("/home/i7621149/CA1/images/tex12.png", 0);
+  loadTextureToShader("/home/i7621149/CA1/images/tex19.png", 1);
+  loadTextureToShader("/home/i7621149/CA1/images/tex09.png", 2);
+  loadTextureToShader("/home/i7621149/CA1/images/tex16.png", 3);
 
-  // should already be used after creating new shader and loading textures but this makes sure
-  setCurrentShader("snail");
+
+
+
 
   // define the quad
   createQuad();
@@ -144,6 +152,11 @@ void NGLScene::setCurrentShader(const std::string &_progName)
   resizeGL(m_width, m_height);
 }
 
+void NGLScene::loadTextureToShader(std::string _textureFile, int _textureUnit)
+{
+  ShaderLibPro::instance()->loadTexture(m_currentShader, _textureFile, &(m_textures[0]), _textureUnit);
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 void NGLScene::mouseMoveEvent (QMouseEvent * _event)
 {
@@ -187,8 +200,9 @@ void NGLScene::keyPressEvent(QKeyEvent *_event)
     case Qt::Key_W : glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); break;
     case Qt::Key_S : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); break;
 
-    case Qt::Key_0 : setCurrentShader("snail"); break;
+    case Qt::Key_0 : setCurrentShader("default"); break;
     case Qt::Key_1 : setCurrentShader("text"); break;
+    case Qt::Key_2 : setCurrentShader("snail"); break;
 
     default : break;
   }

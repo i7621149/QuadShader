@@ -8,6 +8,7 @@
 #include <QOpenGLWindow>
 #include <QOpenGLTexture>
 #include <QTime>
+#include <vector>
 
 //----------------------------------------------------------------------------------------------------------------------
 /// @file NGLScene.h
@@ -44,6 +45,8 @@ public:
   void paintGL();
 
   void setCurrentShader(const std::string &_progName);
+
+  void loadTextureToShader(std::string _textureFile, int _textureUnit);
 
 private:
   //----------------------------------------------------------------------------------------------------------------------
@@ -99,19 +102,16 @@ private:
   void createQuad();
 
   bool m_mouseDown;
-  //----------------------------------------------------------------------------------------------------------------------
-  /// @brief called for loading textures
-  /// can be used with ShaderLib, as long as .getProgramID() is called to get the _progID.
-  /// @param _progID the id of the shader program to use
-  /// @param _textureFile the location of the texture to use
-  /// @param _channelNum the texture unit to use
-  //----------------------------------------------------------------------------------------------------------------------
 
   QTime m_time;
 
   int m_lastFrameTime;
 
-  GLuint m_textures[4];
+  std::vector<GLuint> m_textures;
+
+  std::vector<std::string> m_textureNames;
+
+  GLuint m_frameBuffers[4];
 
   std::string m_currentShader;
 };
