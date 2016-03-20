@@ -108,7 +108,8 @@ vec2 sdDolphinCheap( vec3 p )
   return res;
 }
 
-vec3 ccd, ccp;
+vec3 ccd = vec3(0.0);
+vec3 ccp = vec3(0.0);
 
 vec2 sdDolphin( vec3 p )
 {

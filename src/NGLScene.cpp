@@ -65,8 +65,6 @@ void NGLScene::initializeGL()
   // make sure current shader is clearly set
   setCurrentShader("default");
 
-  // generate texture unit ids
-  //glGenTextures(4, &(m_textures[0]));
   // load textures to the 4 active texture units
   shaderLib->useTexture("textures/tex12.png", 0);
   shaderLib->useTexture("textures/tex19.png", 1);
