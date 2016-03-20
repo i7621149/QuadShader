@@ -46,8 +46,6 @@ public:
 
   void setCurrentShader(const std::string &_progName);
 
-  void loadTextureToShader(std::string _textureFile, int _textureUnit);
-
 private:
   //----------------------------------------------------------------------------------------------------------------------
   /// @brief this is called everytime we resize the window
@@ -106,14 +104,6 @@ private:
   QTime m_time;
 
   int m_lastFrameTime;
-
-  std::vector<GLuint> m_textures;
-
-  std::vector<std::string> m_textureFiles;
-
-  std::vector<GLuint> m_frameBuffers;
-
-  std::string m_currentShader;
 };
 
 #endif

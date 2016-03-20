@@ -14,10 +14,7 @@ NGLScene::NGLScene() :
   m_frame(0),
   m_mouseDown(false),
   m_time(QTime::currentTime()),
-  m_lastFrameTime(0),
-  m_textures(0),
-  m_textureFiles(4, "\0"),
-  m_currentShader("default")
+  m_lastFrameTime(0)
 {
   setTitle("Felix's Shader");
 }
@@ -41,7 +38,7 @@ void NGLScene::resizeGL(int _w , int _h)
   m_width=_w*devicePixelRatio();
   m_height=_h*devicePixelRatio();
   // set resolution in shader
-  // uses a Vec3 to be compatible with Shadertoy
+  // uses a Vec3 to be compatible with Shadertoy, even though resolution is (x,y)
   ngl::ShaderLib::instance()->setRegisteredUniform("iResolution", ngl::Vec3(m_width, m_height, 1.0));
 }
 
@@ -71,11 +68,11 @@ void NGLScene::initializeGL()
   // generate texture unit ids
   //glGenTextures(4, &(m_textures[0]));
   // load textures to the 4 active texture units
-  loadTextureToShader("textures/tex12.png", 0);
-  loadTextureToShader("textures/tex19.png", 1);
-  loadTextureToShader("textures/tex09.png", 2);
-  loadTextureToShader("textures/tex16.png", 3);
-  loadTextureToShader("textures/tex04.png", 4);
+  shaderLib->useTexture("textures/tex12.png", 0);
+  shaderLib->useTexture("textures/tex19.png", 1);
+  shaderLib->useTexture("textures/tex09.png", 2);
+  shaderLib->useTexture("textures/tex16.png", 3);
+  shaderLib->useTexture("textures/tex04.png", 4);
 
   // define the quad
   createQuad();
@@ -141,41 +138,12 @@ void NGLScene::createQuad()
 
 void NGLScene::setCurrentShader(const std::string &_progName)
 {
-  // if it is not the current shader, use shader
-  if(m_currentShader != _progName){
-    ShaderLibPro::instance()->useShaderProgram(_progName);
-    m_currentShader = _progName;
-
-    // load current textures to shader
-    for(int i=0; i<m_textures.size(); i++){
-      ShaderLibPro::instance()->loadTexture(_progName, m_textureFiles[i], &(m_textures[0]), i);
-    }
-
-    // set resolution to update in shader
+  if(ShaderLibPro::instance()->useShaderProgram(_progName)){
+    // resize to send info to shader
     resizeGL(m_width, m_height);
   }
 }
 
-void NGLScene::loadTextureToShader(std::string _textureFile, int _textureUnit)
-{
-  // if the texture unit id isn't generated yet, do so
-  int numOfTextures = m_textures.size();
-  if(_textureUnit >= numOfTextures){
-      if(_textureUnit > numOfTextures){
-        std::cout << "texture unit specified is higher than necessary" << std::endl;
-        std::cout << "generating texture " << numOfTextures << ", rather than texture " << _textureUnit << std::endl;
-      }
-      _textureUnit = numOfTextures;
-      // add texture file and id to vectors
-      m_textureFiles.push_back("\0");
-      m_textures.push_back(0);
-      glGenTextures( 1, &(m_textures[numOfTextures]) );
-  }
-
-  // set file string in vector
-  m_textureFiles[_textureUnit] = _textureFile;
-  ShaderLibPro::instance()->loadTexture(m_currentShader, _textureFile, &(m_textures[0]), _textureUnit);
-}
 
 //----------------------------------------------------------------------------------------------------------------------
 void NGLScene::mouseMoveEvent (QMouseEvent * _event)

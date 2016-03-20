@@ -12,7 +12,7 @@ class ShaderLibPro : public ngl::Singleton<ShaderLibPro>
 public :
   void newShaderProgram(const std::string &_progName, const std::string &_fragFile, const std::string &_vertFile = "shaders/QuadVertex.glsl");
 
-  void useShaderProgram(const std::string &_progName);
+  int useShaderProgram(const std::string &_progName);
 
   void useTexture(std::string _textureFile, int _textureUnit);
 

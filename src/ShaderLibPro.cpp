@@ -6,7 +6,8 @@
 
 ShaderLibPro::ShaderLibPro() :
   m_shader(ngl::ShaderLib::instance()),
-  m_textures(0)
+  m_textures(0),
+  m_currentShader("snail")
 {
 
 }
@@ -48,9 +49,25 @@ void ShaderLibPro::newShaderProgram(const std::string &_progName, const std::str
   useShaderProgram(_progName);
 }
 
-void ShaderLibPro::useShaderProgram(const std::string &_progName)
+int ShaderLibPro::useShaderProgram(const std::string &_progName)
 {
-  m_shader->use(_progName);
+  // if it is not the current shader, use shader
+  if(m_currentShader != _progName){
+    m_shader->use(_progName);
+    m_currentShader = _progName;
+
+    // load current textures to shader
+    for(int i=0; i<m_textures.size(); i++){
+      loadTexture(_progName, m_textureFiles[i], &(m_textures[0]), i);
+    }
+
+    // return 1 for using different program
+    return 1;
+  }
+  else{
+    // return 0 if shader has not changed
+    return 0;
+  }
 }
 
 void ShaderLibPro::useTexture(std::string _textureFile, int _textureUnit)
@@ -71,9 +88,7 @@ void ShaderLibPro::useTexture(std::string _textureFile, int _textureUnit)
 
   // set file string in vector
   m_textureFiles[_textureUnit] = _textureFile;
-
-  ShaderLibPro::instance()->loadTexture(m_currentShader, _textureFile, &(m_textures[0]), _textureUnit);
-}
+  loadTexture(m_currentShader, _textureFile, &(m_textures[0]), _textureUnit);}
 
 void ShaderLibPro::loadTexture(std::string _progName, std::string _textureFile, GLuint *textures, int _channelNum)
 {
