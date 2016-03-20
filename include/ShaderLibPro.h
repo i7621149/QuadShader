@@ -14,16 +14,18 @@ public :
 
   int useShaderProgram(const std::string &_progName);
 
-  void useTexture(std::string _textureFile, int _textureUnit);
+  void useTexture( int _textureUnit, const std::string &_textureFile = "");
 
 private :
   ShaderLibPro();
   ~ShaderLibPro();
   std::string loadShaderSource(const std::string &_fileName);
 
-  void loadTexture(std::string _textureFile, int _channelNum);
+  void loadTextureFile(int _channelNum, const std::string &_textureFile = "");
 
   void createFrameBuffer(int _bufferNum, int _textureUnit);
+
+  void createBufferTexture(int _textureUnit);
 
   // using a pointer attribute to avoid creating it locally at the start of every function
   ngl::ShaderLib *m_shader;

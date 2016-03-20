@@ -66,11 +66,11 @@ void NGLScene::initializeGL()
   setCurrentShader("default");
 
   // load textures to the 4 active texture units
-  shaderLib->useTexture("textures/tex12.png", 0);
-  shaderLib->useTexture("textures/tex19.png", 1);
-  shaderLib->useTexture("textures/tex09.png", 2);
-  shaderLib->useTexture("textures/tex16.png", 3);
-  shaderLib->useTexture("textures/tex04.png", 4);
+  shaderLib->useTexture(0, "textures/tex12.png");
+  shaderLib->useTexture(1, "textures/tex19.png");
+  shaderLib->useTexture(2, "textures/tex09.png");
+  shaderLib->useTexture(3, "textures/tex16.png");
+  shaderLib->useTexture(4, "textures/tex04.png");
 
   // define the quad
   createQuad();

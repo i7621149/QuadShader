@@ -85,7 +85,7 @@ int ShaderLibPro::useShaderProgram(const std::string &_progName)
 
     // load current textures to shader
     for(int i=0; i<m_textures.size(); i++){
-      loadTexture(m_textureFiles[i], i);
+      loadTextureFile(i, m_textureFiles[i]);
     }
 
     // return 1 for using different program
@@ -97,7 +97,7 @@ int ShaderLibPro::useShaderProgram(const std::string &_progName)
   }
 }
 
-void ShaderLibPro::useTexture(std::string _textureFile, int _textureUnit)
+void ShaderLibPro::useTexture(int _textureUnit, const std::string &_textureFile)
 {
   // if the texture unit id isn't generated yet, do so
   int numOfTextures = m_textures.size();
@@ -110,17 +110,21 @@ void ShaderLibPro::useTexture(std::string _textureFile, int _textureUnit)
         _textureUnit = numOfTextures;
       }
       // add texture file and id to vectors
-      m_textureFiles.push_back("\0");
+      m_textureFiles.push_back("");
       m_textures.push_back(0);
       glGenTextures( 1, &(m_textures[numOfTextures]) );
   }
 
   // set file string in vector
   m_textureFiles[_textureUnit] = _textureFile;
-  loadTexture(_textureFile, _textureUnit);
+
+  // if a string is given, load file
+  if(_textureFile != ""){
+    loadTextureFile(_textureUnit, _textureFile);
+  }
 }
 
-void ShaderLibPro::loadTexture(std::string _textureFile, int _channelNum)
+void ShaderLibPro::loadTextureFile(int _channelNum, const std::string &_textureFile)
 {
   // based on jon's image loading
   GLuint progID = m_shader->getProgramID(m_currentShader);
@@ -208,4 +212,9 @@ void ShaderLibPro::createFrameBuffer(int _bufferNum, int _textureUnit)
   // set file string in vector
   //m_textureFiles[_textureUnit] = _textureFile;
   //loadTexture(m_currentShader, _textureFile, &(m_textures[0]), _textureUnit);
+}
+
+void ShaderLibPro::createBufferTexture(int _textureUnit)
+{
+ // glGenTextures();
 }
