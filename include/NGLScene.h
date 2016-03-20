@@ -109,9 +109,9 @@ private:
 
   std::vector<GLuint> m_textures;
 
-  std::vector<std::string> m_textureNames;
+  std::vector<std::string> m_textureFiles;
 
-  GLuint m_frameBuffers[4];
+  std::vector<GLuint> m_frameBuffers;
 
   std::string m_currentShader;
 };

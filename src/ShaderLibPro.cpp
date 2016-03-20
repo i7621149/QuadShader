@@ -5,7 +5,8 @@
 #include <fstream>
 
 ShaderLibPro::ShaderLibPro() :
-  m_shader(ngl::ShaderLib::instance())
+  m_shader(ngl::ShaderLib::instance()),
+  m_textures(0)
 {
 
 }
@@ -52,6 +53,28 @@ void ShaderLibPro::useShaderProgram(const std::string &_progName)
   m_shader->use(_progName);
 }
 
+void ShaderLibPro::useTexture(std::string _textureFile, int _textureUnit)
+{
+  // if the texture unit id isn't generated yet, do so
+  int numOfTextures = m_textures.size();
+  if(_textureUnit >= numOfTextures){
+      if(_textureUnit > numOfTextures){
+        std::cout << "texture unit specified is higher than necessary" << std::endl;
+        std::cout << "generating texture " << numOfTextures << ", rather than texture " << _textureUnit << std::endl;
+      }
+      _textureUnit = numOfTextures;
+      // add texture file and id to vectors
+      m_textureFiles.push_back("\0");
+      m_textures.push_back(0);
+      glGenTextures( 1, &(m_textures[numOfTextures]) );
+  }
+
+  // set file string in vector
+  m_textureFiles[_textureUnit] = _textureFile;
+
+  ShaderLibPro::instance()->loadTexture(m_currentShader, _textureFile, &(m_textures[0]), _textureUnit);
+}
+
 void ShaderLibPro::loadTexture(std::string _progName, std::string _textureFile, GLuint *textures, int _channelNum)
 {
   // make sure program is active otherwise this will break
@@ -69,7 +92,8 @@ void ShaderLibPro::loadTexture(std::string _progName, std::string _textureFile, 
 
     unsigned char *data = new unsigned char[ width*height*3];
     unsigned int index=0;
-    for( int y=0; y<height; ++y)
+    // reversed height so it loads as is used in shader
+    for( int y=height-1; y>=0; --y)
     {
       for( int x=0; x<width; ++x)
       {

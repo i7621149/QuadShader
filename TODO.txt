@@ -2,5 +2,7 @@ Buffers
 Compile shaders at runtime // use a button to load and compile textures to channels and switch to new compiled shader
 UI switch
 
+add TextureCube function
+
 GEO shader
 shadows

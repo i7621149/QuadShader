@@ -15,7 +15,8 @@ NGLScene::NGLScene() :
   m_mouseDown(false),
   m_time(QTime::currentTime()),
   m_lastFrameTime(0),
-  m_textures(4, 0),
+  m_textures(0),
+  m_textureFiles(4, "\0"),
   m_currentShader("default")
 {
   setTitle("Felix's Shader");
@@ -56,28 +57,25 @@ void NGLScene::initializeGL()
   glEnable(GL_MULTISAMPLE);
 
   // this allows for automatic generation and compilation of shaders, plus loading texture easily
-  ShaderLibPro *shader = ShaderLibPro::instance();
+  ShaderLibPro *shaderLib = ShaderLibPro::instance();
   // using shaderLibPro to generate simple vert/frag shaders
-  shader->newShaderProgram("default", "shaders/DefaultQuadFragment.glsl");
+  shaderLib->newShaderProgram("default", "shaders/DefaultQuadFragment.glsl");
 
-  shader->newShaderProgram("snail", "shaders/SnailFragment.glsl");
-  shader->newShaderProgram("text", "shaders/TextInfoFragment.glsl");
+  shaderLib->newShaderProgram("text", "shaders/TextInfoFragment.glsl");
+  shaderLib->newShaderProgram("snail", "shaders/SnailFragment.glsl");
+  shaderLib->newShaderProgram("new", "shaders/NewFragment.glsl");
 
   // make sure current shader is clearly set
-  setCurrentShader("snail");
-
+  setCurrentShader("default");
 
   // generate texture unit ids
-  glGenTextures(4, &(m_textures[0]));
+  //glGenTextures(4, &(m_textures[0]));
   // load textures to the 4 active texture units
-  loadTextureToShader("/home/i7621149/CA1/images/tex12.png", 0);
-  loadTextureToShader("/home/i7621149/CA1/images/tex19.png", 1);
-  loadTextureToShader("/home/i7621149/CA1/images/tex09.png", 2);
-  loadTextureToShader("/home/i7621149/CA1/images/tex16.png", 3);
-
-
-
-
+  loadTextureToShader("textures/tex12.png", 0);
+  loadTextureToShader("textures/tex19.png", 1);
+  loadTextureToShader("textures/tex09.png", 2);
+  loadTextureToShader("textures/tex16.png", 3);
+  loadTextureToShader("textures/tex04.png", 4);
 
   // define the quad
   createQuad();
@@ -143,17 +141,39 @@ void NGLScene::createQuad()
 
 void NGLScene::setCurrentShader(const std::string &_progName)
 {
-  // use shader
+  // if it is not the current shader, use shader
   if(m_currentShader != _progName){
     ShaderLibPro::instance()->useShaderProgram(_progName);
     m_currentShader = _progName;
+
+    // load current textures to shader
+    for(int i=0; i<m_textures.size(); i++){
+      ShaderLibPro::instance()->loadTexture(_progName, m_textureFiles[i], &(m_textures[0]), i);
+    }
+
+    // set resolution to update in shader
+    resizeGL(m_width, m_height);
   }
-  // set resolution of shader
-  resizeGL(m_width, m_height);
 }
 
 void NGLScene::loadTextureToShader(std::string _textureFile, int _textureUnit)
 {
+  // if the texture unit id isn't generated yet, do so
+  int numOfTextures = m_textures.size();
+  if(_textureUnit >= numOfTextures){
+      if(_textureUnit > numOfTextures){
+        std::cout << "texture unit specified is higher than necessary" << std::endl;
+        std::cout << "generating texture " << numOfTextures << ", rather than texture " << _textureUnit << std::endl;
+      }
+      _textureUnit = numOfTextures;
+      // add texture file and id to vectors
+      m_textureFiles.push_back("\0");
+      m_textures.push_back(0);
+      glGenTextures( 1, &(m_textures[numOfTextures]) );
+  }
+
+  // set file string in vector
+  m_textureFiles[_textureUnit] = _textureFile;
   ShaderLibPro::instance()->loadTexture(m_currentShader, _textureFile, &(m_textures[0]), _textureUnit);
 }
 
@@ -203,6 +223,7 @@ void NGLScene::keyPressEvent(QKeyEvent *_event)
     case Qt::Key_0 : setCurrentShader("default"); break;
     case Qt::Key_1 : setCurrentShader("text"); break;
     case Qt::Key_2 : setCurrentShader("snail"); break;
+    case Qt::Key_3 : setCurrentShader("new"); break;
 
     default : break;
   }
@@ -218,18 +239,18 @@ void NGLScene::keyPressEvent(QKeyEvent *_event)
 
 void NGLScene::timerEvent(QTimerEvent *)
 {
-  ngl::ShaderLib *shader=ngl::ShaderLib::instance();
+  ngl::ShaderLib *shaderLib=ngl::ShaderLib::instance();
 
   //getting seconds by dividing milliseconds by 1000
   float globalSeconds = m_time.elapsed()/1000.0;
-  shader->setRegisteredUniform("iGlobalTime", globalSeconds);
+  shaderLib->setRegisteredUniform("iGlobalTime", globalSeconds);
 
   QDate date = QDate::currentDate();
   float dateYear = date.year();
   float dateMonth = date.month();
   float dateDay = date.day();
   float dateSeconds = (m_time.msecsSinceStartOfDay() + m_time.elapsed()) / 1000.0;
-  shader->setRegisteredUniform("iDate", dateYear, dateMonth, dateDay, dateSeconds);
+  shaderLib->setRegisteredUniform("iDate", dateYear, dateMonth, dateDay, dateSeconds);
 
   ngl::Vec4 mouseData;
   if(m_mouseDown){
@@ -242,7 +263,7 @@ void NGLScene::timerEvent(QTimerEvent *)
   else{
     mouseData[2] = 0.0; // mouse is not pressed
   }
-  ngl::ShaderLib::instance()->setRegisteredUniform("iMouse", mouseData);
+  shaderLib->setRegisteredUniform("iMouse", mouseData);
 
   update();
 }

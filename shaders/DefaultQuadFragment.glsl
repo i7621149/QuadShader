@@ -5,7 +5,7 @@
 //             from https://www.shadertoy.com/new             //
 //    This outputs a colour gradient that varies with time    //
 //                                                            //
-//    Most shaders written in Shadertoy format should work    //
+//   On compilation this is combined with BaseFragment.glsl   //
 //                                                            //
 //------------------------------------------------------------//
 
