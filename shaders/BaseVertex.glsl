@@ -1,8 +1,10 @@
 #version 410 core
-//very simple shader, can be changed
+
+// positions in
 layout (location = 0) in vec3  inPosition;
 
-void main()
-{
-  gl_Position = vec4(inPosition, 1.0);
-}
+// normals in
+layout (location = 2) in vec3 inNormal;
+
+// uvs in
+layout (location = 1) in vec2 inUV;

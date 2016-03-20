@@ -29,6 +29,7 @@ void NGLScene::resizeGL(QResizeEvent *_event)
   m_width=_event->size().width()*devicePixelRatio();
   m_height=_event->size().height()*devicePixelRatio();
   // set resolution in shader
+  // uses a Vec3 to be compatible with Shadertoy
   ngl::ShaderLib::instance()->setRegisteredUniform("iResolution", ngl::Vec3(m_width, m_height, 1.0));
 }
 
@@ -36,6 +37,8 @@ void NGLScene::resizeGL(int _w , int _h)
 {
   m_width=_w*devicePixelRatio();
   m_height=_h*devicePixelRatio();
+  // set resolution in shader
+  // uses a Vec3 to be compatible with Shadertoy
   ngl::ShaderLib::instance()->setRegisteredUniform("iResolution", ngl::Vec3(m_width, m_height, 1.0));
 }
 
@@ -50,26 +53,30 @@ void NGLScene::initializeGL()
   // enable multisampling for smoother drawing
   glEnable(GL_MULTISAMPLE);
 
+  // this allows for automatic generation and compilation of shaders, plus loading texture easily
   ShaderLibPro *shader = ShaderLibPro::instance();
   // using shaderLibPro to generate simple vert/frag shaders
-  shader->newShaderProgram("base", "shaders/NewFragment.glsl", "shaders/QuadVertex.glsl");
-  // generate texture unit ids
-  glGenTextures(8, m_textures);
-  // load textures to the 4 active texture units
-  shader->loadTexture("base", "/home/i7621149/CA1/images/tex12.png", m_textures, 0);
-  shader->loadTexture("base", "/home/i7621149/CA1/images/tex19.png", m_textures, 1);
-  shader->loadTexture("base", "/home/i7621149/CA1/images/tex09.png", m_textures, 2);
-  shader->loadTexture("base", "/home/i7621149/CA1/images/tex16.png", m_textures, 3);
+  shader->newShaderProgram("snail", "shaders/SnailFragment.glsl");
+  shader->newShaderProgram("text", "shaders/TextInfoFragment.glsl");
 
-  shader->useShaderProgram("base");
+
+  // generate texture unit ids
+  glGenTextures(4, m_textures);
+  // load textures to the 4 active texture units
+  shader->loadTexture("snail", "/home/i7621149/CA1/images/tex12.png", m_textures, 0);
+  shader->loadTexture("snail", "/home/i7621149/CA1/images/tex19.png", m_textures, 1);
+  shader->loadTexture("snail", "/home/i7621149/CA1/images/tex09.png", m_textures, 2);
+  shader->loadTexture("snail", "/home/i7621149/CA1/images/tex16.png", m_textures, 3);
+
+  // should already be used after creating new shader and loading textures but this makes sure
+  setCurrentShader("snail");
 
   // define the quad
   createQuad();
 
   // set up timer loop
-  startTimer(10);
+  startTimer(16);
 }
-
 
 void NGLScene::paintGL()
 {
@@ -95,7 +102,7 @@ void NGLScene::paintGL()
 
 void NGLScene::createQuad()
 {
-  // a simple quad object, from Jon's code
+  // a simple quad object which fills the screen, from Jon's code
   float* vert = new float[18];
   const static float s=1.0;
   vert[0] =-s; vert[1] =  s; vert[2] =-1.0;
@@ -124,6 +131,17 @@ void NGLScene::createQuad()
 
   // clean up
   delete [] vert;
+}
+
+void NGLScene::setCurrentShader(const std::string &_progName)
+{
+  // use shader
+  if(m_currentShader != _progName){
+    ShaderLibPro::instance()->useShaderProgram(_progName);
+    m_currentShader = _progName;
+  }
+  // set resolution of shader
+  resizeGL(m_width, m_height);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -168,12 +186,10 @@ void NGLScene::keyPressEvent(QKeyEvent *_event)
     case Qt::Key_Escape : QGuiApplication::exit(EXIT_SUCCESS); break;
     case Qt::Key_W : glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); break;
     case Qt::Key_S : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); break;
-    /*
-    case Qt::Key_0 : newMode = 0; break;
-    case Qt::Key_1 : newMode = 1; break;
-    case Qt::Key_2 : newMode = 2; break;
-    case Qt::Key_3 : newMode = 3; break;
-    */
+
+    case Qt::Key_0 : setCurrentShader("snail"); break;
+    case Qt::Key_1 : setCurrentShader("text"); break;
+
     default : break;
   }
   /*

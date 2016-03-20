@@ -43,6 +43,8 @@ public:
   //----------------------------------------------------------------------------------------------------------------------
   void paintGL();
 
+  void setCurrentShader(const std::string &_progName);
+
 private:
   //----------------------------------------------------------------------------------------------------------------------
   /// @brief this is called everytime we resize the window
@@ -109,7 +111,9 @@ private:
 
   int m_lastFrameTime;
 
-  GLuint m_textures[8];
+  GLuint m_textures[4];
+
+  std::string m_currentShader;
 };
 
 #endif

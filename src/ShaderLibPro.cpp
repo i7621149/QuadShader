@@ -17,43 +17,48 @@ ShaderLibPro::~ShaderLibPro()
 
 void ShaderLibPro::newShaderProgram(const std::string &_progName, const std::string &_fragFile, const std::string &_vertFile)
 {
-  ngl::ShaderLib* shader = ngl::ShaderLib::instance();
   std::string fragShader = _progName + "Frag";
   std::string vertShader = _progName + "Vert";
   std::cout << fragShader << ", " << vertShader << std::endl;
 
-  shader->createShaderProgram(_progName);
+  m_shader->createShaderProgram(_progName);
 
-  shader->attachShader(vertShader, ngl::ShaderType::VERTEX);
-  shader->attachShader(fragShader, ngl::ShaderType::FRAGMENT);
+  m_shader->attachShader(vertShader, ngl::ShaderType::VERTEX);
+  m_shader->attachShader(fragShader, ngl::ShaderType::FRAGMENT);
 
-  // load the shaders text source
-  shader->loadShaderSource(vertShader, _vertFile);
+  // create shader from vert source and base, which includes version and layout in
+  std::string vertShaderSource = loadShaderSource("shaders/BaseVertex.glsl") + loadShaderSource(_vertFile) + "\0";
+  m_shader->loadShaderSourceFromString(vertShader, vertShaderSource);
 
+  // create shader from frag source and base, which includes version and uniforms
   std::string fragShaderSource = loadShaderSource("shaders/BaseFragment.glsl") + loadShaderSource(_fragFile) + "\0";
-  shader->loadShaderSourceFromString(fragShader, fragShaderSource);
+  m_shader->loadShaderSourceFromString(fragShader, fragShaderSource);
 
   // compile source code
-  shader->compileShader(vertShader);
-  shader->compileShader(fragShader);
+  m_shader->compileShader(vertShader);
+  m_shader->compileShader(fragShader);
 
   // attach to created program
-  shader->attachShaderToProgram(_progName, vertShader);
-  shader->attachShaderToProgram(_progName, fragShader);
+  m_shader->attachShaderToProgram(_progName, vertShader);
+  m_shader->attachShaderToProgram(_progName, fragShader);
 
   // link it up
-  shader->linkProgramObject(_progName);
+  m_shader->linkProgramObject(_progName);
+  useShaderProgram(_progName);
 }
 
 void ShaderLibPro::useShaderProgram(const std::string &_progName)
 {
-  ngl::ShaderLib::instance()->use(_progName);
+  m_shader->use(_progName);
 }
 
 void ShaderLibPro::loadTexture(std::string _progName, std::string _textureFile, GLuint *textures, int _channelNum)
 {
+  // make sure program is active otherwise this will break
+  useShaderProgram(_progName);
   // based on jon's image loading
-  GLuint progID = ngl::ShaderLib::instance()->getProgramID(_progName);
+  GLuint progID = m_shader->getProgramID(_progName);
+
   QImage image;
   // load given texture files
   bool loaded=image.load(_textureFile.c_str());
@@ -103,7 +108,7 @@ void ShaderLibPro::loadTexture(std::string _progName, std::string _textureFile, 
     GLuint texLocation = glGetUniformLocation(progID, channelName.c_str());
     glUniform1i(texLocation, _channelNum);
 
-    // print info to confirm texture loaded, i think it can be slow
+    // print info to confirm texture loaded
     std::cout << "Loaded texture to " << channelName.c_str() << std::endl;
     // clean up
     delete[] data;
@@ -130,7 +135,7 @@ std::string ShaderLibPro::loadShaderSource(const std::string &_fileName)
                                    );
   shaderSource.close();
   // testing that we've got the text from the file
-  std::cout << source << std::endl;
+  //std::cout << source << std::endl;
 
   return source;
 }
