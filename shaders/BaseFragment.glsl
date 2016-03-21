@@ -39,6 +39,7 @@ uniform vec4 iDate;
 //----------------------------------------------------------------------------------------------------------------//
 
 // more textures than shadertoy allows
+// preferable to add these at compile time?
 uniform sampler2D iChannel4;
 uniform sampler2D iChannel5;
 uniform sampler2D iChannel6;

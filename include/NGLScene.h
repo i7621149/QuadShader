@@ -60,6 +60,9 @@ private:
   //----------------------------------------------------------------------------------------------------------------------
   void keyPressEvent(QKeyEvent *_event);
   //----------------------------------------------------------------------------------------------------------------------
+  void toggleFullScreen();
+
+
   /// @brief this method is called every time a mouse is moved
   /// @param _event the Qt Event structure
   //----------------------------------------------------------------------------------------------------------------------
@@ -98,6 +101,8 @@ private:
   int m_frame;
 
   void createQuad();
+
+  bool m_fullScreen;
 
   bool m_mouseDown;
 

@@ -3,7 +3,6 @@
 #include <QImage>
 #include <sstream>
 #include <fstream>
-//does this work in labs?
 #include <boost/algorithm/string/replace.hpp>
 
 ShaderLibPro::ShaderLibPro() :
@@ -92,7 +91,7 @@ int ShaderLibPro::useShaderProgram(const std::string &_progName)
     m_shader->use(_progName);
     m_currentShader = _progName;
 
-    // load current textures to shader
+    // load/reload current textures to shader
     for(int i=0; i<m_textures.size(); i++){
       std::cout << "accessing texture " << i <<std::endl;
       loadTextureFile(i, m_textureFiles[i]);

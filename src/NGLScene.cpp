@@ -12,6 +12,7 @@
 
 NGLScene::NGLScene() :
   m_frame(0),
+  m_fullScreen(false),
   m_mouseDown(false),
   m_time(QTime::currentTime()),
   m_lastFrameTime(0)
@@ -71,7 +72,6 @@ void NGLScene::initializeGL()
   shaderLib->useTexture(2, "textures/tex09.png");
   shaderLib->useTexture(3, "textures/tex16.png");
   shaderLib->useTexture(4, "textures/tex04.png");
-
 
   //shaderLib->createFrameBuffer(0, 1);
 
@@ -186,8 +186,13 @@ void NGLScene::keyPressEvent(QKeyEvent *_event)
   {
   // escape key to quite
     case Qt::Key_Escape : QGuiApplication::exit(EXIT_SUCCESS); break;
+
+    // render wireframe or shaded, mostly for bugfixing
     case Qt::Key_W : glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); break;
     case Qt::Key_S : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); break;
+
+    // toggle fullscreen because who has time for two buttons for this
+    case Qt::Key_F : toggleFullScreen(); break;
 
     case Qt::Key_0 : setCurrentShader("default"); break;
     case Qt::Key_1 : setCurrentShader("text"); break;
@@ -235,4 +240,11 @@ void NGLScene::timerEvent(QTimerEvent *)
   shaderLib->setRegisteredUniform("iMouse", mouseData);
 
   update();
+}
+
+void NGLScene::toggleFullScreen()
+{
+  // complex fullscreen shaders can be expensive and slow, so be careful
+  m_fullScreen ^= true;
+  m_fullScreen ? showFullScreen() : showNormal();
 }
