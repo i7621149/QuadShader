@@ -3,6 +3,8 @@
 #include <QImage>
 #include <sstream>
 #include <fstream>
+//does this work in labs?
+#include <boost/algorithm/string/replace.hpp>
 
 ShaderLibPro::ShaderLibPro() :
   m_shader(ngl::ShaderLib::instance()),
@@ -16,14 +18,15 @@ ShaderLibPro::ShaderLibPro() :
 
 ShaderLibPro::~ShaderLibPro()
 {
-  // when does this get called?
+  std::cout << "shutting down ShaderLibPro" << std::endl;
 
 
   glDeleteTextures(m_textures.size(), &(m_textures[0]));
-  glDeleteFramebuffers(m_frameBuffers.size(), &(m_frameBuffers[0]));
 
+  //this is a thing???
+  //glDeleteFramebuffers(m_frameBuffers.size(), &(m_frameBuffers[0]));
   //????????????????? what goes in there ????????????
-  glDeleteRenderbuffers(m_depthStencilBuffers.size(), &(m_depthStencilBuffers[0]));
+  //glDeleteRenderbuffers(m_depthStencilBuffers.size(), &(m_depthStencilBuffers[0]));
 }
 
 void ShaderLibPro::newShaderProgram(const std::string &_progName, const std::string &_fragFile, const std::string &_vertFile)
@@ -43,6 +46,8 @@ void ShaderLibPro::newShaderProgram(const std::string &_progName, const std::str
 
   // create shader from frag source and base, which includes version and uniforms
   std::string fragShaderSource = loadShaderSource("shaders/BaseFragment.glsl") + loadShaderSource(_fragFile) + "\0";
+  //replace deprecated function that shadertoy uses
+  boost::replace_all(fragShaderSource, "texture2D", "texture");
   m_shader->loadShaderSourceFromString(fragShader, fragShaderSource);
 
   // compile source code
@@ -89,6 +94,7 @@ int ShaderLibPro::useShaderProgram(const std::string &_progName)
 
     // load current textures to shader
     for(int i=0; i<m_textures.size(); i++){
+      std::cout << "accessing texture " << i <<std::endl;
       loadTextureFile(i, m_textureFiles[i]);
     }
 
@@ -116,6 +122,8 @@ int ShaderLibPro::useTexture(int _textureUnit, const std::string &_textureFile)
       // add texture file and id to vectors
       m_textureFiles.push_back("");
       m_textures.push_back(0);
+      std::cout << "accessing textures" <<std::endl;
+
       glGenTextures( 1, &(m_textures[numOfTextures]) );
 
       // moved this to here, not entirely sure if it's the correct place?

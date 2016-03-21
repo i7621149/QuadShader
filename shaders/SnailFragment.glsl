@@ -176,7 +176,7 @@ float mapShell( in vec3 p, out vec4 matInfo )
     else        { d = d2; dx=r2-r; dy=h2; }
 
 
-    float di = texture2D( iChannel2, vec2(t+r,0.5) ).x;
+    float di = (texture2D( iChannel2, vec2(t+r,0.5) )).x;
     d += 0.002*di;
 
     matInfo = vec4(dx,dy,r/0.4,t/3.14159);
