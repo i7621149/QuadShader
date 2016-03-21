@@ -14,7 +14,9 @@ public :
 
   int useShaderProgram(const std::string &_progName);
 
-  void useTexture( int _textureUnit, const std::string &_textureFile = "");
+  int useTexture(int _textureUnit, const std::string &_textureFile = "");
+
+  void createFrameBuffer(int _bufferNum, int _textureUnit);
 
 private :
   ShaderLibPro();
@@ -22,8 +24,6 @@ private :
   std::string loadShaderSource(const std::string &_fileName);
 
   void loadTextureFile(int _channelNum, const std::string &_textureFile = "");
-
-  void createFrameBuffer(int _bufferNum, int _textureUnit);
 
   void createBufferTexture(int _textureUnit);
 
@@ -35,6 +35,8 @@ private :
   std::vector<std::string> m_textureFiles;
 
   std::vector<GLuint> m_frameBuffers;
+
+  std::vector<GLuint> m_depthStencilBuffers;
 
   std::string m_currentShader;
 };

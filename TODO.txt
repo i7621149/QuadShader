@@ -1,6 +1,11 @@
+
+LINE 75 in NGLScene will break everything
+
 Buffers
 Compile shaders at runtime // use a button to load and compile textures to channels and switch to new compiled shader
 UI switch
+
+un-hardcode the width and height in loading frame buffer shit
 
 add TextureCube function
 

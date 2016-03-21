@@ -8,7 +8,8 @@ ShaderLibPro::ShaderLibPro() :
   m_shader(ngl::ShaderLib::instance()),
   m_textures(0),
   m_frameBuffers(0),
-  m_currentShader("snail")
+  m_depthStencilBuffers(0),
+  m_currentShader("default")
 {
 
 }
@@ -20,6 +21,9 @@ ShaderLibPro::~ShaderLibPro()
 
   glDeleteTextures(m_textures.size(), &(m_textures[0]));
   glDeleteFramebuffers(m_frameBuffers.size(), &(m_frameBuffers[0]));
+
+  //????????????????? what goes in there ????????????
+  glDeleteRenderbuffers(m_depthStencilBuffers.size(), &(m_depthStencilBuffers[0]));
 }
 
 void ShaderLibPro::newShaderProgram(const std::string &_progName, const std::string &_fragFile, const std::string &_vertFile)
@@ -97,7 +101,7 @@ int ShaderLibPro::useShaderProgram(const std::string &_progName)
   }
 }
 
-void ShaderLibPro::useTexture(int _textureUnit, const std::string &_textureFile)
+int ShaderLibPro::useTexture(int _textureUnit, const std::string &_textureFile)
 {
   // if the texture unit id isn't generated yet, do so
   int numOfTextures = m_textures.size();
@@ -113,18 +117,24 @@ void ShaderLibPro::useTexture(int _textureUnit, const std::string &_textureFile)
       m_textureFiles.push_back("");
       m_textures.push_back(0);
       glGenTextures( 1, &(m_textures[numOfTextures]) );
+
+      // moved this to here, not entirely sure if it's the correct place?
+      glBindTexture(GL_TEXTURE_2D, m_textures[_textureUnit]);
   }
 
   // set file string in vector
   m_textureFiles[_textureUnit] = _textureFile;
 
+
   // if a string is given, load file
   if(_textureFile != ""){
     loadTextureFile(_textureUnit, _textureFile);
   }
+
+  return _textureUnit;
 }
 
-void ShaderLibPro::loadTextureFile(int _channelNum, const std::string &_textureFile)
+void ShaderLibPro::loadTextureFile(int _textureUnit, const std::string &_textureFile)
 {
   // based on jon's image loading
   GLuint progID = m_shader->getProgramID(m_currentShader);
@@ -152,32 +162,34 @@ void ShaderLibPro::loadTextureFile(int _channelNum, const std::string &_textureF
       }
     }
 
+    // set active texture unit
+    glActiveTexture(GL_TEXTURE0 + _textureUnit);
+
+    // bind the texture to the GLuint - put somewhere else now, not sure if right?
+    //glBindTexture(GL_TEXTURE_2D, m_textures[_channelNum]);
+    // load texture
+    glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,width,height,0,GL_RGB,GL_UNSIGNED_BYTE,data);
+
     // setting up mipmap parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    // not sure whehter the first should be GL_LINEAR or GL_LINEAR_MIPMAP_LINEAR?
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
     // set wrapping parameters for textures
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-    // set active texture unit
-    glActiveTexture(GL_TEXTURE0 + _channelNum);
-    // bind the texture to the GLuint
-    glBindTexture(GL_TEXTURE_2D, m_textures[_channelNum]);
-    // load texture
-    glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,width,height,0,GL_RGB,GL_UNSIGNED_BYTE,data);
     // creating mipmaps, needs to be done after texture is loaded
     glGenerateMipmap(GL_TEXTURE_2D);
 
     // calculate texture channel name
     // this allows for easier adding of textures, as they can all be called iChannelX where X is their number
     std::ostringstream convertStream;
-    convertStream << _channelNum;
+    convertStream << _textureUnit;
     std::string channelName = "iChannel" + convertStream.str();
 
     // get texture unit location and set uniform up
     GLuint texLocation = glGetUniformLocation(progID, channelName.c_str());
-    glUniform1i(texLocation, _channelNum);
+    glUniform1i(texLocation, _textureUnit);
 
     // print info to confirm texture loaded
     std::cout << "Loaded texture to " << channelName.c_str() << std::endl;
@@ -201,20 +213,49 @@ void ShaderLibPro::createFrameBuffer(int _bufferNum, int _textureUnit)
 
         // set bufferNum to be one more than current last
         _bufferNum = numOfBuffers;
-
       }
 
       // add frame buffer id to vector
       m_frameBuffers.push_back(0);
       glGenFramebuffers( 1, &(m_frameBuffers[numOfBuffers]) );
+      m_depthStencilBuffers.push_back(0);
+      glGenRenderbuffers( 1, &(m_depthStencilBuffers[numOfBuffers]) );
   }
 
-  // set file string in vector
-  //m_textureFiles[_textureUnit] = _textureFile;
-  //loadTexture(m_currentShader, _textureFile, &(m_textures[0]), _textureUnit);
+  createBufferTexture(_textureUnit);
+
+  glBindRenderbuffer(GL_RENDERBUFFER, m_depthStencilBuffers[_bufferNum]);
+
+  // not sure about the depth number, and the resolution is hard coded again
+  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH32F_STENCIL8, 512, 288);
+
+  glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_depthStencilBuffers[_bufferNum]);
+  glBindFramebuffer(GL_FRAMEBUFFER, m_frameBuffers[0]);
 }
 
 void ShaderLibPro::createBufferTexture(int _textureUnit)
 {
- // glGenTextures();
+  // useTexture returns the actual textureUnit being used, so need to set _textureUnit in case
+  _textureUnit = useTexture(_textureUnit);
+
+  // not in useTexture function, so set here? also not sure if necessary?
+  glActiveTexture(GL_TEXTURE0 + _textureUnit);
+
+  // width and height should NOT be hard coded
+  // if this varies from regular width/height, a glViewport call is probably necessary
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 512, 288, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+
+  // setting up mipmap parameters
+  // might only want these to be linear?
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+  // set wrapping parameters for textures
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  // not sure whether this works here?
+  glGenerateMipmap(GL_TEXTURE_2D);
+
+  //woah boy wtf???????????????
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_textures[_textureUnit], 0);
 }
