@@ -73,7 +73,7 @@ void NGLScene::initializeGL()
   shaderLib->useTexture(3, "textures/tex16.png");
   shaderLib->useTexture(4, "textures/tex04.png");
 
-  //shaderLib->createFrameBuffer(0, 1);
+  shaderLib->createFrameBuffer(0, 4);
 
   // define the quad
   createQuad();

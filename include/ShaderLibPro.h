@@ -20,14 +20,16 @@ public :
 
 private :
   ShaderLibPro();
+
   ~ShaderLibPro();
+
   std::string loadShaderSource(const std::string &_fileName);
 
   void loadTextureFile(int _channelNum, const std::string &_textureFile = "");
 
   void createBufferTexture(int _textureUnit);
 
-  // using a pointer attribute to avoid creating it locally at the start of every function
+  // using a pointer attribute for convenience, to avoid creating it locally at the start of every function
   ngl::ShaderLib *m_shader;
 
   std::vector<GLuint> m_textures;

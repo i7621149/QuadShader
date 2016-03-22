@@ -19,7 +19,6 @@ ShaderLibPro::~ShaderLibPro()
 {
   std::cout << "shutting down ShaderLibPro" << std::endl;
 
-
   glDeleteTextures(m_textures.size(), &(m_textures[0]));
 
   //this is a thing???
@@ -126,87 +125,89 @@ int ShaderLibPro::useTexture(int _textureUnit, const std::string &_textureFile)
       glGenTextures( 1, &(m_textures[numOfTextures]) );
 
       // moved this to here, not entirely sure if it's the correct place?
+      // if it already is bound, don't need to do this?
       glBindTexture(GL_TEXTURE_2D, m_textures[_textureUnit]);
   }
 
   // set file string in vector
   m_textureFiles[_textureUnit] = _textureFile;
 
-
-  // if a string is given, load file
-  if(_textureFile != ""){
-    loadTextureFile(_textureUnit, _textureFile);
-  }
+  // load file
+  loadTextureFile(_textureUnit, _textureFile);
 
   return _textureUnit;
 }
 
 void ShaderLibPro::loadTextureFile(int _textureUnit, const std::string &_textureFile)
 {
+  // set active texture unit
+  glActiveTexture(GL_TEXTURE0 + _textureUnit);
+
   // based on jon's image loading
   GLuint progID = m_shader->getProgramID(m_currentShader);
-
-  QImage image;
-  // load given texture files
-  bool loaded=image.load(_textureFile.c_str());
-  if(loaded == true)
+  if(!_textureFile.empty())
   {
-    int width=image.width();
-    int height=image.height();
 
-    unsigned char *data = new unsigned char[ width*height*3];
-    unsigned int index=0;
-    // reversed height so it loads as is used in shader
-    for( int y=height-1; y>=0; --y)
-    {
-      for( int x=0; x<width; ++x)
-      {
-        // getting RGB from the image
-        QRgb colour=image.pixel(x,y);
-        data[index++]=qRed(colour);
-        data[index++]=qGreen(colour);
-        data[index++]=qBlue(colour);
+    QImage image;
+    // load given texture files
+    bool loaded=image.load(_textureFile.c_str());
+    if(loaded == true){
+      int width=image.width();
+      int height=image.height();
+
+      unsigned char *data = new unsigned char[ width*height*3];
+      unsigned int index=0;
+      // reversed height so it loads as is used in shader
+      for( int y=height-1; y>=0; --y){
+        for( int x=0; x<width; ++x){
+          // getting RGB from the image
+          QRgb colour=image.pixel(x,y);
+          data[index++]=qRed(colour);
+          data[index++]=qGreen(colour);
+          data[index++]=qBlue(colour);
+        }
       }
+
+      // bind the texture to the GLuint - put somewhere else now, not sure if right?
+      //glBindTexture(GL_TEXTURE_2D, m_textures[_channelNum]);
+      // load texture
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+
+      // clean up
+      delete[] data;
     }
-
-    // set active texture unit
-    glActiveTexture(GL_TEXTURE0 + _textureUnit);
-
-    // bind the texture to the GLuint - put somewhere else now, not sure if right?
-    //glBindTexture(GL_TEXTURE_2D, m_textures[_channelNum]);
-    // load texture
-    glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,width,height,0,GL_RGB,GL_UNSIGNED_BYTE,data);
-
-    // setting up mipmap parameters
-    // not sure whehter the first should be GL_LINEAR or GL_LINEAR_MIPMAP_LINEAR?
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-
-    // set wrapping parameters for textures
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    // creating mipmaps, needs to be done after texture is loaded
-    glGenerateMipmap(GL_TEXTURE_2D);
-
-    // calculate texture channel name
-    // this allows for easier adding of textures, as they can all be called iChannelX where X is their number
-    std::ostringstream convertStream;
-    convertStream << _textureUnit;
-    std::string channelName = "iChannel" + convertStream.str();
-
-    // get texture unit location and set uniform up
-    GLuint texLocation = glGetUniformLocation(progID, channelName.c_str());
-    glUniform1i(texLocation, _textureUnit);
-
-    // print info to confirm texture loaded
-    std::cout << "Loaded texture to " << channelName.c_str() << std::endl;
-    // clean up
-    delete[] data;
+    else{
+      std::cerr << _textureFile << " was not found" << std::endl;
+      exit(EXIT_FAILURE);
+    }
   }
   else{
-    std::cerr << _textureFile << " was not found" << std::endl;
-    exit(EXIT_FAILURE);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 512, 288, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
   }
+
+  // setting up mipmap parameters
+  // not sure whehter the first should be GL_LINEAR or GL_LINEAR_MIPMAP_LINEAR?
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+  // set wrapping parameters for textures
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  // creating mipmaps, needs to be done after texture is loaded
+  glGenerateMipmap(GL_TEXTURE_2D);
+
+  // calculate texture channel name
+  // this allows for easier adding of textures, as they can all be called iChannelX where X is their number
+  std::ostringstream convertStream;
+  convertStream << _textureUnit;
+  std::string channelName = "iChannel" + convertStream.str();
+
+  // get texture unit location and set uniform up
+  GLuint texLocation = glGetUniformLocation(progID, channelName.c_str());
+  glUniform1i(texLocation, _textureUnit);
+
+  // print info to confirm texture loaded
+  std::cout << "Loaded texture to " << channelName.c_str() << std::endl;
 }
 
 void ShaderLibPro::createFrameBuffer(int _bufferNum, int _textureUnit)
@@ -244,24 +245,6 @@ void ShaderLibPro::createBufferTexture(int _textureUnit)
 {
   // useTexture returns the actual textureUnit being used, so need to set _textureUnit in case
   _textureUnit = useTexture(_textureUnit);
-
-  // not in useTexture function, so set here? also not sure if necessary?
-  glActiveTexture(GL_TEXTURE0 + _textureUnit);
-
-  // width and height should NOT be hard coded
-  // if this varies from regular width/height, a glViewport call is probably necessary
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 512, 288, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-
-  // setting up mipmap parameters
-  // might only want these to be linear?
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-
-  // set wrapping parameters for textures
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  // not sure whether this works here?
-  glGenerateMipmap(GL_TEXTURE_2D);
 
   //woah boy wtf???????????????
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_textures[_textureUnit], 0);
