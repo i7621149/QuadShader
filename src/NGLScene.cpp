@@ -63,8 +63,6 @@ void NGLScene::initializeGL()
   shaderLib->newShaderProgram("snail", "shaders/SnailFragment.glsl");
   shaderLib->newShaderProgram("new", "shaders/NewFragment.glsl");
 
-  // make sure current shader is clearly set
-  setCurrentShader("default");
 
   // load textures to the 4 active texture units
   shaderLib->useTexture(0, "textures/tex12.png");
@@ -73,7 +71,9 @@ void NGLScene::initializeGL()
   shaderLib->useTexture(3, "textures/tex16.png");
   shaderLib->useTexture(4, "textures/tex04.png");
 
-  shaderLib->createFrameBuffer(0, 4);
+  //shaderLib->createFrameBuffer(0, 4, m_width, m_height);
+
+  setCurrentShader("new");
 
   // define the quad
   createQuad();

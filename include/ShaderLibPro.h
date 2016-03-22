@@ -16,7 +16,7 @@ public :
 
   int useTexture(int _textureUnit, const std::string &_textureFile = "");
 
-  void createFrameBuffer(int _bufferNum, int _textureUnit);
+  void createFrameBuffer(int _bufferNum, int _textureUnit, int _width, int _height);
 
 private :
   ShaderLibPro();
@@ -25,7 +25,7 @@ private :
 
   std::string loadShaderSource(const std::string &_fileName);
 
-  void loadTextureFile(int _channelNum, const std::string &_textureFile = "");
+  void loadTextureFile(int _channelNum, const std::string &_textureFile = "", int _width = 0, int _height = 0);
 
   void createBufferTexture(int _textureUnit);
 

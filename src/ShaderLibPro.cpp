@@ -123,10 +123,6 @@ int ShaderLibPro::useTexture(int _textureUnit, const std::string &_textureFile)
       std::cout << "accessing textures" <<std::endl;
 
       glGenTextures( 1, &(m_textures[numOfTextures]) );
-
-      // moved this to here, not entirely sure if it's the correct place?
-      // if it already is bound, don't need to do this?
-      glBindTexture(GL_TEXTURE_2D, m_textures[_textureUnit]);
   }
 
   // set file string in vector
@@ -138,10 +134,12 @@ int ShaderLibPro::useTexture(int _textureUnit, const std::string &_textureFile)
   return _textureUnit;
 }
 
-void ShaderLibPro::loadTextureFile(int _textureUnit, const std::string &_textureFile)
+void ShaderLibPro::loadTextureFile(int _textureUnit, const std::string &_textureFile, int _width, int _height)
 {
   // set active texture unit
   glActiveTexture(GL_TEXTURE0 + _textureUnit);
+
+  glBindTexture(GL_TEXTURE_2D, m_textures[_textureUnit]);
 
   // based on jon's image loading
   GLuint progID = m_shader->getProgramID(m_currentShader);
@@ -152,14 +150,14 @@ void ShaderLibPro::loadTextureFile(int _textureUnit, const std::string &_texture
     // load given texture files
     bool loaded=image.load(_textureFile.c_str());
     if(loaded == true){
-      int width=image.width();
-      int height=image.height();
+      _width=image.width();
+      _height=image.height();
 
-      unsigned char *data = new unsigned char[ width*height*3];
+      unsigned char *data = new unsigned char[ _width*_height*3];
       unsigned int index=0;
       // reversed height so it loads as is used in shader
-      for( int y=height-1; y>=0; --y){
-        for( int x=0; x<width; ++x){
+      for( int y=_height-1; y>=0; --y){
+        for( int x=0; x<_width; ++x){
           // getting RGB from the image
           QRgb colour=image.pixel(x,y);
           data[index++]=qRed(colour);
@@ -171,7 +169,7 @@ void ShaderLibPro::loadTextureFile(int _textureUnit, const std::string &_texture
       // bind the texture to the GLuint - put somewhere else now, not sure if right?
       //glBindTexture(GL_TEXTURE_2D, m_textures[_channelNum]);
       // load texture
-      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _width, _height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 
       // clean up
       delete[] data;
@@ -182,7 +180,7 @@ void ShaderLibPro::loadTextureFile(int _textureUnit, const std::string &_texture
     }
   }
   else{
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 512, 288, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _width, _height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
   }
 
   // setting up mipmap parameters
@@ -210,7 +208,7 @@ void ShaderLibPro::loadTextureFile(int _textureUnit, const std::string &_texture
   std::cout << "Loaded texture to " << channelName.c_str() << std::endl;
 }
 
-void ShaderLibPro::createFrameBuffer(int _bufferNum, int _textureUnit)
+void ShaderLibPro::createFrameBuffer(int _bufferNum, int _textureUnit, int _width, int _height)
 {
   // if the buffer id isn't generated yet, do so
   int numOfBuffers = m_frameBuffers.size();
@@ -235,7 +233,7 @@ void ShaderLibPro::createFrameBuffer(int _bufferNum, int _textureUnit)
   glBindRenderbuffer(GL_RENDERBUFFER, m_depthStencilBuffers[_bufferNum]);
 
   // not sure about the depth number, and the resolution is hard coded again
-  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH32F_STENCIL8, 512, 288);
+  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH32F_STENCIL8, _width, _height);
 
   glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_depthStencilBuffers[_bufferNum]);
   glBindFramebuffer(GL_FRAMEBUFFER, m_frameBuffers[0]);
