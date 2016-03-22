@@ -64,7 +64,7 @@ void ShaderLibPro::newShaderProgram(const std::string &_progName, const std::str
   useShaderProgram(_progName);
 }
 
-void ShaderLibPro::draw(int _shaderNum, NGLScene *scene)
+void ShaderLibPro::draw(NGLScene *scene)
 {
   setShaderUniforms();
   scene->drawScene();

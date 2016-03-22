@@ -1,13 +1,10 @@
 #ifndef SHADERLIBPRO_H__
 #define SHADERLIBPRO_H__
 
-#include <ngl/ShaderLib.h>
-#include <ngl/Singleton.h>
-#include <string>
-
 #ifndef NGLSCENE_H__
 #define NGLSCENE_H__
 
+// define NGLScene drawScene function, as this is called in ShaderLibPro draw
 class NGLScene
 {
 public :
@@ -15,6 +12,13 @@ public :
 };
 
 #endif
+
+
+#include <ngl/ShaderLib.h>
+#include <ngl/Singleton.h>
+#include <string>
+#include "ShaderPro.h"
+
 
 class ShaderLibPro : public ngl::Singleton<ShaderLibPro>
 {
@@ -29,7 +33,7 @@ public :
 
   void createFrameBuffer(int _bufferNum, int _textureUnit);
 
-  void draw(int _shaderNum, NGLScene *scene);
+  void draw(NGLScene *scene);
 
   void setShaderUniforms();
 
@@ -52,18 +56,13 @@ private :
 
   void createBufferTexture(int _textureUnit);
 
-  // using a pointer attribute for convenience, to avoid creating it locally at the start of every function
-  ngl::ShaderLib *m_shader;
-
-  std::vector<GLuint> m_textures;
-
-  std::vector<std::string> m_textureFiles;
+  std::vector<ShaderPro> *m_shaders;
 
   std::vector<GLuint> m_frameBuffers;
 
   std::vector<GLuint> m_depthStencilBuffers;
 
-  std::string m_currentShader;
+  ShaderPro *m_currentShader;
 };
 
 #endif
