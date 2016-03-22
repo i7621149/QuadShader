@@ -5,6 +5,9 @@
 #include <fstream>
 #include <boost/algorithm/string/replace.hpp>
 
+#define MAX_BUFFERS 4
+
+
 ShaderLibPro::ShaderLibPro() :
   m_shader(ngl::ShaderLib::instance()),
   m_textures(0),
@@ -61,6 +64,21 @@ void ShaderLibPro::newShaderProgram(const std::string &_progName, const std::str
   useShaderProgram(_progName);
 }
 
+void ShaderLibPro::draw(int _shaderNum, NGLScene *scene)
+{
+  setShaderUniforms();
+  scene->drawScene();
+}
+
+void ShaderLibPro::setShaderUniforms()
+{
+  m_shader->setRegisteredUniform("iResolution", m_resolution);
+  m_shader->setRegisteredUniform("iGlobalTime", m_globalTime);
+  m_shader->setRegisteredUniform("iTimeDelta", m_timeDelta);
+  m_shader->setRegisteredUniform("iFrame", m_frame);
+  m_shader->setRegisteredUniform("iMouse", m_mouse);
+  m_shader->setRegisteredUniform("iDate", m_date);
+}
 
 // just loading text from files
 std::string ShaderLibPro::loadShaderSource(const std::string &_fileName)
@@ -134,7 +152,7 @@ int ShaderLibPro::useTexture(int _textureUnit, const std::string &_textureFile)
   return _textureUnit;
 }
 
-void ShaderLibPro::loadTextureFile(int _textureUnit, const std::string &_textureFile, int _width, int _height)
+void ShaderLibPro::loadTextureFile(int _textureUnit, const std::string &_textureFile)
 {
   // set active texture unit
   glActiveTexture(GL_TEXTURE0 + _textureUnit);
@@ -150,14 +168,14 @@ void ShaderLibPro::loadTextureFile(int _textureUnit, const std::string &_texture
     // load given texture files
     bool loaded=image.load(_textureFile.c_str());
     if(loaded == true){
-      _width=image.width();
-      _height=image.height();
+      int width=image.width();
+      int height=image.height();
 
-      unsigned char *data = new unsigned char[ _width*_height*3];
+      unsigned char *data = new unsigned char[ width*height*3];
       unsigned int index=0;
       // reversed height so it loads as is used in shader
-      for( int y=_height-1; y>=0; --y){
-        for( int x=0; x<_width; ++x){
+      for( int y=height-1; y>=0; --y){
+        for( int x=0; x<width; ++x){
           // getting RGB from the image
           QRgb colour=image.pixel(x,y);
           data[index++]=qRed(colour);
@@ -169,7 +187,7 @@ void ShaderLibPro::loadTextureFile(int _textureUnit, const std::string &_texture
       // bind the texture to the GLuint - put somewhere else now, not sure if right?
       //glBindTexture(GL_TEXTURE_2D, m_textures[_channelNum]);
       // load texture
-      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _width, _height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 
       // clean up
       delete[] data;
@@ -180,7 +198,7 @@ void ShaderLibPro::loadTextureFile(int _textureUnit, const std::string &_texture
     }
   }
   else{
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _width, _height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 512, 288, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
   }
 
   // setting up mipmap parameters
@@ -208,7 +226,7 @@ void ShaderLibPro::loadTextureFile(int _textureUnit, const std::string &_texture
   std::cout << "Loaded texture to " << channelName.c_str() << std::endl;
 }
 
-void ShaderLibPro::createFrameBuffer(int _bufferNum, int _textureUnit, int _width, int _height)
+void ShaderLibPro::createFrameBuffer(int _bufferNum, int _textureUnit)
 {
   // if the buffer id isn't generated yet, do so
   int numOfBuffers = m_frameBuffers.size();
@@ -233,7 +251,7 @@ void ShaderLibPro::createFrameBuffer(int _bufferNum, int _textureUnit, int _widt
   glBindRenderbuffer(GL_RENDERBUFFER, m_depthStencilBuffers[_bufferNum]);
 
   // not sure about the depth number, and the resolution is hard coded again
-  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH32F_STENCIL8, _width, _height);
+  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH32F_STENCIL8, 512, 288);
 
   glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_depthStencilBuffers[_bufferNum]);
   glBindFramebuffer(GL_FRAMEBUFFER, m_frameBuffers[0]);

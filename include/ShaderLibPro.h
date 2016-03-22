@@ -5,6 +5,17 @@
 #include <ngl/Singleton.h>
 #include <string>
 
+#ifndef NGLSCENE_H__
+#define NGLSCENE_H__
+
+class NGLScene
+{
+public :
+  void drawScene(void);
+};
+
+#endif
+
 class ShaderLibPro : public ngl::Singleton<ShaderLibPro>
 {
   friend class ngl::Singleton<ShaderLibPro>;
@@ -16,7 +27,19 @@ public :
 
   int useTexture(int _textureUnit, const std::string &_textureFile = "");
 
-  void createFrameBuffer(int _bufferNum, int _textureUnit, int _width, int _height);
+  void createFrameBuffer(int _bufferNum, int _textureUnit);
+
+  void draw(int _shaderNum, NGLScene *scene);
+
+  void setShaderUniforms();
+
+  // uniforms
+  ngl::Vec3 m_resolution;
+  float m_globalTime;
+  float m_timeDelta;
+  int m_frame;
+  ngl::Vec4 m_mouse;
+  ngl::Vec4 m_date;
 
 private :
   ShaderLibPro();
@@ -25,7 +48,7 @@ private :
 
   std::string loadShaderSource(const std::string &_fileName);
 
-  void loadTextureFile(int _channelNum, const std::string &_textureFile = "", int _width = 0, int _height = 0);
+  void loadTextureFile(int _channelNum, const std::string &_textureFile = "");
 
   void createBufferTexture(int _textureUnit);
 

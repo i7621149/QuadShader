@@ -31,7 +31,7 @@ void NGLScene::resizeGL(QResizeEvent *_event)
   m_height=_event->size().height()*devicePixelRatio();
   // set resolution in shader
   // uses a Vec3 to be compatible with Shadertoy
-  ngl::ShaderLib::instance()->setRegisteredUniform("iResolution", ngl::Vec3(m_width, m_height, 1.0));
+  ShaderLibPro::instance()->m_resolution = ngl::Vec3(m_width, m_height, 1.0);
 }
 
 void NGLScene::resizeGL(int _w , int _h)
@@ -40,7 +40,7 @@ void NGLScene::resizeGL(int _w , int _h)
   m_height=_h*devicePixelRatio();
   // set resolution in shader
   // uses a Vec3 to be compatible with Shadertoy, even though resolution is (x,y)
-  ngl::ShaderLib::instance()->setRegisteredUniform("iResolution", ngl::Vec3(m_width, m_height, 1.0));
+  ShaderLibPro::instance()->m_resolution = ngl::Vec3(m_width, m_height, 1.0);
 }
 
 void NGLScene::initializeGL()
@@ -84,10 +84,23 @@ void NGLScene::initializeGL()
 
 void NGLScene::paintGL()
 {
+  ShaderLibPro *shaderLib = ShaderLibPro::instance();
   // increase frame number variable for shader
   m_frame++;
-  ngl::ShaderLib::instance()->setRegisteredUniform("iFrame", m_frame);
+  shaderLib->m_frame = m_frame;
 
+
+  shaderLib->draw(this);
+
+
+  // calculate time taken to render the frame (time since last frame was rendered)
+  float renderTime = (m_time.elapsed() - m_lastFrameTime) / 1000.0;
+  shaderLib->m_timeDelta = renderTime;
+  m_lastFrameTime = m_time.elapsed();
+}
+
+void NGLScene::drawScene()
+{
   // clear the screen and depth buffer
   glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -97,11 +110,6 @@ void NGLScene::paintGL()
   // bind and draw our quad
   glBindVertexArray(m_vaoID);
   glDrawArrays(GL_TRIANGLES, 0, 6);
-
-  // calculate time taken to render the frame (time since last frame was rendered)
-  float renderTime = (m_time.elapsed() - m_lastFrameTime) / 1000.0;
-  ngl::ShaderLib::instance()->setRegisteredUniform("iTimeDelta", renderTime);
-  m_lastFrameTime = m_time.elapsed();
 }
 
 void NGLScene::createQuad()
@@ -213,18 +221,18 @@ void NGLScene::keyPressEvent(QKeyEvent *_event)
 
 void NGLScene::timerEvent(QTimerEvent *)
 {
-  ngl::ShaderLib *shaderLib=ngl::ShaderLib::instance();
+  ShaderLibPro *shaderLib=ShaderLibPro::instance();
 
   //getting seconds by dividing milliseconds by 1000
   float globalSeconds = m_time.elapsed()/1000.0;
-  shaderLib->setRegisteredUniform("iGlobalTime", globalSeconds);
+  shaderLib->m_globalTime = globalSeconds;
 
   QDate date = QDate::currentDate();
   float dateYear = date.year();
   float dateMonth = date.month();
   float dateDay = date.day();
   float dateSeconds = (m_time.msecsSinceStartOfDay() + m_time.elapsed()) / 1000.0;
-  shaderLib->setRegisteredUniform("iDate", dateYear, dateMonth, dateDay, dateSeconds);
+  shaderLib->m_date = ngl::Vec4(dateYear, dateMonth, dateDay, dateSeconds);
 
   ngl::Vec4 mouseData;
   if(m_mouseDown){
@@ -237,7 +245,7 @@ void NGLScene::timerEvent(QTimerEvent *)
   else{
     mouseData[2] = 0.0; // mouse is not pressed
   }
-  shaderLib->setRegisteredUniform("iMouse", mouseData);
+  shaderLib->m_mouse = mouseData;
 
   update();
 }
