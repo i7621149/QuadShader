@@ -8,3 +8,5 @@ cube maps
 
 GEO shader
 shadows
+
+separate functions for loading texture and loading buffer, not just default args

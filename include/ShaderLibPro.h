@@ -4,6 +4,7 @@
 #include <ngl/ShaderLib.h>
 #include <ngl/Singleton.h>
 #include <string>
+#include "ShaderPro.h"
 
 #ifndef NGLSCENE_H__
 #define NGLSCENE_H__
@@ -15,6 +16,10 @@ public :
 };
 
 #endif
+
+//struct ShaderLibPro{
+
+//};
 
 class ShaderLibPro : public ngl::Singleton<ShaderLibPro>
 {
@@ -33,7 +38,7 @@ public :
 
   void setShaderUniforms();
 
-  // uniforms
+  // uniforms for shader
   ngl::Vec3 m_resolution;
   float m_globalTime;
   float m_timeDelta;
@@ -48,7 +53,7 @@ private :
 
   std::string loadShaderSource(const std::string &_fileName);
 
-  void loadTextureFile(int _channelNum, const std::string &_textureFile = "");
+  void loadTextureFile(int _channelNum, const std::string &_textureFile);
 
   void createBufferTexture(int _textureUnit);
 
@@ -62,6 +67,8 @@ private :
   std::vector<GLuint> m_frameBuffers;
 
   std::vector<GLuint> m_depthStencilBuffers;
+
+  std::vector<ShaderPro *> m_shaderPros;
 
   std::string m_currentShader;
 };

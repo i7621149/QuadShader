@@ -4,6 +4,7 @@
 #include <sstream>
 #include <fstream>
 #include <boost/algorithm/string/replace.hpp>
+#include <ShaderPro.h>
 
 #define MAX_BUFFERS 4
 
@@ -32,6 +33,7 @@ ShaderLibPro::~ShaderLibPro()
 
 void ShaderLibPro::newShaderProgram(const std::string &_progName, const std::string &_fragFile, const std::string &_vertFile)
 {
+  ShaderPro *shaderPro = new ShaderPro;
   std::string fragShader = _progName + "Frag";
   std::string vertShader = _progName + "Vert";
   std::cout << fragShader << ", " << vertShader << std::endl;

@@ -59,11 +59,6 @@ void NGLScene::initializeGL()
   // using shaderLibPro to generate simple vert/frag shaders
   shaderLib->newShaderProgram("default", "shaders/DefaultQuadFragment.glsl");
 
-  shaderLib->newShaderProgram("text", "shaders/TextInfoFragment.glsl");
-  shaderLib->newShaderProgram("snail", "shaders/SnailFragment.glsl");
-  shaderLib->newShaderProgram("new", "shaders/NewFragment.glsl");
-
-
   // load textures to the 4 active texture units
   shaderLib->useTexture(0, "textures/tex12.png");
   shaderLib->useTexture(1, "textures/tex19.png");
@@ -90,7 +85,7 @@ void NGLScene::paintGL()
   shaderLib->m_frame = m_frame;
 
 
-  shaderLib->draw(this);
+  shaderLib->draw(0, this);
 
 
   // calculate time taken to render the frame (time since last frame was rendered)
@@ -201,11 +196,6 @@ void NGLScene::keyPressEvent(QKeyEvent *_event)
 
     // toggle fullscreen because who has time for two buttons for this
     case Qt::Key_F : toggleFullScreen(); break;
-
-    case Qt::Key_0 : setCurrentShader("default"); break;
-    case Qt::Key_1 : setCurrentShader("text"); break;
-    case Qt::Key_2 : setCurrentShader("snail"); break;
-    case Qt::Key_3 : setCurrentShader("new"); break;
 
     default : break;
   }
