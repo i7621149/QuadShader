@@ -44,8 +44,6 @@ public:
   //----------------------------------------------------------------------------------------------------------------------
   void paintGL();
 
-  void drawScene();
-
   void setCurrentShader(const std::string &_progName);
 
 private:
@@ -63,6 +61,7 @@ private:
   void keyPressEvent(QKeyEvent *_event);
   //----------------------------------------------------------------------------------------------------------------------
   void toggleFullScreen();
+
 
   /// @brief this method is called every time a mouse is moved
   /// @param _event the Qt Event structure

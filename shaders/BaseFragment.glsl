@@ -33,18 +33,16 @@ uniform sampler2D iChannel3;
 
 // date works correctly, using QDateTime variable
 uniform vec4 iDate;
+
 // to do with audio?
 // uniform float iSampleRate;
-
 //----------------------------------------------------------------------------------------------------------------//
 
 // more textures than shadertoy allows
 // preferable to add these at compile time?
-
 uniform sampler2D iChannel4;
 uniform sampler2D iChannel5;
 uniform sampler2D iChannel6;
 uniform sampler2D iChannel7;
 uniform sampler2D iChannel8;
 uniform sampler2D iChannel9;
-

@@ -1,12 +1,13 @@
 LINE 75 in NGLScene will break everything
+find and replace texture2D in shader with texture 2D
 
 Buffers
 Compile shaders at runtime // use a button to load and compile textures to channels and switch to new compiled shader
 UI switch
 
-cube maps
+un-hardcode the width and height in loading frame buffer shit
+
+add TextureCube function
 
 GEO shader
 shadows
-
-separate functions for loading texture and loading buffer, not just default args

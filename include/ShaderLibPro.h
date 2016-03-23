@@ -4,22 +4,6 @@
 #include <ngl/ShaderLib.h>
 #include <ngl/Singleton.h>
 #include <string>
-#include "ShaderPro.h"
-
-#ifndef NGLSCENE_H__
-#define NGLSCENE_H__
-
-class NGLScene
-{
-public :
-  void drawScene(void);
-};
-
-#endif
-
-//struct ShaderLibPro{
-
-//};
 
 class ShaderLibPro : public ngl::Singleton<ShaderLibPro>
 {
@@ -34,30 +18,16 @@ public :
 
   void createFrameBuffer(int _bufferNum, int _textureUnit);
 
-  void draw(int _shaderNum, NGLScene *scene);
-
-  void setShaderUniforms();
-
-  // uniforms for shader
-  ngl::Vec3 m_resolution;
-  float m_globalTime;
-  float m_timeDelta;
-  int m_frame;
-  ngl::Vec4 m_mouse;
-  ngl::Vec4 m_date;
-
 private :
   ShaderLibPro();
-
   ~ShaderLibPro();
-
   std::string loadShaderSource(const std::string &_fileName);
 
-  void loadTextureFile(int _channelNum, const std::string &_textureFile);
+  void loadTextureFile(int _channelNum, const std::string &_textureFile = "");
 
   void createBufferTexture(int _textureUnit);
 
-  // using a pointer attribute for convenience, to avoid creating it locally at the start of every function
+  // using a pointer attribute to avoid creating it locally at the start of every function
   ngl::ShaderLib *m_shader;
 
   std::vector<GLuint> m_textures;
@@ -67,8 +37,6 @@ private :
   std::vector<GLuint> m_frameBuffers;
 
   std::vector<GLuint> m_depthStencilBuffers;
-
-  std::vector<ShaderPro *> m_shaderPros;
 
   std::string m_currentShader;
 };
