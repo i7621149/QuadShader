@@ -5,6 +5,12 @@
 #include <ngl/Singleton.h>
 #include <string>
 
+typedef struct ShaderData
+{
+  std::string name;
+  std::vector<GLuint> textures;
+} ShaderData;
+
 class ShaderLibPro : public ngl::Singleton<ShaderLibPro>
 {
   friend class ngl::Singleton<ShaderLibPro>;
@@ -29,6 +35,8 @@ private :
 
   // using a pointer attribute to avoid creating it locally at the start of every function
   ngl::ShaderLib *m_shader;
+
+  std::vector<ShaderData> m_shaderData;
 
   std::vector<GLuint> m_textures;
 

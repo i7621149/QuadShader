@@ -9,6 +9,7 @@
 #include <iostream>
 #include <ngl/NGLStream.h>
 #include <cstdlib>
+#include "ShaderVariables.h"
 
 NGLScene::NGLScene() :
   m_frame(0),
@@ -244,7 +245,7 @@ void NGLScene::timerEvent(QTimerEvent *)
 
 void NGLScene::toggleFullScreen()
 {
-  // complex fullscreen shaders can be expensive and slow, so be careful
+  // complex fullscreen shaders can be expensive and slow, so be careful making window fullscreen (or just large)
   m_fullScreen ^= true;
   m_fullScreen ? showFullScreen() : showNormal();
 }

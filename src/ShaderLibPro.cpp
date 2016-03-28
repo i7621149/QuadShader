@@ -7,6 +7,7 @@
 
 ShaderLibPro::ShaderLibPro() :
   m_shader(ngl::ShaderLib::instance()),
+  m_shaderData(0),
   m_textures(0),
   m_frameBuffers(0),
   m_depthStencilBuffers(0),
@@ -30,6 +31,8 @@ ShaderLibPro::~ShaderLibPro()
 
 void ShaderLibPro::newShaderProgram(const std::string &_progName, const std::string &_fragFile, const std::string &_vertFile)
 {
+  ShaderData shaderData = {_progName, std::vector<GLuint>(0) };
+  m_shaderData.push_back(shaderData);
   std::string fragShader = _progName + "Frag";
   std::string vertShader = _progName + "Vert";
   std::cout << fragShader << ", " << vertShader << std::endl;
@@ -61,7 +64,6 @@ void ShaderLibPro::newShaderProgram(const std::string &_progName, const std::str
   m_shader->linkProgramObject(_progName);
   useShaderProgram(_progName);
 }
-
 
 // just loading text from files
 std::string ShaderLibPro::loadShaderSource(const std::string &_fileName)
