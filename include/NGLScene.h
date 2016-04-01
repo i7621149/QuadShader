@@ -44,6 +44,8 @@ public:
   //----------------------------------------------------------------------------------------------------------------------
   void paintGL();
 
+  void drawScene();
+
   void setCurrentShader(const std::string &_progName);
 
 private:
@@ -98,8 +100,6 @@ private:
 
   GLuint m_vaoID;
 
-  int m_frame;
-
   void createQuad();
 
   bool m_fullScreen;
@@ -109,6 +109,8 @@ private:
   QTime m_time;
 
   int m_lastFrameTime;
+
+  ngl::Vec4 m_mouseData;
 };
 
 #endif

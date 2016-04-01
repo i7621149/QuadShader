@@ -6,10 +6,10 @@
 
 struct ShaderVariables : public ngl::Singleton<ShaderVariables>
 {
+  friend class ngl::Singleton<ShaderVariables>;
 public :
-  ShaderVariables();
-  ~ShaderVariables();
-  void reset();
+  void reset(bool _hard=false);
+  void loadToShader(GLuint _progID);
 
   ngl::Vec3 resolution;
   float globalTime;
@@ -17,6 +17,10 @@ public :
   int frame;
   ngl::Vec4 mouse;
   ngl::Vec4 date;
+
+private :
+  ShaderVariables();
+  ~ShaderVariables();
 };
 
 #endif

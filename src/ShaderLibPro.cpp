@@ -6,22 +6,17 @@
 #include <boost/algorithm/string/replace.hpp>
 
 ShaderLibPro::ShaderLibPro() :
-  m_shader(ngl::ShaderLib::instance()),
-  m_shaderData(0),
-  m_textures(0),
-  m_frameBuffers(0),
-  m_depthStencilBuffers(0),
-  m_currentShader("default")
+  m_shaders(0)
 {
 
 }
 
 ShaderLibPro::~ShaderLibPro()
 {
-  std::cout << "shutting down ShaderLibPro" << std::endl;
+  //std::cout << "shutting down ShaderLibPro" << std::endl;
 
 
-  glDeleteTextures(m_textures.size(), &(m_textures[0]));
+  //glDeleteTextures(m_textures.size(), &(m_textures[0]));
 
   //this is a thing???
   //glDeleteFramebuffers(m_frameBuffers.size(), &(m_frameBuffers[0]));
@@ -29,6 +24,29 @@ ShaderLibPro::~ShaderLibPro()
   //glDeleteRenderbuffers(m_depthStencilBuffers.size(), &(m_depthStencilBuffers[0]));
 }
 
+void ShaderLibPro::loadShaders(const std::string &_sourceFile)
+{
+
+}
+
+void ShaderLibPro::draw(NGLScene *_scene)
+{
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
 void ShaderLibPro::newShaderProgram(const std::string &_progName, const std::string &_fragFile, const std::string &_vertFile)
 {
   ShaderData shaderData = {_progName, std::vector<GLuint>(0) };
@@ -48,8 +66,9 @@ void ShaderLibPro::newShaderProgram(const std::string &_progName, const std::str
 
   // create shader from frag source and base, which includes version and uniforms
   std::string fragShaderSource = loadShaderSource("shaders/BaseFragment.glsl") + loadShaderSource(_fragFile) + "\0";
-  //replace deprecated function that shadertoy uses
+  //replace deprecated functions that shadertoy uses
   boost::replace_all(fragShaderSource, "texture2D", "texture");
+ // boost::replace_all(fragShaderSource, "textureCube", "texture");
   m_shader->loadShaderSourceFromString(fragShader, fragShaderSource);
 
   // compile source code
@@ -268,3 +287,4 @@ void ShaderLibPro::createBufferTexture(int _textureUnit)
   //woah boy wtf???????????????
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_textures[_textureUnit], 0);
 }
+*/

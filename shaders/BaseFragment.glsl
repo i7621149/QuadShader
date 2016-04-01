@@ -25,12 +25,6 @@ uniform int iFrame;
 // uniform float iChannelResolution[4];
 uniform vec4 iMouse;
 
-// need to set up 4 channels to match shadertoy, however, more are added below
-uniform sampler2D iChannel0;
-uniform sampler2D iChannel1;
-uniform sampler2D iChannel2;
-uniform sampler2D iChannel3;
-
 // date works correctly, using QDateTime variable
 uniform vec4 iDate;
 
@@ -38,6 +32,11 @@ uniform vec4 iDate;
 // uniform float iSampleRate;
 //----------------------------------------------------------------------------------------------------------------//
 
+// need to set up 4 channels to match shadertoy, however, more are added below
+uniform sampler2D iChannel0;
+uniform sampler2D iChannel1;
+uniform sampler2D iChannel2;
+uniform sampler2D iChannel3;
 // more textures than shadertoy allows
 // preferable to add these at compile time?
 uniform sampler2D iChannel4;
