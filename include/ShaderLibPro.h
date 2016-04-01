@@ -12,6 +12,7 @@
 // define NGLScene drawScene function, as this is called in ShaderLibPro draw
 class NGLScene
 {
+public :
   void drawScene();
 };
 

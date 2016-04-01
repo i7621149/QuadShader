@@ -25,6 +25,8 @@ public :
 
   void loadTextures();
 
+  void loadImage(int _textureUnit, TextureData _texture);
+
   void printShaderData();
 
   enum class DebugMode {COMPILE, LINK}; //useful for setting stuff, being readable

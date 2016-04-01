@@ -95,7 +95,7 @@ void NGLScene::paintGL()
   // increase frame number variable for shader
   ShaderVariables::instance()->frame++;
 
-  drawScene();
+  ShaderLibPro::instance()->draw(this);
 
   // calculate time taken to render the frame (time since last frame was rendered)
   float renderTime = (m_time.elapsed() - m_lastFrameTime) / 1000.0;
@@ -115,6 +115,7 @@ void NGLScene::drawScene()
   glViewport(0, 0, m_width, m_height);
   // bind and draw our quad
   glBindVertexArray(m_vaoID);
+
   glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 

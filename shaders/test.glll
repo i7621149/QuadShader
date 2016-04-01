@@ -1,4 +1,5 @@
 START MAIN
   FRAGMENT shaders/FurFragment.glsl
   VERTEX shaders/QuadVertex.glsl
+  TEXTURE 2D textures/tex12.png
 END

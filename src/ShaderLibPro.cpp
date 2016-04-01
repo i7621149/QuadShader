@@ -4,8 +4,7 @@
 #include <sstream>
 #include <fstream>
 #include <boost/algorithm/string/replace.hpp>
-
-//#include <boost/iostreams/filtering_stream.hpp>
+#include "ShaderVariables.h"
 
 ShaderLibPro::ShaderLibPro() :
   m_shaders(0)
@@ -125,7 +124,7 @@ void ShaderLibPro::setShaderInfo(const std::string &_sourceFile)
             texture.id = texID;
 
             texture.type = TEXTURE2D;
-            texture.textureFile = splitString[1];
+            texture.textureFile = splitString[2];
           }
           else if(splitString[1] == "CUBE"){
             std::cout << "cube!" << std::endl;
@@ -134,7 +133,7 @@ void ShaderLibPro::setShaderInfo(const std::string &_sourceFile)
             texture.id = texID;
 
             texture.type = TEXTURECUBE;
-            texture.textureFile = splitString[1];
+            texture.textureFile = splitString[2];
           }
           else if(splitString[1] == "BUFFER"){
             std::cout << "buffer!" << std::endl;
@@ -169,7 +168,13 @@ void ShaderLibPro::setShaderInfo(const std::string &_sourceFile)
 
 void ShaderLibPro::draw(NGLScene *_scene)
 {
+  for(ShaderPro *shader : m_shaders){
+    // debug print
+    //ShaderVariables::instance()->printVariables();
+    ShaderVariables::instance()->loadToShader(shader->m_progID);
 
+    _scene->drawScene();
+  }
 }
 
 void ShaderLibPro::loadShaders()
