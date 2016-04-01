@@ -5,24 +5,20 @@
 #include <fstream>
 #include <boost/algorithm/string/replace.hpp>
 
-#define MAX_BUFFERS 4
-
+//#include <boost/iostreams/filtering_stream.hpp>
 
 ShaderLibPro::ShaderLibPro() :
-  m_shader(ngl::ShaderLib::instance()),
-  m_textures(0),
-  m_frameBuffers(0),
-  m_depthStencilBuffers(0),
-  m_currentShader("default")
+  m_shaders(0)
 {
 
 }
 
 ShaderLibPro::~ShaderLibPro()
 {
-  std::cout << "shutting down ShaderLibPro" << std::endl;
+  //std::cout << "shutting down ShaderLibPro" << std::endl;
 
-  glDeleteTextures(m_textures.size(), &(m_textures[0]));
+
+  //glDeleteTextures(m_textures.size(), &(m_textures[0]));
 
   //this is a thing???
   //glDeleteFramebuffers(m_frameBuffers.size(), &(m_frameBuffers[0]));
@@ -30,8 +26,171 @@ ShaderLibPro::~ShaderLibPro()
   //glDeleteRenderbuffers(m_depthStencilBuffers.size(), &(m_depthStencilBuffers[0]));
 }
 
+void ShaderLibPro::setShaderInfo(const std::string &_sourceFile)
+{
+  std::cout << "loading shaders" << std::endl;
+  std::ifstream file(_sourceFile);
+
+  if(!file.is_open()){
+    std::cerr << "file not found" << _sourceFile << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
+  bool mainIsSet = false;
+  std::string line;
+  // go through first to set up each shader
+  while(std::getline(file, line)){
+    std::istringstream iss(line);
+    std::vector<std::string> splitString((std::istream_iterator<std::string>(iss)), (std::istream_iterator<std::string>()));
+    if(splitString[0] == "START"){
+      std::cout << "new Shader " << std::endl;
+
+      ShaderPro *shader = new ShaderPro;
+      m_shaders.push_back(shader);
+
+      shader->m_progID = glCreateProgram();
+      shader->m_name = splitString[1];
+
+      if(splitString[1] != "MAIN"){
+        std::cout << "not main, do frame buffer stuff" << std::endl;
+
+
+
+
+
+        // frame buffer stuff!
+
+
+
+
+
+      }
+      else{
+        mainIsSet = true;
+        std::cout << "MAIN!" << std::endl;
+      }
+    }
+  }
+
+
+  if(!mainIsSet){
+    std::cerr << "WARNING: no main shader set!" << std::endl;
+  }
+
+
+
+  int lineNum = 1;
+  int shaderNum = 0;
+  ShaderPro *currentShader = nullptr;
+
+  // reset file
+  file.clear();
+  file.seekg(0, file.beg);
+  while(std::getline(file, line)){
+    std::istringstream iss(line);
+    std::vector<std::string> splitString((std::istream_iterator<std::string>(iss)), (std::istream_iterator<std::string>()));
+
+    if(splitString[0] == "START"){
+      if(shaderNum < m_shaders.size()){
+        currentShader = m_shaders[shaderNum];
+      }
+      else{
+        std::cerr << "ERROR: trying to work on shader that doesn't fit, line " << lineNum << std::endl;
+      }
+    }
+    // if we have a valid currentShader:
+    else if(currentShader){
+      if(splitString[0] == "VERTEX"){
+          std::cout << "vertex!" << std::endl;
+
+          currentShader->m_vertID = glCreateShader(GL_VERTEX_SHADER);
+          currentShader->m_vertFile = splitString[1];
+      }
+      else if(splitString[0] == "FRAGMENT"){
+          std::cout << "fragment!" << std::endl;
+
+          currentShader->m_fragID = glCreateShader(GL_FRAGMENT_SHADER);
+          currentShader->m_fragFile = splitString[1];
+
+      }
+      else if(splitString[0] == "TEXTURE"){
+          std::cout << "adding texture: ";
+
+          TextureData texture;
+          GLuint texID;
+          if(splitString[1] == "2D"){
+            std::cout << "2D!" << std::endl;
+
+            glGenTextures(1, &texID);
+            texture.id = texID;
+
+            texture.type = TEXTURE2D;
+            texture.textureFile = splitString[1];
+          }
+          else if(splitString[1] == "CUBE"){
+            std::cout << "cube!" << std::endl;
+
+            glGenTextures(1, &texID);
+            texture.id = texID;
+
+            texture.type = TEXTURECUBE;
+            texture.textureFile = splitString[1];
+          }
+          else if(splitString[1] == "BUFFER"){
+            std::cout << "buffer!" << std::endl;
+            texture.type = BUFFER;
+            texture.textureFile = "\0";
+          }
+          else{
+            std::cerr << "ERROR: unrecognised texture type, line " << lineNum << std::endl;
+          }
+
+          currentShader->m_textures.push_back(texture);
+      }
+
+      else if(splitString[0] == "END"){
+          std::cout << "end of Shader" << std::endl;
+
+          currentShader = nullptr;
+          shaderNum++;
+      }
+      else{
+        std::cerr << "ERROR: glll line " << lineNum << std::endl;
+      }
+    }
+    else{
+      std::cerr << "ERROR: no current shader, line " << lineNum << std::endl;
+    }
+    lineNum++;
+  }
+
+  loadShaders();
+}
+
+void ShaderLibPro::draw(NGLScene *_scene)
+{
+
+}
+
+void ShaderLibPro::loadShaders()
+{
+  for(ShaderPro *shader : m_shaders){
+    shader->compile();
+  }
+}
+
+
+
+
+
+
+
+
+/*
 void ShaderLibPro::newShaderProgram(const std::string &_progName, const std::string &_fragFile, const std::string &_vertFile)
 {
+  ShaderData shaderData = {_progName, std::vector<GLuint>(0) };
+  m_shaderData.push_back(shaderData);
   std::string fragShader = _progName + "Frag";
   std::string vertShader = _progName + "Vert";
   std::cout << fragShader << ", " << vertShader << std::endl;
@@ -47,8 +206,9 @@ void ShaderLibPro::newShaderProgram(const std::string &_progName, const std::str
 
   // create shader from frag source and base, which includes version and uniforms
   std::string fragShaderSource = loadShaderSource("shaders/BaseFragment.glsl") + loadShaderSource(_fragFile) + "\0";
-  //replace deprecated function that shadertoy uses
+  //replace deprecated functions that shadertoy uses
   boost::replace_all(fragShaderSource, "texture2D", "texture");
+ // boost::replace_all(fragShaderSource, "textureCube", "texture");
   m_shader->loadShaderSourceFromString(fragShader, fragShaderSource);
 
   // compile source code
@@ -64,6 +224,7 @@ void ShaderLibPro::newShaderProgram(const std::string &_progName, const std::str
   useShaderProgram(_progName);
 }
 
+<<<<<<< HEAD
 void ShaderLibPro::draw(NGLScene *scene)
 {
   setShaderUniforms();
@@ -80,6 +241,8 @@ void ShaderLibPro::setShaderUniforms()
   m_shader->setRegisteredUniform("iDate", m_date);
 }
 
+=======
+>>>>>>> 9472b6eb9ea9e8deb078c9b58c5cf422d60ee571
 // just loading text from files
 std::string ShaderLibPro::loadShaderSource(const std::string &_fileName)
 {
@@ -141,89 +304,89 @@ int ShaderLibPro::useTexture(int _textureUnit, const std::string &_textureFile)
       std::cout << "accessing textures" <<std::endl;
 
       glGenTextures( 1, &(m_textures[numOfTextures]) );
+
+      // moved this to here, not entirely sure if it's the correct place?
+      glBindTexture(GL_TEXTURE_2D, m_textures[_textureUnit]);
   }
 
   // set file string in vector
   m_textureFiles[_textureUnit] = _textureFile;
 
-  // load file
-  loadTextureFile(_textureUnit, _textureFile);
+
+  // if a string is given, load file
+  if(_textureFile != ""){
+    loadTextureFile(_textureUnit, _textureFile);
+  }
 
   return _textureUnit;
 }
 
 void ShaderLibPro::loadTextureFile(int _textureUnit, const std::string &_textureFile)
 {
-  // set active texture unit
-  glActiveTexture(GL_TEXTURE0 + _textureUnit);
-
-  glBindTexture(GL_TEXTURE_2D, m_textures[_textureUnit]);
-
   // based on jon's image loading
   GLuint progID = m_shader->getProgramID(m_currentShader);
-  if(!_textureFile.empty())
+
+  QImage image;
+  // load given texture files
+  bool loaded=image.load(_textureFile.c_str());
+  if(loaded == true)
   {
+    int width=image.width();
+    int height=image.height();
 
-    QImage image;
-    // load given texture files
-    bool loaded=image.load(_textureFile.c_str());
-    if(loaded == true){
-      int width=image.width();
-      int height=image.height();
-
-      unsigned char *data = new unsigned char[ width*height*3];
-      unsigned int index=0;
-      // reversed height so it loads as is used in shader
-      for( int y=height-1; y>=0; --y){
-        for( int x=0; x<width; ++x){
-          // getting RGB from the image
-          QRgb colour=image.pixel(x,y);
-          data[index++]=qRed(colour);
-          data[index++]=qGreen(colour);
-          data[index++]=qBlue(colour);
-        }
+    unsigned char *data = new unsigned char[ width*height*3];
+    unsigned int index=0;
+    // reversed height so it loads as is used in shader
+    for( int y=height-1; y>=0; --y)
+    {
+      for( int x=0; x<width; ++x)
+      {
+        // getting RGB from the image
+        QRgb colour=image.pixel(x,y);
+        data[index++]=qRed(colour);
+        data[index++]=qGreen(colour);
+        data[index++]=qBlue(colour);
       }
-
-      // bind the texture to the GLuint - put somewhere else now, not sure if right?
-      //glBindTexture(GL_TEXTURE_2D, m_textures[_channelNum]);
-      // load texture
-      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-
-      // clean up
-      delete[] data;
     }
-    else{
-      std::cerr << _textureFile << " was not found" << std::endl;
-      exit(EXIT_FAILURE);
-    }
+
+    // set active texture unit
+    glActiveTexture(GL_TEXTURE0 + _textureUnit);
+
+    // bind the texture to the GLuint - put somewhere else now, not sure if right?
+    //glBindTexture(GL_TEXTURE_2D, m_textures[_channelNum]);
+    // load texture
+    glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,width,height,0,GL_RGB,GL_UNSIGNED_BYTE,data);
+
+    // setting up mipmap parameters
+    // not sure whehter the first should be GL_LINEAR or GL_LINEAR_MIPMAP_LINEAR?
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+    // set wrapping parameters for textures
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    // creating mipmaps, needs to be done after texture is loaded
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    // calculate texture channel name
+    // this allows for easier adding of textures, as they can all be called iChannelX where X is their number
+    std::ostringstream convertStream;
+    convertStream << _textureUnit;
+    std::string channelName = "iChannel" + convertStream.str();
+
+    // get texture unit location and set uniform up
+    GLuint texLocation = glGetUniformLocation(progID, channelName.c_str());
+    glUniform1i(texLocation, _textureUnit);
+
+    // print info to confirm texture loaded
+    std::cout << "Loaded texture to " << channelName.c_str() << std::endl;
+    // clean up
+    delete[] data;
   }
   else{
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 512, 288, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    std::cerr << _textureFile << " was not found" << std::endl;
+    exit(EXIT_FAILURE);
   }
-
-  // setting up mipmap parameters
-  // not sure whehter the first should be GL_LINEAR or GL_LINEAR_MIPMAP_LINEAR?
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-
-  // set wrapping parameters for textures
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  // creating mipmaps, needs to be done after texture is loaded
-  glGenerateMipmap(GL_TEXTURE_2D);
-
-  // calculate texture channel name
-  // this allows for easier adding of textures, as they can all be called iChannelX where X is their number
-  std::ostringstream convertStream;
-  convertStream << _textureUnit;
-  std::string channelName = "iChannel" + convertStream.str();
-
-  // get texture unit location and set uniform up
-  GLuint texLocation = glGetUniformLocation(progID, channelName.c_str());
-  glUniform1i(texLocation, _textureUnit);
-
-  // print info to confirm texture loaded
-  std::cout << "Loaded texture to " << channelName.c_str() << std::endl;
 }
 
 void ShaderLibPro::createFrameBuffer(int _bufferNum, int _textureUnit)
@@ -262,6 +425,25 @@ void ShaderLibPro::createBufferTexture(int _textureUnit)
   // useTexture returns the actual textureUnit being used, so need to set _textureUnit in case
   _textureUnit = useTexture(_textureUnit);
 
+  // not in useTexture function, so set here? also not sure if necessary?
+  glActiveTexture(GL_TEXTURE0 + _textureUnit);
+
+  // width and height should NOT be hard coded
+  // if this varies from regular width/height, a glViewport call is probably necessary
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 512, 288, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+
+  // setting up mipmap parameters
+  // might only want these to be linear?
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+  // set wrapping parameters for textures
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  // not sure whether this works here?
+  glGenerateMipmap(GL_TEXTURE_2D);
+
   //woah boy wtf???????????????
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_textures[_textureUnit], 0);
 }
+*/

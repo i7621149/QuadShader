@@ -64,6 +64,7 @@ private:
   //----------------------------------------------------------------------------------------------------------------------
   void toggleFullScreen();
 
+
   /// @brief this method is called every time a mouse is moved
   /// @param _event the Qt Event structure
   //----------------------------------------------------------------------------------------------------------------------
@@ -99,8 +100,6 @@ private:
 
   GLuint m_vaoID;
 
-  int m_frame;
-
   void createQuad();
 
   bool m_fullScreen;
@@ -110,6 +109,8 @@ private:
   QTime m_time;
 
   int m_lastFrameTime;
+
+  ngl::Vec4 m_mouseData;
 };
 
 #endif

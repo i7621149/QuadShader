@@ -1,0 +1,4 @@
+START MAIN
+  FRAGMENT shaders/FurFragment.glsl
+  VERTEX shaders/QuadVertex.glsl
+END

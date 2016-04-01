@@ -1,5 +1,5 @@
 # This specifies the exe name
-TARGET=QuadShader
+TARGET=FelixShader
 # where to put the .o files
 OBJECTS_DIR=obj
 # core Qt Libs to use add more here if needed.
@@ -18,11 +18,15 @@ CONFIG-=app_bundle
 # Auto include all .cpp files in the project src directory (can specifiy individually if required)
 SOURCES+= $$PWD/src/main.cpp \
           $$PWD/src/NGLScene.cpp \
-          $$PWD/src/ShaderLibPro.cpp
+          $$PWD/src/ShaderLibPro.cpp \
+          $$PWD/src/ShaderVariables.cpp \
+          $$PWD/src/ShaderPro.cpp
 # same for the .h files
 HEADERS+= $$PWD/include/NGLScene.h \
           $$PWD/include/ShaderLibPro.h \
-          $$PWD/include/ShaderPro.h
+          $$PWD/include/ShaderVariables.h \
+          $$PWD/include/ShaderPro.h \
+          $$PWD/include/TextureData.h
 # and add the include dir into the search path for Qt and make
 INCLUDEPATH +=./include
 # where our exe is going to live (root of project)
@@ -30,7 +34,8 @@ DESTDIR=./
 # add the glsl shader files
 OTHER_FILES += README.md \
                TODO.txt \
-               ./shaders/*.glsl
+               ./shaders/*.glsl \
+               ./shaders/*.glll
 # were are going to default to a console app
 CONFIG += console
 # note each command you add needs a ; as it will be run as a single line
