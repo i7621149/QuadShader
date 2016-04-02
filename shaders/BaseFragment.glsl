@@ -32,7 +32,7 @@ uniform vec4 iDate;
 //uniform float iSampleRate;
 //----------------------------------------------------------------------------------------------------------------//
 
-// need to set up 4 channels to match shadertoy, more are possible
+// need to set up 4 channels to match shadertoy, more are possible, these are added by the C++ code, so aren't needed here
 //uniform sampler2D iChannel0;
 //uniform sampler2D iChannel1;
 //uniform sampler2D iChannel2;

@@ -802,9 +802,9 @@ void main()
     vec2 q = fragCoord.xy/iResolution.xy;
     col *= 0.3 + 0.7*pow(16.0*q.x*q.y*(1.0-q.x)*(1.0-q.y),0.1);
 
-    if(q.x < 0.2){
-      col = (texture2D(iChannel4, q)).xyz;
-    }
+    //if(q.x < 0.2){
+    //  col = (texture2D(iChannel4, q)).xyz;
+    //}
 
     fragColor = vec4( col, 1.0 );
 }

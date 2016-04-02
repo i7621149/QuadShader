@@ -26,9 +26,9 @@ void ShaderPro::compile()
 {
   loadVertSource();
   loadFragSource();
-  loadTextures();
   glLinkProgram(m_progID);
   glUseProgram(m_progID);
+  loadTextures();
 }
 
 void ShaderPro::loadVertSource()
@@ -97,6 +97,9 @@ std::string ShaderPro::getFragBase()
     if(texture.type == TEXTURE2D){
       fragBase += "uniform sampler2D iChannel" + textureString + ";\n";
     }
+    else if(texture.type == TEXTURECUBE){
+      fragBase += "uniform samplerCube iChannel" + textureString + ";\n";
+    }
 
     textureNum++;
   }
@@ -107,21 +110,27 @@ void ShaderPro::loadTextures()
 {
   int textureUnit = 0;
   for(TextureData texture : m_textures){
-    // currently just doing it for TEXTURE2D
+
+    // load texturefile if it is 2d or cube
     if(texture.type == TEXTURE2D){
-      loadImage(textureUnit, texture);
+      std::cout << std::endl << "loading 2D texture" << std::endl;
+      loadImage(textureUnit, texture, GL_TEXTURE_2D);
+    }
+    else if(texture.type == TEXTURECUBE){
+      std::cout << std::endl << "loading CUBE texture" << std::endl;
+      loadImage(textureUnit, texture, GL_TEXTURE_CUBE_MAP);
     }
     textureUnit++;
   }
 }
 
-void ShaderPro::loadImage(int _textureUnit, TextureData _texture)
+void ShaderPro::loadImage(int _textureUnit, TextureData _texture, GLenum _type)
 {
+  std::cout << "texture ID: " << _texture.id <<std::endl;
+  std::cout << "texture unit: " << _textureUnit << std::endl;
+
   QImage image;
   // load given texture files
-
-  std::cout << "\n\n\n\n\nloading " << _texture.textureFile << "\n\n\n\n\n\n" << std::endl;
-
   bool loaded=image.load(_texture.textureFile.c_str());
   if(loaded == true)
   {
@@ -146,23 +155,22 @@ void ShaderPro::loadImage(int _textureUnit, TextureData _texture)
     // set active texture unit
     glActiveTexture(GL_TEXTURE0 + _textureUnit);
 
-
     // is this the right place??
-    glBindTexture(GL_TEXTURE_2D, _texture.id);
+    glBindTexture(_type, _texture.id);
 
     // load texture
-    glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,width,height,0,GL_RGB,GL_UNSIGNED_BYTE,data);
+    glTexImage2D(_type,0,GL_RGB,width,height,0,GL_RGB,GL_UNSIGNED_BYTE,data);
 
     // setting up mipmap parameters
-    // not sure whehter the first should be GL_LINEAR or GL_LINEAR_MIPMAP_LINEAR?
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    // not sure whether the first should be GL_LINEAR or GL_LINEAR_MIPMAP_LINEAR?
+    glTexParameteri(_type, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(_type, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
     // set wrapping parameters for textures
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(_type, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(_type, GL_TEXTURE_WRAP_T, GL_REPEAT);
     // creating mipmaps, needs to be done after texture is loaded
-    glGenerateMipmap(GL_TEXTURE_2D);
+    glGenerateMipmap(_type);
 
     // calculate texture channel name
     // this allows for easier adding of textures, as they can all be called iChannelX where X is their number
@@ -172,10 +180,17 @@ void ShaderPro::loadImage(int _textureUnit, TextureData _texture)
 
     // get texture unit location and set uniform up
     GLuint texLocation = glGetUniformLocation(m_progID, channelName.c_str());
+
     glUniform1i(texLocation, _textureUnit);
 
-    // print info to confirm texture loaded
-    std::cout << "Loaded texture to " << channelName.c_str() << std::endl;
+    if(texLocation == -1){
+      // warning, as it might not exist if it is never used in shader
+      std::cerr << "WARNING: cannot get uniform location of " << channelName << "\nPerhaps it is not being used in the shader?" << std::endl;
+    }
+    else{
+      // print info to confirm texture loaded
+      std::cout << "Loaded texture to " << channelName.c_str() << std::endl;
+    }
     // clean up
     delete[] data;
   }

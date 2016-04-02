@@ -25,7 +25,7 @@ public :
 
   void loadTextures();
 
-  void loadImage(int _textureUnit, TextureData _texture);
+  void loadImage(int _textureUnit, TextureData _texture, GLenum _type);
 
   void printShaderData();
 

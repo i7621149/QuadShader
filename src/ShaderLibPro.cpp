@@ -19,9 +19,9 @@ ShaderLibPro::~ShaderLibPro()
 
   //glDeleteTextures(m_textures.size(), &(m_textures[0]));
 
-  //this is a thing???
+  // this is a thing???
   //glDeleteFramebuffers(m_frameBuffers.size(), &(m_frameBuffers[0]));
-  //????????????????? what goes in there ????????????
+  // ????????????????? what goes in there ????????????
   //glDeleteRenderbuffers(m_depthStencilBuffers.size(), &(m_depthStencilBuffers[0]));
 }
 
@@ -41,6 +41,12 @@ void ShaderLibPro::setShaderInfo(const std::string &_sourceFile)
   while(std::getline(file, line)){
     std::istringstream iss(line);
     std::vector<std::string> splitString((std::istream_iterator<std::string>(iss)), (std::istream_iterator<std::string>()));
+
+    if(splitString.size() == 0){
+      // empty line
+      continue;
+    }
+
     if(splitString[0] == "START"){
       std::cout << "new Shader " << std::endl;
 
@@ -85,9 +91,20 @@ void ShaderLibPro::setShaderInfo(const std::string &_sourceFile)
   // reset file
   file.clear();
   file.seekg(0, file.beg);
+  // go through file again
   while(std::getline(file, line)){
     std::istringstream iss(line);
     std::vector<std::string> splitString((std::istream_iterator<std::string>(iss)), (std::istream_iterator<std::string>()));
+
+    if(splitString.size() == 0){
+      // empty line
+      continue;
+    }
+
+    if(splitString[0][0] == '#'){
+      //commented line
+      continue;
+    }
 
     if(splitString[0] == "START"){
       if(shaderNum < m_shaders.size()){
@@ -121,6 +138,7 @@ void ShaderLibPro::setShaderInfo(const std::string &_sourceFile)
             std::cout << "2D!" << std::endl;
 
             glGenTextures(1, &texID);
+
             texture.id = texID;
 
             texture.type = TEXTURE2D;
@@ -171,9 +189,13 @@ void ShaderLibPro::draw(NGLScene *_scene)
   for(ShaderPro *shader : m_shaders){
     // debug print
     //ShaderVariables::instance()->printVariables();
+
+    glUseProgram(shader->m_progID);
+
     ShaderVariables::instance()->loadToShader(shader->m_progID);
 
     _scene->drawScene();
+    //shader->printShaderData();
   }
 }
 

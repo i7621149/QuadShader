@@ -57,31 +57,10 @@ void NGLScene::initializeGL()
   // enable multisampling for smoother drawing
   glEnable(GL_MULTISAMPLE);
 
+  // enable nice cube maps, no seams
+  glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+
   ShaderLibPro::instance()->setShaderInfo("shaders/test.glll");
-
-  // this allows for automatic generation and compilation of shaders, plus loading texture easily
-  //ShaderLibPro *shaderLib = ShaderLibPro::instance();
-  // using shaderLibPro to generate simple vert/frag shaders
-  //shaderLib->newShaderProgram("default", "shaders/DefaultQuadFragment.glsl");
-
-  //shaderLib->newShaderProgram("text", "shaders/TextInfoFragment.glsl");
-  //shaderLib->newShaderProgram("snail", "shaders/SnailFragment.glsl");
-  //shaderLib->newShaderProgram("dolphin", "shaders/DolphinFragment.glsl");
-
-  // need to use samlperCube
-  //shaderLib->newShaderProgram("new", "shaders/NewFragment.glsl");
-
-  // make sure current shader is clearly set
-  //setCurrentShader("default");
-
-  // load textures to the 4 active texture units
-  //shaderLib->useTexture(0, "textures/tex12.png");
-  //shaderLib->useTexture(1, "textures/tex19.png");
-  //shaderLib->useTexture(2, "textures/tex09.png");
-  //shaderLib->useTexture(3, "textures/tex16.png");
-  //shaderLib->useTexture(4, "textures/tex04.png");
-
-  //shaderLib->createFrameBuffer(0, 1);
 
   // define the quad
   createQuad();
