@@ -1,5 +1,5 @@
 # This specifies the exe name
-TARGET=FelixShader
+TARGET=QuadShader
 # where to put the .o files
 OBJECTS_DIR=obj
 # core Qt Libs to use add more here if needed.
@@ -35,7 +35,9 @@ DESTDIR=./
 OTHER_FILES += README.md \
                TODO.txt \
                ./shaders/*.glsl \
-               ./shaders/*.glll
+               ./shaders/*.glll \
+               ./shaders/buffertest/*.glll \
+               ./shaders/buffertest/*.glsl
 # were are going to default to a console app
 CONFIG += console
 # note each command you add needs a ; as it will be run as a single line

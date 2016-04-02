@@ -25,6 +25,8 @@ public :
 
   void loadTextures();
 
+  void texturesToShader();
+
   void loadImage(int _textureUnit, TextureData _texture, GLenum _type);
 
   void printShaderData();
@@ -32,6 +34,8 @@ public :
   enum class DebugMode {COMPILE, LINK}; //useful for setting stuff, being readable
 
   void printInfoLog(GLuint _id, DebugMode _mode);
+
+  void setUpFramebuffer();
 
   std::string m_name;
 
@@ -41,7 +45,11 @@ public :
 
   GLuint m_vertID;
 
-  GLuint m_outID;
+  GLuint m_outBufferID;
+
+  GLuint m_outTextureID;
+
+  GLuint m_outDepthStencilID;
 
   std::string m_fragFile;
 

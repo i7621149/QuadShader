@@ -1,0 +1,24 @@
+
+SHADER A
+  FRAGMENT shaders/buffertest/bufferA.glsl
+  VERTEX   shaders/QuadVertex.glsl
+
+  TEXTURE 2D textures/tex01.png
+  TEXTURE 2D textures/tex19.png
+  TEXTURE 2D textures/tex09.png
+  TEXTURE 2D textures/tex16.png
+END A
+
+
+
+
+
+SHADER MAIN
+  FRAGMENT shaders/buffertest/main.glsl
+  VERTEX   shaders/QuadVertex.glsl
+
+  TEXTURE 2D textures/tex12.png
+  #TEXTURE BUFFER A
+END MAIN
+
+

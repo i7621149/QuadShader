@@ -26,9 +26,13 @@ public :
 
   void setShaderInfo(const std::string &_sourceFile);
 
+  void draw(NGLScene *_scene);
+
   void loadShaders();
 
-  void draw(NGLScene *_scene);
+  ShaderPro *getShader(const std::string &_shaderName);
+
+
 
 private :
   ShaderLibPro();

@@ -60,7 +60,8 @@ void NGLScene::initializeGL()
   // enable nice cube maps, no seams
   glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
-  ShaderLibPro::instance()->setShaderInfo("shaders/test.glll");
+  //ShaderLibPro::instance()->setShaderInfo("shaders/test.glll");
+  ShaderLibPro::instance()->setShaderInfo("shaders/buffertest/buffertest.glll");
 
   // define the quad
   createQuad();

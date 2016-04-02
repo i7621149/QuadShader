@@ -10,7 +10,7 @@ struct TextureData
 {
   GLuint id;
   textureType type;
-  std::string textureFile;
+  std::string textureSource;
 };
 
 #endif//TEXTUREDATA_H__

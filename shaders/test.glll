@@ -1,4 +1,4 @@
-START MAIN
+SHADER MAIN
   FRAGMENT   shaders/SnailFragment.glsl
   VERTEX     shaders/QuadVertex.glsl
 
@@ -8,4 +8,5 @@ START MAIN
   TEXTURE 2D textures/tex19.png
   TEXTURE 2D textures/tex09.png
   TEXTURE 2D textures/tex16.png
-END
+END MAIN
+

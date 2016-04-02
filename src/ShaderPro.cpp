@@ -9,7 +9,9 @@
 
 ShaderPro::ShaderPro() :
   m_progID(0),
-  m_outID(0),
+  m_outBufferID(0),
+  m_outTextureID(0),
+  m_outDepthStencilID(0),
   m_fragFile("\0"),
   m_vertFile("\0"),
   m_textures(0)
@@ -19,13 +21,20 @@ ShaderPro::ShaderPro() :
 
 ShaderPro::~ShaderPro()
 {
-
+  if(m_name != "MAIN"){
+    glDeleteFramebuffers(1, &m_outBufferID);
+  }
 }
 
 void ShaderPro::compile()
 {
   loadVertSource();
   loadFragSource();
+
+  if(m_name != "MAIN"){
+    setUpFramebuffer();
+  }
+
   glLinkProgram(m_progID);
   glUseProgram(m_progID);
   loadTextures();
@@ -37,8 +46,8 @@ void ShaderPro::loadVertSource()
 
   std::string vertSource = loadSource("shaders/BaseVertex.glsl") + loadSource(m_vertFile) + "\0";
 
-  // testing that we've got the text from the file
-  std::cout << vertSource << std::endl;
+  // print out final vertSource
+  //std::cout << vertSource << std::endl;
 
   const char *cVertSource = vertSource.c_str();
 
@@ -58,8 +67,8 @@ void ShaderPro::loadFragSource()
   boost::replace_all(fragSource, "texture2D", "texture");
   boost::replace_all(fragSource, "textureCube", "texture");
 
-  // testing that we've got the text from the file
-  std::cout << fragSource << std::endl;
+  // print out final fragSource
+  //std::cout << fragSource << std::endl;
 
   const char *cFragSource = fragSource.c_str();
 
@@ -69,6 +78,7 @@ void ShaderPro::loadFragSource()
   glAttachShader(m_progID, m_fragID);
 }
 
+// simple loading text from file
 std::string ShaderPro::loadSource(const std::string &_fileName)
 {
   std::ifstream shaderSource(_fileName);
@@ -85,6 +95,7 @@ std::string ShaderPro::loadSource(const std::string &_fileName)
   return source;
 }
 
+// add required information to fragment shader, such as correct uniforms
 std::string ShaderPro::getFragBase()
 {
   std::string fragBase = loadSource("shaders/BaseFragment.glsl");
@@ -99,6 +110,9 @@ std::string ShaderPro::getFragBase()
     }
     else if(texture.type == TEXTURECUBE){
       fragBase += "uniform samplerCube iChannel" + textureString + ";\n";
+    }
+    else if(texture.type == BUFFER){
+      fragBase += "uniform sampler2D iChannel" + textureString + ";\n";
     }
 
     textureNum++;
@@ -124,6 +138,39 @@ void ShaderPro::loadTextures()
   }
 }
 
+void ShaderPro::texturesToShader()
+{
+  int textureUnit = 0;
+  for(TextureData texture : m_textures){
+
+    glActiveTexture(GL_TEXTURE0 + textureUnit);
+
+    if(texture.type == TEXTURE2D){
+      // is this the right place??
+      glBindTexture(GL_TEXTURE_2D, texture.id);
+    }
+    else if(texture.type == TEXTURECUBE){
+      glBindTexture(GL_TEXTURE_CUBE_MAP, texture.id);
+    }
+    else if(texture.type == BUFFER){
+      glBindTexture(GL_TEXTURE_2D, texture.id);
+    }
+
+    // calculate texture channel name
+    // this allows for easier adding of textures, as they can all be called iChannelX where X is their number
+    std::ostringstream convertStream;
+    convertStream << textureUnit;
+    std::string channelName = "iChannel" + convertStream.str();
+
+    // get texture unit location and set uniform up
+    GLuint texLocation = glGetUniformLocation(m_progID, channelName.c_str());
+
+    glUniform1i(texLocation, textureUnit);
+
+    textureUnit++;
+  }
+}
+
 void ShaderPro::loadImage(int _textureUnit, TextureData _texture, GLenum _type)
 {
   std::cout << "texture ID: " << _texture.id <<std::endl;
@@ -131,7 +178,7 @@ void ShaderPro::loadImage(int _textureUnit, TextureData _texture, GLenum _type)
 
   QImage image;
   // load given texture files
-  bool loaded=image.load(_texture.textureFile.c_str());
+  bool loaded=image.load(_texture.textureSource.c_str());
   if(loaded == true)
   {
     int width=image.width();
@@ -195,26 +242,30 @@ void ShaderPro::loadImage(int _textureUnit, TextureData _texture, GLenum _type)
     delete[] data;
   }
   else{
-    std::cerr << _texture.textureFile << " was not found" << std::endl;
+    std::cerr << _texture.textureSource << " was not found" << std::endl;
     exit(EXIT_FAILURE);
   }
 }
 
 void ShaderPro::printShaderData()
 {
+  std::cout << std::endl;
   std::cout << "SHADER INFO" << std::endl;
   std::cout << "m_name: " << m_name << std::endl;
   std::cout << "m_progID: " << m_progID << std::endl;
-  std::cout << "m_fragID: " << m_name << std::endl;
-  std::cout << "m_vertID: " << m_progID << std::endl;
-  std::cout << "m_outID: " << m_name << std::endl;
+  std::cout << "m_fragID: " << m_fragID << std::endl;
+  std::cout << "m_vertID: " << m_vertID << std::endl;
+  std::cout << "m_outBufferID: " << m_outBufferID << std::endl;
+  std::cout << "m_outTextureID: " << m_outTextureID << std::endl;
+  std::cout << "m_outDepthStencilID: " << m_outDepthStencilID << std::endl;
   std::cout << "m_fragFile: " << m_fragFile << std::endl;
   std::cout << "m_vertFile: " << m_vertFile << std::endl;
 
   std::cout << "Textures:" << std::endl;
   for(TextureData texture : m_textures){
-    std::cout << "Texture: " << texture.id << ", " << texture.type << ", " << texture.textureFile << std::endl;
+    std::cout << "Texture: " << texture.id << ", " << texture.type << ", " << texture.textureSource << std::endl;
   }
+  std::cout << std::endl;
 }
 
 // this allows us to print off info about whether the shader compiled correctly
@@ -247,4 +298,34 @@ void ShaderPro::printInfoLog(GLuint _id, DebugMode _mode)
       exit(EXIT_FAILURE);
     }
   }
+}
+
+void ShaderPro::setUpFramebuffer()
+{
+  glBindFramebuffer(GL_FRAMEBUFFER, m_outBufferID);
+
+  glBindTexture(GL_TEXTURE_2D, m_outTextureID);
+
+  glTexImage2D(
+      GL_TEXTURE_2D, 0, GL_RGB, 512, 288, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL
+  );
+
+  //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+  // set wrapping parameters for textures
+  //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+  // dont think this works here?
+  //glGenerateMipmap(GL_TEXTURE_2D);
+
+  // color attachment0?
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_outTextureID, 0);
+
+
+  glBindRenderbuffer(GL_RENDERBUFFER, m_outDepthStencilID);
+  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 512, 288);
+
+  glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_outDepthStencilID);
 }

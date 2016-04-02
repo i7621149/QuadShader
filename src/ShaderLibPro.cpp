@@ -47,33 +47,35 @@ void ShaderLibPro::setShaderInfo(const std::string &_sourceFile)
       continue;
     }
 
-    if(splitString[0] == "START"){
+    if(splitString[0] == "SHADER"){
       std::cout << "new Shader " << std::endl;
 
       ShaderPro *shader = new ShaderPro;
-      m_shaders.push_back(shader);
 
       shader->m_progID = glCreateProgram();
       shader->m_name = splitString[1];
 
       if(splitString[1] != "MAIN"){
-        std::cout << "not main, do frame buffer stuff" << std::endl;
+        std::cout << "not main, generating framebuffer" << std::endl;
+        GLuint bufferID;
+        GLuint bufferTexID;
+        GLuint bufferDepthStencilID;
 
+        glGenFramebuffers(1, &bufferID);
+        glGenTextures(1, &bufferTexID);
+        glGenRenderbuffers(1, &bufferDepthStencilID);
 
-
-
-
-        // frame buffer stuff!
-
-
-
-
+        shader->m_outBufferID = bufferID;
+        shader->m_outTextureID = bufferTexID;
+        shader->m_outDepthStencilID = bufferDepthStencilID;
 
       }
       else{
         mainIsSet = true;
         std::cout << "MAIN!" << std::endl;
       }
+
+      m_shaders.push_back(shader);
     }
   }
 
@@ -106,7 +108,7 @@ void ShaderLibPro::setShaderInfo(const std::string &_sourceFile)
       continue;
     }
 
-    if(splitString[0] == "START"){
+    if(splitString[0] == "SHADER"){
       if(shaderNum < m_shaders.size()){
         currentShader = m_shaders[shaderNum];
       }
@@ -134,6 +136,7 @@ void ShaderLibPro::setShaderInfo(const std::string &_sourceFile)
 
           TextureData texture;
           GLuint texID;
+
           if(splitString[1] == "2D"){
             std::cout << "2D!" << std::endl;
 
@@ -142,21 +145,32 @@ void ShaderLibPro::setShaderInfo(const std::string &_sourceFile)
             texture.id = texID;
 
             texture.type = TEXTURE2D;
-            texture.textureFile = splitString[2];
+            texture.textureSource = splitString[2];
           }
           else if(splitString[1] == "CUBE"){
             std::cout << "cube!" << std::endl;
 
             glGenTextures(1, &texID);
+
             texture.id = texID;
 
             texture.type = TEXTURECUBE;
-            texture.textureFile = splitString[2];
+            texture.textureSource = splitString[2];
           }
           else if(splitString[1] == "BUFFER"){
             std::cout << "buffer!" << std::endl;
+            ShaderPro *shader = getShader(splitString[2]);
+
+            if(shader){
+              texture.id = shader->m_outTextureID;
+            }
+            else{
+              std::cerr << "loading shader " << splitString[2] << " failed!" <<std::endl;
+              exit(EXIT_FAILURE);
+            }
+
             texture.type = BUFFER;
-            texture.textureFile = "\0";
+            texture.textureSource = shader->m_name;
           }
           else{
             std::cerr << "ERROR: unrecognised texture type, line " << lineNum << std::endl;
@@ -190,13 +204,22 @@ void ShaderLibPro::draw(NGLScene *_scene)
     // debug print
     //ShaderVariables::instance()->printVariables();
 
+    glBindFramebuffer(GL_FRAMEBUFFER, shader->m_outBufferID);
+
     glUseProgram(shader->m_progID);
+
+    //shader->texturesToShader();
+    shader->printShaderData();
+
+    std::cout << "bufferID: " << shader->m_outBufferID << std::endl;
+    std::cout << "textureOut: " << shader->m_outTextureID << std::endl;
+    std::cout << "textureIn: " << shader->m_textures[1].id << std::endl;
 
     ShaderVariables::instance()->loadToShader(shader->m_progID);
 
     _scene->drawScene();
-    //shader->printShaderData();
   }
+  std::cout << std::endl;
 }
 
 void ShaderLibPro::loadShaders()
@@ -206,7 +229,17 @@ void ShaderLibPro::loadShaders()
   }
 }
 
-
+ShaderPro *ShaderLibPro::getShader(const std::string &_shaderName)
+{
+  for(ShaderPro *shader : m_shaders){
+    if(shader->m_name == _shaderName){
+      std::cout << "shader " << _shaderName << " found!" << std::endl;
+      return shader;
+    }
+  }
+  std::cerr << "ERROR: Shader " << _shaderName << " not found!" << std::endl;
+  return nullptr;
+}
 
 
 
