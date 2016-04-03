@@ -2,6 +2,8 @@
 #define SHADERVARIABLES_H__
 
 #include <ngl/Util.h>
+#include <ngl/Mat4.h>
+#include <ngl/Mat3.h>
 #include <ngl/Singleton.h>
 
 struct ShaderVariables : public ngl::Singleton<ShaderVariables>
@@ -18,6 +20,11 @@ public :
   int frame;
   ngl::Vec4 mouse;
   ngl::Vec4 date;
+
+  ngl::Mat4 MV;
+  ngl::Mat4 MVP;
+  ngl::Mat3 normalMatrix;
+  ngl::Mat4 M;
 
 private :
   ShaderVariables();

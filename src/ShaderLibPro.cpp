@@ -198,7 +198,7 @@ void ShaderLibPro::setShaderInfo(const std::string &_sourceFile)
   loadShaders();
 }
 
-void ShaderLibPro::draw(NGLScene *_scene)
+void ShaderLibPro::draw(NGLScene* _scene)
 {
   for(ShaderPro *shader : m_shaders){
     // debug print

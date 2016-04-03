@@ -38,6 +38,11 @@ void ShaderVariables::loadToShader(GLuint _progID)
   glUniform1i(glGetUniformLocation(_progID, "iFrame"), frame);
   glUniform4f(glGetUniformLocation(_progID, "iMouse"), mouse[0], mouse[1], mouse[2], mouse[3]);
   glUniform4f(glGetUniformLocation(_progID, "iDate"), date[0], date[1], date[2], date[3]);
+
+  glUniformMatrix4fv(glGetUniformLocation(_progID, "MV"), 1, GL_FALSE, MV.openGL());
+  glUniformMatrix4fv(glGetUniformLocation(_progID, "MVP"), 1, GL_FALSE, MVP.openGL());
+  glUniformMatrix3fv(glGetUniformLocation(_progID, "normalMatrix"), 1, GL_FALSE, normalMatrix.openGL());
+  glUniformMatrix4fv(glGetUniformLocation(_progID, "M"), 1, GL_FALSE, M.openGL());
 }
 
 void ShaderVariables::printVariables()

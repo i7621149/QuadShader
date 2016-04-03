@@ -9,6 +9,7 @@
 #include <QOpenGLTexture>
 #include <QTime>
 #include <vector>
+#include <ngl/Transformation.h>
 
 //----------------------------------------------------------------------------------------------------------------------
 /// @file NGLScene.h
@@ -46,7 +47,11 @@ public:
 
   void drawScene();
 
-  void setCurrentShader(const std::string &_progName);
+  void drawGeo();
+
+  void drawQuad();
+
+  void loadGeoDataToShaderVariables();
 
 private:
   //----------------------------------------------------------------------------------------------------------------------
@@ -63,7 +68,6 @@ private:
   void keyPressEvent(QKeyEvent *_event);
   //----------------------------------------------------------------------------------------------------------------------
   void toggleFullScreen();
-
 
   /// @brief this method is called every time a mouse is moved
   /// @param _event the Qt Event structure
@@ -111,6 +115,26 @@ private:
   int m_lastFrameTime;
 
   ngl::Vec4 m_mouseData;
+
+  enum class drawMode{TEAPOT, QUAD, SPHERE};
+
+  drawMode m_mode;
+
+  ngl::Vec3 m_position;
+
+  ngl::Vec3 m_focus;
+
+  ngl::Vec3 m_up;
+
+  ngl::Camera m_cam;
+
+  ngl::Mat4 m_view;
+
+  ngl::Mat4 m_project;
+
+  ngl::Transformation m_transform;
+
+  float m_oldYRotation;
 };
 
 #endif

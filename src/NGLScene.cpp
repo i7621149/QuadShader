@@ -16,7 +16,14 @@ NGLScene::NGLScene() :
   m_mouseDown(false),
   m_time(QTime::currentTime()),
   m_lastFrameTime(0),
-  m_mouseData(0,0,0,0)
+  m_mouseData(0,0,0,0),
+  m_mode(drawMode::TEAPOT),
+  m_position(2,1,2),
+  m_focus(0,0.5,0),
+  m_up(0,1,0),
+  m_cam(m_position, m_focus, m_up),
+  m_view(ngl::lookAt(m_position, m_focus, m_up)),
+  m_oldYRotation(0)
 {
   setTitle("Felix's Shader");
 }
@@ -34,6 +41,8 @@ void NGLScene::resizeGL(QResizeEvent *_event)
   // uses a Vec3 to be compatible with Shadertoy
   //ngl::ShaderLib::instance()->setRegisteredUniform("iResolution", ngl::Vec3(m_width, m_height, 1.0));
   ShaderVariables::instance()->resolution = ngl::Vec3(m_width, m_height, 1.0);
+
+  m_project = ngl::perspective(45.0f, float(m_width)/m_height, 0.2f, 20.0f);
 }
 
 void NGLScene::resizeGL(int _w , int _h)
@@ -44,6 +53,8 @@ void NGLScene::resizeGL(int _w , int _h)
   // uses a Vec3 to be compatible with Shadertoy, even though resolution is (x,y)
   //ngl::ShaderLib::instance()->setRegisteredUniform("iResolution", ngl::Vec3(m_width, m_height, 1.0));
   ShaderVariables::instance()->resolution = ngl::Vec3(m_width, m_height, 1.0);
+
+  m_project = ngl::perspective(45.0f, float(m_width)/m_height, 0.2f, 20.0f);
 }
 
 void NGLScene::initializeGL()
@@ -61,10 +72,13 @@ void NGLScene::initializeGL()
   glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
   //ShaderLibPro::instance()->setShaderInfo("shaders/test.glll");
-  ShaderLibPro::instance()->setShaderInfo("shaders/buffertest/buffertest.glll");
+  //ShaderLibPro::instance()->setShaderInfo("shaders/buffertest/buffertest.glll");
+  ShaderLibPro::instance()->setShaderInfo("shaders/geotest/geotest.glll");
 
   // define the quad
   createQuad();
+
+  ngl::VAOPrimitives::instance()->createSphere("sphere", 1.0, 100);
 
   // set up timer loop
   startTimer(16);
@@ -93,10 +107,77 @@ void NGLScene::drawScene()
 
   // not sure if glViewport is necessary?
   glViewport(0, 0, m_width, m_height);
+
+  if(m_mode == drawMode::QUAD){
+    drawQuad();
+  }
+  else{
+    drawGeo();
+  }
+
+}
+
+void NGLScene::drawGeo()
+{
+  std::cout << "drawing geo" << std::endl;
+  loadGeoDataToShaderVariables();
+  switch(m_mode){
+    case drawMode::TEAPOT :
+      ngl::VAOPrimitives::instance()->draw("teapot");
+      break;
+    case drawMode::SPHERE :
+      ngl::VAOPrimitives::instance()->draw("sphere");
+      break;
+  }
+}
+
+void NGLScene::drawQuad()
+{
+  // create new identity matrix
+  ngl::Mat4 identityMat4;
+  ngl::Mat3 identityMat3;
+  // should be identity automatically
+  //MVP.identity();
+
+  ShaderVariables::instance()->MVP = identityMat4;
+
   // bind and draw our quad
   glBindVertexArray(m_vaoID);
 
   glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+
+void NGLScene::loadGeoDataToShaderVariables()
+{
+  /*
+  ngl::ShaderLib *shader=ngl::ShaderLib::instance();
+
+  ngl::Mat4 MV;
+  ngl::Mat4 MVP;
+  ngl::Mat3 normalMatrix;
+  ngl::Mat4 M;
+  M=m_mouseGlobalTX;
+  normalMatrix=MV;
+  normalMatrix.inverse();
+  shader->setShaderParamFromMat4("MV",MV);
+  shader->setShaderParamFromMat4("MVP",MVP);
+  shader->setShaderParamFromMat3("normalMatrix",normalMatrix);
+  shader->setShaderParamFromMat4("M",M);
+  */
+
+  //ngl::Mat4 MV = M * m_cam.getViewMatrix();
+  //ngl::Mat4 MVP = M * m_cam.getVPMatrix();
+  //ngl::Mat3 normalMatrix = MV;
+  //normalMatrix.inverse();
+
+  ngl::Mat4 MVP;
+
+  MVP = m_transform.getMatrix() * m_view * m_project;
+
+  std::cout << MVP << std::endl;
+
+
+  ShaderVariables::instance()->MVP = MVP;
 }
 
 void NGLScene::createQuad()
@@ -132,14 +213,7 @@ void NGLScene::createQuad()
   delete [] vert;
 }
 
-void NGLScene::setCurrentShader(const std::string &_progName)
-{
-  //if(ShaderLibPro::instance()->useShaderProgram(_progName))
-  {
-    // resize to send info to shader
-    resizeGL(m_width, m_height);
-  }
-}
+
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -152,10 +226,10 @@ void NGLScene::mouseMoveEvent (QMouseEvent * _event)
 void NGLScene::mousePressEvent ( QMouseEvent * _event)
 {
   //if(_event->button() == Qt::LeftButton){
-    QPoint p = this->mapFromGlobal(QCursor::pos());
-    m_mouseData[2] = p.x();
-    m_mouseData[3] = m_height-p.y();
+    m_mouseData[2] = _event->x();
+    m_mouseData[3] = m_height-_event->y();
     m_mouseDown = true;
+    m_oldYRotation = m_transform.getRotation()[1];
   //}
 }
 
@@ -195,9 +269,9 @@ void NGLScene::keyPressEvent(QKeyEvent *_event)
     // toggle fullscreen because who has time for two buttons for this
     case Qt::Key_F : toggleFullScreen(); break;
 
-    //case Qt::Key_0 : setCurrentShader("default"); break;
-    //case Qt::Key_1 : setCurrentShader("text"); break;
-    //case Qt::Key_2 : setCurrentShader("snail"); break;
+    case Qt::Key_0 : m_mode = drawMode::QUAD; break;
+    case Qt::Key_1 : m_mode = drawMode::TEAPOT; break;
+    case Qt::Key_2 : m_mode = drawMode::SPHERE; break;
     //case Qt::Key_3 : setCurrentShader("dolphin"); break;
     //case Qt::Key_4 : setCurrentShader("new"); break;
 
@@ -234,6 +308,12 @@ void NGLScene::timerEvent(QTimerEvent *)
     QPoint p = this->mapFromGlobal(QCursor::pos());
     m_mouseData[0] = p.x();
     m_mouseData[1] = m_height-p.y();
+
+    float rotation;
+
+    rotation = m_mouseData[0] - m_mouseData[2];
+
+    m_transform.setRotation(0, m_oldYRotation+rotation, 0);
   }
   //shaderLib->setRegisteredUniform("iMouse", m_mouseData);
   ShaderVariables::instance()->mouse = m_mouseData;
