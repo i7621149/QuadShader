@@ -184,7 +184,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
 
     color = c.xyz;
   }
-      //color *= (texture2D(iChannel1, fragCoord.xy/iResolution.xy)).xyz * 2.0;
+  color *= (texture2D(iChannel1, fragCoord.xy/iResolution.xy)).xyz * 2.0;
 
   fragColor = vec4(2. * color, 1.0 );
 }
