@@ -107,7 +107,6 @@ private:
   //----------------------------------------------------------------------------------------------------------------------
   int m_height;
 
-
   GLuint m_vaoID;
 
   void createQuad();
@@ -129,6 +128,10 @@ private:
   ngl::Transformation m_transform;
 
   float m_areaSize;
+  float m_wallWidth;
+  float m_wallHeight;
+
+  bool m_multiplayer;
 
   Player m_player1;
   Player m_player2;

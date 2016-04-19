@@ -11,6 +11,7 @@
 #include <cstdlib>
 #include "ShaderVariables.h"
 #include <cmath>
+#include "ngl/Random.h"
 
 NGLScene::NGLScene() :
   m_fullScreen(false),
@@ -18,11 +19,14 @@ NGLScene::NGLScene() :
   m_time(QTime::currentTime()),
   m_lastFrameTime(0),
   m_mouseData(0,0,0,0),
+  m_multiplayer(false),
   m_camPos(0, 10, 30),
   m_cam(m_camPos ,ngl::Vec3::zero(), ngl::Vec3::up()),
   m_areaSize(20),
-  m_player1(ngl::Vec3(m_areaSize/2, 0, 0), m_areaSize),
-  m_player2(ngl::Vec3(-m_areaSize/2, 0, 0), m_areaSize),
+  m_wallWidth(1),
+  m_wallHeight(2),
+  m_player1(ngl::Vec3(m_areaSize/2, 0, 0), m_areaSize-m_wallWidth),
+  m_player2(ngl::Vec3(-m_areaSize/2, 0, 0), m_areaSize-m_wallWidth),
   m_player1Attack(false),
   m_player2Attack(false)
 {
@@ -76,15 +80,13 @@ void NGLScene::initializeGL()
   //ShaderLibPro::instance()->setShaderInfo("shaders/buffertest/buffertest.glll");
   ShaderLibPro::instance()->setShaderInfo("shaders/geotest/geotest.glll");
 
-  float wallThickness = 1;
-  float wallHeight = 2;
-
-  m_walls.push_back(Wall(ngl::Vec3(m_areaSize,0,0.5), ngl::Vec3(1,wallHeight,m_areaSize*2)));
-  m_walls.push_back(Wall(ngl::Vec3(-m_areaSize,0,-0.5), ngl::Vec3(1,wallHeight,m_areaSize*2)));
-  m_walls.push_back(Wall(ngl::Vec3(-0.5,0,m_areaSize), ngl::Vec3(m_areaSize*2,wallHeight,wallThickness)));
-  m_walls.push_back(Wall(ngl::Vec3(0.5,0,-m_areaSize), ngl::Vec3(m_areaSize*2,wallHeight,wallThickness)));
+  m_walls.push_back(Wall(ngl::Vec3(m_areaSize,0,m_wallWidth/2.0), ngl::Vec3(1,m_wallHeight,m_areaSize*2)));
+  m_walls.push_back(Wall(ngl::Vec3(-m_areaSize,0,-m_wallWidth/2.0), ngl::Vec3(1,m_wallHeight,m_areaSize*2)));
+  m_walls.push_back(Wall(ngl::Vec3(-m_wallWidth/2.0,0,m_areaSize), ngl::Vec3(m_areaSize*2,m_wallHeight,m_wallWidth)));
+  m_walls.push_back(Wall(ngl::Vec3(m_wallWidth/2.0,0,-m_areaSize), ngl::Vec3(m_areaSize*2,m_wallHeight,m_wallWidth)));
 
   m_player1Ctrl = ngl::Vec3::zero();
+  m_player2Ctrl = ngl::Vec3::zero();
   // set up timer loop
   startTimer(16);
 }
@@ -122,6 +124,7 @@ void NGLScene::drawScene(GLuint _progID)
   m_box.draw(_progID, VP);
   m_player1.draw(_progID, VP);
   m_player2.draw(_progID, VP);
+
 }
 
 
@@ -189,19 +192,26 @@ void NGLScene::keyPressEvent(QKeyEvent *_event)
       // toggle fullscreen because who has time for two buttons for this
       case Qt::Key_F : toggleFullScreen(); break;
 
+      // player 1 controls
       case Qt::Key_Left : m_player1Ctrl[0] -= 1; break;
       case Qt::Key_Right: m_player1Ctrl[0] += 1; break;
       case Qt::Key_Up : m_player1Ctrl[2] -= 1; break;
       case Qt::Key_Down : m_player1Ctrl[2] += 1; break;
       case Qt::Key_Shift : m_player1Attack = true; break;
-
-      case Qt::Key_A : m_player2Ctrl[0] -= 1; break;
-      case Qt::Key_D: m_player2Ctrl[0] += 1; break;
-      case Qt::Key_W : m_player2Ctrl[2] -= 1; break;
-      case Qt::Key_S : m_player2Ctrl[2] += 1; break;
-      case Qt::Key_Space : m_player2Attack = true; break;
-
       default : break;
+    }
+    if(m_multiplayer)
+    {
+      switch(_event->key())
+      {
+        // player 2 controls
+        case Qt::Key_A : m_player2Ctrl[0] -= 1; break;
+        case Qt::Key_D: m_player2Ctrl[0] += 1; break;
+        case Qt::Key_W : m_player2Ctrl[2] -= 1; break;
+        case Qt::Key_S : m_player2Ctrl[2] += 1; break;
+        case Qt::Key_Space : m_player2Attack = true; break;
+        default : break;
+      }
     }
   }
 }
@@ -212,18 +222,25 @@ void NGLScene::keyReleaseEvent(QKeyEvent *_event)
   {
     switch (_event->key())
     {
+      // player 1 controls
       case Qt::Key_Left : m_player1Ctrl[0] += 1; break;
       case Qt::Key_Right: m_player1Ctrl[0] -= 1; break;
       case Qt::Key_Up : m_player1Ctrl[2] += 1; break;
       case Qt::Key_Down : m_player1Ctrl[2] -= 1; break;
-
+      default : break;
+    }
+  }
+  if(m_multiplayer)
+    switch(_event->key())
+    {
+      // player 2 controls
       case Qt::Key_A : m_player2Ctrl[0] += 1; break;
       case Qt::Key_D: m_player2Ctrl[0] -= 1; break;
       case Qt::Key_W : m_player2Ctrl[2] += 1; break;
       case Qt::Key_S : m_player2Ctrl[2] -= 1; break;
       default : break;
     }
-  }
+
 }
 
 void NGLScene::timerEvent(QTimerEvent *_event)
@@ -249,20 +266,28 @@ void NGLScene::timerEvent(QTimerEvent *_event)
     m_mouseData[0] = p.x();
     m_mouseData[1] = m_height-p.y();
   }
-  //shaderLib->setRegisteredUniform("iMouse", m_mouseData);
+
   ShaderVariables::instance()->mouse = m_mouseData;
 
   m_player1.update(m_player1Ctrl, m_player1Attack, &m_player2);
-
   m_player2.update(m_player2Ctrl, m_player2Attack, &m_player1);
 
-  m_box.update();
+  if(m_box.isAlive())
+  {
+    m_box.update(&m_player1, &m_player2);
+  }
+  else
+  {
+    // box is hit
+
+    m_box.reset(ngl::Random::instance()->getRandomPoint(m_areaSize-m_wallWidth-1, 0, m_areaSize-m_wallWidth-1));
+  }
 
   updateCamera();
 
-
   m_player1Attack = false;
   m_player2Attack = false;
+
   update();
 }
 

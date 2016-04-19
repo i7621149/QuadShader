@@ -39,7 +39,7 @@ void Player::update(ngl::Vec3 _dir, bool _attack, Player *_otherPlayer)
 
       if(m_vel.lengthSquared() > 0)
       {
-        m_vel.m_y = 0.2;
+        m_vel.m_y = 0.2f;
       }
       m_grounded = false;
     }
@@ -55,23 +55,23 @@ void Player::update(ngl::Vec3 _dir, bool _attack, Player *_otherPlayer)
   else
   {
     // if player is not on the ground, add falling acceleration to vel
-    m_vel.m_y -= 0.09;
+    m_vel.m_y -= 0.09f;
   }
 
   // test to see if player goes out of bounds, if so, bounce back
   ngl::Vec3 newPos = m_pos + m_vel;
   if(newPos.m_x < -m_areaSize || newPos.m_x > m_areaSize)
   {
-    m_vel.m_x *= -1.5;
-    m_vel.m_y = 0.7;
-    m_stunnedTime = 0.5;
+    m_vel.m_x *= -1.5f;
+    m_vel.m_y = 0.7f;
+    m_stunnedTime = 0.5f;
     m_grounded = false;
   }
   if(newPos.m_z < -m_areaSize || newPos.m_z > m_areaSize)
   {
-    m_vel.m_z *= -1.5;
-    m_vel.m_y = 0.7;
-    m_stunnedTime = 0.5;
+    m_vel.m_z *= -1.5f;
+    m_vel.m_y = 0.7f;
+    m_stunnedTime = 0.5f;
     m_grounded = false;
   }
 
@@ -83,7 +83,7 @@ void Player::update(ngl::Vec3 _dir, bool _attack, Player *_otherPlayer)
 
     ngl::Vec3 playerDistVec = m_pos - _otherPlayer->getPos();
     // check distance to other player, for hit/miss
-    if((playerDistVec.lengthSquared() < m_attackRad*m_attackRad)
+    if(playerDistVec.lengthSquared() < m_attackRad*m_attackRad)
     {
       _otherPlayer->hit();
     }
@@ -99,7 +99,6 @@ void Player::update(ngl::Vec3 _dir, bool _attack, Player *_otherPlayer)
       m_spin = 0;
       m_attacking = false;
     }
-
   }
   else
   {
@@ -132,15 +131,15 @@ void Player::draw(GLuint _progID, ngl::Mat4 _VPMatrix)
   }
 }
 
-void Player::attack(Player *_otherPlayer)
-{
-
-}
-
 void Player::hit()
 {
   m_vel = ngl::Vec3(0,1,0);
-  m_pos.m_y = 0.1;
+  m_pos.m_y = 0.1f;
   m_grounded = false;
-  m_stunnedTime = 1;
+  m_stunnedTime = 1.0f;
+}
+
+void Player::pickUpBox()
+{
+  m_score++;
 }

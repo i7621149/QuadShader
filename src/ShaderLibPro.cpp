@@ -1,5 +1,6 @@
 #include "ShaderLibPro.h"
 
+#include <iostream>
 #include <QImage>
 #include <sstream>
 #include <fstream>

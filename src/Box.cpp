@@ -21,7 +21,7 @@ Box::Box(ngl::Vec3 _pos) :
   m_rotSpeed *= 3.0;
 }
 
-void Box::update()
+void Box::update(Player *_player1, Player *_player2)
 {
   int time = QTime::currentTime().msecsSinceStartOfDay();
 
@@ -30,10 +30,32 @@ void Box::update()
   m_pos.m_y = yPos;
 
   m_rot += m_rotSpeed;
+
+  if(_player1 && _player2)
+  {
+    if((_player1->getPos() - m_pos).lengthSquared() < 1)
+    {
+      _player1->pickUpBox();
+      m_alive = false;
+    }
+    else if((_player2->getPos() - m_pos).lengthSquared() < 1)
+    {
+      _player2->pickUpBox();
+      m_alive = false;
+    }
+  }
+
 }
 
 void Box::draw(GLuint _progID, ngl::Mat4 _VPMatrix)
 {
   loadDataToShader(_progID, _VPMatrix);
   ngl::VAOPrimitives::instance()->draw("cube");
+}
+
+void Box::reset(ngl::Vec3 _pos)
+{
+  m_pos = _pos;
+  update(nullptr, nullptr);
+  m_alive = true;
 }

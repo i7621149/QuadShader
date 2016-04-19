@@ -12,3 +12,15 @@ add TextureCube function
 
 GEO shader
 shadows
+
+
+//
+NEW TODO:
+
+Reformat ShaderLib to shader sets owned by shaderlib
+Write 3 geo shaders
+show score
+show time
+
+add ai
+change area size so that its the actual area
