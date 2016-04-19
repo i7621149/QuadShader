@@ -1,7 +1,7 @@
 #ifndef SHADERLIBPRO_H__
 #define SHADERLIBPRO_H__
 
-#include <ngl/Singleton.h>
+#include "ngl/Singleton.h"
 #include <string>
 
 #include "ShaderPro.h"
@@ -13,7 +13,7 @@
 class NGLScene
 {
 public :
-  void drawScene();
+  void drawScene(GLuint _progID);
 };
 
 #endif//NGLSCENE_H__
@@ -32,12 +32,9 @@ public :
 
   ShaderPro *getShader(const std::string &_shaderName);
 
-
-
 private :
   ShaderLibPro();
   ~ShaderLibPro();
-
 
   std::vector<ShaderPro*> m_shaders;
 };

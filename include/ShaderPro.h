@@ -3,7 +3,7 @@
 
 #include <string>
 #include <vector>
-#include <ngl/Util.h>
+#include "ngl/Util.h"
 
 #include "TextureData.h"
 

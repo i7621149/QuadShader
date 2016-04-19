@@ -21,7 +21,8 @@ ShaderPro::ShaderPro() :
 
 ShaderPro::~ShaderPro()
 {
-  if(m_name != "MAIN"){
+  if(m_name != "MAIN")
+  {
     glDeleteFramebuffers(1, &m_outBufferID);
   }
 }
@@ -31,7 +32,8 @@ void ShaderPro::compile()
   loadVertSource();
   loadFragSource();
 
-  if(m_name != "MAIN"){
+  if(m_name != "MAIN")
+  {
     setUpFramebuffer();
   }
 
@@ -82,7 +84,8 @@ void ShaderPro::loadFragSource()
 std::string ShaderPro::loadSource(const std::string &_fileName)
 {
   std::ifstream shaderSource(_fileName);
-  if(!shaderSource.is_open()){
+  if(!shaderSource.is_open())
+  {
     std::cerr << "file not found: " << _fileName << std::endl;
     exit(EXIT_FAILURE);
   }
@@ -101,17 +104,21 @@ std::string ShaderPro::getFragBase()
   std::string fragBase = loadSource("shaders/BaseFragment.glsl");
 
   int textureNum = 0;
-  for(TextureData texture: m_textures){
+  for(TextureData texture: m_textures)
+  {
 
     std::string textureString = std::to_string(textureNum);
 
-    if(texture.type == TEXTURE2D){
+    if(texture.type == TEXTURE2D)
+    {
       fragBase += "uniform sampler2D iChannel" + textureString + ";\n";
     }
-    else if(texture.type == TEXTURECUBE){
+    else if(texture.type == TEXTURECUBE)
+    {
       fragBase += "uniform samplerCube iChannel" + textureString + ";\n";
     }
-    else if(texture.type == BUFFER){
+    else if(texture.type == BUFFER)
+    {
       fragBase += "uniform sampler2D iChannel" + textureString + ";\n";
     }
 
@@ -123,14 +130,16 @@ std::string ShaderPro::getFragBase()
 void ShaderPro::loadTextures()
 {
   int textureUnit = 0;
-  for(TextureData texture : m_textures){
-
+  for(TextureData texture : m_textures)
+  {
     // load texturefile if it is 2d or cube
-    if(texture.type == TEXTURE2D){
+    if(texture.type == TEXTURE2D)
+    {
       std::cout << std::endl << "loading 2D texture" << std::endl;
       loadImage(textureUnit, texture, GL_TEXTURE_2D);
     }
-    else if(texture.type == TEXTURECUBE){
+    else if(texture.type == TEXTURECUBE)
+    {
       std::cout << std::endl << "loading CUBE texture" << std::endl;
       loadImage(textureUnit, texture, GL_TEXTURE_CUBE_MAP);
     }
@@ -145,14 +154,17 @@ void ShaderPro::texturesToShader()
 
     glActiveTexture(GL_TEXTURE0 + textureUnit);
 
-    if(texture.type == TEXTURE2D){
+    if(texture.type == TEXTURE2D)
+    {
       // is this the right place??
       glBindTexture(GL_TEXTURE_2D, texture.id);
     }
-    else if(texture.type == TEXTURECUBE){
+    else if(texture.type == TEXTURECUBE)
+    {
       glBindTexture(GL_TEXTURE_CUBE_MAP, texture.id);
     }
-    else if(texture.type == BUFFER){
+    else if(texture.type == BUFFER)
+    {
       glBindTexture(GL_TEXTURE_2D, texture.id);
     }
 
@@ -230,18 +242,21 @@ void ShaderPro::loadImage(int _textureUnit, TextureData _texture, GLenum _type)
 
     glUniform1i(texLocation, _textureUnit);
 
-    if(texLocation == -1){
+    if(texLocation == -1)
+    {
       // warning, as it might not exist if it is never used in shader
       std::cerr << "WARNING: cannot get uniform location of " << channelName << "\nPerhaps it is not being used in the shader?" << std::endl;
     }
-    else{
+    else
+    {
       // print info to confirm texture loaded
       std::cout << "Loaded texture to " << channelName.c_str() << std::endl;
     }
     // clean up
     delete[] data;
   }
-  else{
+  else
+  {
     std::cerr << _texture.textureSource << " was not found" << std::endl;
     exit(EXIT_FAILURE);
   }
@@ -262,7 +277,8 @@ void ShaderPro::printShaderData()
   std::cout << "m_vertFile: " << m_vertFile << std::endl;
 
   std::cout << "Textures:" << std::endl;
-  for(TextureData texture : m_textures){
+  for(TextureData texture : m_textures)
+  {
     std::cout << "Texture: " << texture.id << ", " << texture.type << ", " << texture.textureSource << std::endl;
   }
   std::cout << std::endl;
@@ -281,19 +297,23 @@ void ShaderPro::printInfoLog(GLuint _id, DebugMode _mode)
     std::cerr << "LOG:\n" << infoLog.get() << std::endl;
 
     GLenum mode;
-    if(_mode == DebugMode::COMPILE){
+    if(_mode == DebugMode::COMPILE)
+    {
       mode = GL_COMPILE_STATUS;
     }
-    else if(_mode == DebugMode::LINK){
+    else if(_mode == DebugMode::LINK)
+    {
       mode = GL_LINK_STATUS;
     }
-    else{
+    else
+    {
       mode = 0;
       std::cerr << "MODE FORMATTING ERROR!" << std::endl;
     }
 
     glGetShaderiv(_id, mode, &infoLogLength);
-    if(infoLogLength == GL_FALSE){
+    if(infoLogLength == GL_FALSE)
+    {
       std::cerr << "shader compilation or linking error" << std::endl;
       exit(EXIT_FAILURE);
     }
@@ -306,9 +326,7 @@ void ShaderPro::setUpFramebuffer()
 
   glBindTexture(GL_TEXTURE_2D, m_outTextureID);
 
-  glTexImage2D(
-      GL_TEXTURE_2D, 0, GL_RGB, 512, 288, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL
-  );
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 512, 288, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 
   //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
@@ -322,7 +340,6 @@ void ShaderPro::setUpFramebuffer()
 
   // color attachment0?
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_outTextureID, 0);
-
 
   glBindRenderbuffer(GL_RENDERBUFFER, m_outDepthStencilID);
   glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 512, 288);

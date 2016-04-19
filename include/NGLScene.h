@@ -1,15 +1,18 @@
 #ifndef NGLSCENE_H__
 #define NGLSCENE_H__
-#include <ngl/Camera.h>
-#include <ngl/Colour.h>
-#include <ngl/Light.h>
-#include <ngl/Transformation.h>
-#include <ngl/Text.h>
+#include "ngl/Camera.h"
+#include "ngl/Colour.h"
+#include "ngl/Light.h"
+#include "ngl/Transformation.h"
+#include "ngl/Text.h"
 #include <QOpenGLWindow>
 #include <QOpenGLTexture>
 #include <QTime>
 #include <vector>
-#include <ngl/Transformation.h>
+#include "ngl/Transformation.h"
+#include "Player.h"
+#include "Box.h"
+#include "Wall.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 /// @file NGLScene.h
@@ -45,13 +48,9 @@ public:
   //----------------------------------------------------------------------------------------------------------------------
   void paintGL();
 
-  void drawScene();
+  void drawScene(GLuint _progID);
 
-  void drawGeo();
-
-  void drawQuad();
-
-  void loadGeoDataToShaderVariables();
+  void loadGeoDataToShaderVariables(GLuint _progID);
 
 private:
   //----------------------------------------------------------------------------------------------------------------------
@@ -66,6 +65,9 @@ private:
   /// @param [in] _event the Qt event to query for size etc
   //----------------------------------------------------------------------------------------------------------------------
   void keyPressEvent(QKeyEvent *_event);
+
+
+  void keyReleaseEvent(QKeyEvent *_event);
   //----------------------------------------------------------------------------------------------------------------------
   void toggleFullScreen();
 
@@ -91,6 +93,12 @@ private:
   /// @param _event the Qt Event structure
   //----------------------------------------------------------------------------------------------------------------------
   void wheelEvent( QWheelEvent *_event);
+
+  void timerEvent(QTimerEvent *_event);
+
+  void updateCamera();
+
+  void drawWalls(GLuint _progID);
   //----------------------------------------------------------------------------------------------------------------------
   /// @brief window width
   //----------------------------------------------------------------------------------------------------------------------
@@ -100,7 +108,6 @@ private:
   //----------------------------------------------------------------------------------------------------------------------
   int m_height;
 
-  void timerEvent(QTimerEvent *);
 
   GLuint m_vaoID;
 
@@ -116,25 +123,19 @@ private:
 
   ngl::Vec4 m_mouseData;
 
-  enum class drawMode{TEAPOT, QUAD, SPHERE};
-
-  drawMode m_mode;
-
-  ngl::Vec3 m_position;
-
-  ngl::Vec3 m_focus;
-
-  ngl::Vec3 m_up;
+  ngl::Vec3 m_camPos;
 
   ngl::Camera m_cam;
 
-  ngl::Mat4 m_view;
-
-  ngl::Mat4 m_project;
-
   ngl::Transformation m_transform;
 
-  float m_oldYRotation;
+  Player m_player;
+
+  ngl::Vec3 m_playerCtrl;
+
+  Box m_box;
+
+  std::vector<Wall> m_walls;
 };
 
 #endif

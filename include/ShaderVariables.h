@@ -1,10 +1,10 @@
 #ifndef SHADERVARIABLES_H__
 #define SHADERVARIABLES_H__
 
-#include <ngl/Util.h>
-#include <ngl/Mat4.h>
-#include <ngl/Mat3.h>
-#include <ngl/Singleton.h>
+#include "ngl/Util.h"
+#include "ngl/Mat4.h"
+#include "ngl/Mat3.h"
+#include "ngl/Singleton.h"
 
 struct ShaderVariables : public ngl::Singleton<ShaderVariables>
 {

@@ -1,6 +1,7 @@
 Buffers
 -TexturesToShader function is breaking shit
 
+You should destroy the vbo http://www.open.gl
 
 Compile shaders at runtime // use a button to load and compile textures to channels and switch to new compiled shader
 UI switch

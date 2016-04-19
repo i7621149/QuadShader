@@ -1,8 +1,8 @@
 #ifndef TEXTUREDATA_H__
 #define TEXTUREDATA_H__
 
-#include <ngl/Util.h>
-#include <string>
+#include "ngl/Util.h"
+#include "string"
 
 enum textureType {TEXTURE2D, TEXTURECUBE, BUFFER};
 
