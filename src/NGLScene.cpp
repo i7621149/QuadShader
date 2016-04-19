@@ -19,7 +19,12 @@ NGLScene::NGLScene() :
   m_lastFrameTime(0),
   m_mouseData(0,0,0,0),
   m_camPos(0, 10, 30),
-  m_cam(m_camPos ,ngl::Vec3::zero(), ngl::Vec3::up())
+  m_cam(m_camPos ,ngl::Vec3::zero(), ngl::Vec3::up()),
+  m_areaSize(20),
+  m_player1(ngl::Vec3(m_areaSize/2, 0, 0), m_areaSize),
+  m_player2(ngl::Vec3(-m_areaSize/2, 0, 0), m_areaSize),
+  m_player1Attack(false),
+  m_player2Attack(false)
 {
   setTitle("Shader Splash");
 }
@@ -71,15 +76,15 @@ void NGLScene::initializeGL()
   //ShaderLibPro::instance()->setShaderInfo("shaders/buffertest/buffertest.glll");
   ShaderLibPro::instance()->setShaderInfo("shaders/geotest/geotest.glll");
 
-  float areaSize = 20;
   float wallThickness = 1;
   float wallHeight = 2;
 
-  m_walls.push_back(Wall(ngl::Vec3(areaSize,0,0.5), ngl::Vec3(1,wallHeight,areaSize*2)));
-  m_walls.push_back(Wall(ngl::Vec3(-areaSize,0,-0.5), ngl::Vec3(1,wallHeight,areaSize*2)));
-  m_walls.push_back(Wall(ngl::Vec3(-0.5,0,areaSize), ngl::Vec3(areaSize*2,wallHeight,wallThickness)));
-  m_walls.push_back(Wall(ngl::Vec3(0.5,0,-areaSize), ngl::Vec3(areaSize*2,wallHeight,wallThickness)));
+  m_walls.push_back(Wall(ngl::Vec3(m_areaSize,0,0.5), ngl::Vec3(1,wallHeight,m_areaSize*2)));
+  m_walls.push_back(Wall(ngl::Vec3(-m_areaSize,0,-0.5), ngl::Vec3(1,wallHeight,m_areaSize*2)));
+  m_walls.push_back(Wall(ngl::Vec3(-0.5,0,m_areaSize), ngl::Vec3(m_areaSize*2,wallHeight,wallThickness)));
+  m_walls.push_back(Wall(ngl::Vec3(0.5,0,-m_areaSize), ngl::Vec3(m_areaSize*2,wallHeight,wallThickness)));
 
+  m_player1Ctrl = ngl::Vec3::zero();
   // set up timer loop
   startTimer(16);
 }
@@ -108,29 +113,19 @@ void NGLScene::drawScene(GLuint _progID)
 
   glViewport(0, 0, m_width, m_height);
 
-  drawWalls(_progID);
+  ngl::Mat4 VP = m_cam.getVPMatrix();
 
-  m_transform.reset();
-  m_transform = m_box.getTransform();
-  loadGeoDataToShaderVariables(_progID);
-  m_box.draw();
-
-  m_transform = m_player.getTransform();
-  loadGeoDataToShaderVariables(_progID);
-  ngl::VAOPrimitives::instance()->draw("teapot");
-}
-
-void NGLScene::drawWalls(GLuint _progID)
-{
   for(Wall &wall : m_walls)
   {
-    m_transform = wall.getTransform();
-    loadGeoDataToShaderVariables(_progID);
-    wall.draw();
+    wall.draw(_progID, VP);
   }
+  m_box.draw(_progID, VP);
+  m_player1.draw(_progID, VP);
+  m_player2.draw(_progID, VP);
 }
 
-void NGLScene::loadGeoDataToShaderVariables(GLuint _progID)
+
+void NGLScene::loadGeoDataToShader(GLuint _progID)
 {
   ngl::Mat4 MVP;
 
@@ -188,16 +183,24 @@ void NGLScene::keyPressEvent(QKeyEvent *_event)
       case Qt::Key_Escape : QGuiApplication::exit(EXIT_SUCCESS); break;
 
       // render wireframe or shaded, mostly for bugfixing
-      case Qt::Key_W : glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); break;
-      case Qt::Key_S : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); break;
+      //case Qt::Key_Z : glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); break;
+      //case Qt::Key_X : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); break;
 
       // toggle fullscreen because who has time for two buttons for this
       case Qt::Key_F : toggleFullScreen(); break;
 
-      case Qt::Key_Left : m_playerCtrl[0] -= 1; break;
-      case Qt::Key_Right: m_playerCtrl[0] += 1; break;
-      case Qt::Key_Up : m_playerCtrl[2] -= 1; break;
-      case Qt::Key_Down : m_playerCtrl[2] += 1; break;
+      case Qt::Key_Left : m_player1Ctrl[0] -= 1; break;
+      case Qt::Key_Right: m_player1Ctrl[0] += 1; break;
+      case Qt::Key_Up : m_player1Ctrl[2] -= 1; break;
+      case Qt::Key_Down : m_player1Ctrl[2] += 1; break;
+      case Qt::Key_Shift : m_player1Attack = true; break;
+
+      case Qt::Key_A : m_player2Ctrl[0] -= 1; break;
+      case Qt::Key_D: m_player2Ctrl[0] += 1; break;
+      case Qt::Key_W : m_player2Ctrl[2] -= 1; break;
+      case Qt::Key_S : m_player2Ctrl[2] += 1; break;
+      case Qt::Key_Space : m_player2Attack = true; break;
+
       default : break;
     }
   }
@@ -209,10 +212,15 @@ void NGLScene::keyReleaseEvent(QKeyEvent *_event)
   {
     switch (_event->key())
     {
-      case Qt::Key_Left : m_playerCtrl[0] += 1; break;
-      case Qt::Key_Right: m_playerCtrl[0] -= 1; break;
-      case Qt::Key_Up : m_playerCtrl[2] += 1; break;
-      case Qt::Key_Down : m_playerCtrl[2] -= 1; break;
+      case Qt::Key_Left : m_player1Ctrl[0] += 1; break;
+      case Qt::Key_Right: m_player1Ctrl[0] -= 1; break;
+      case Qt::Key_Up : m_player1Ctrl[2] += 1; break;
+      case Qt::Key_Down : m_player1Ctrl[2] -= 1; break;
+
+      case Qt::Key_A : m_player2Ctrl[0] += 1; break;
+      case Qt::Key_D: m_player2Ctrl[0] -= 1; break;
+      case Qt::Key_W : m_player2Ctrl[2] += 1; break;
+      case Qt::Key_S : m_player2Ctrl[2] -= 1; break;
       default : break;
     }
   }
@@ -244,13 +252,17 @@ void NGLScene::timerEvent(QTimerEvent *_event)
   //shaderLib->setRegisteredUniform("iMouse", m_mouseData);
   ShaderVariables::instance()->mouse = m_mouseData;
 
-  m_player.update(m_playerCtrl);
+  m_player1.update(m_player1Ctrl, m_player1Attack, &m_player2);
 
-  ngl::Vec3 playerPos = m_player.getPos();
+  m_player2.update(m_player2Ctrl, m_player2Attack, &m_player1);
 
   m_box.update();
 
   updateCamera();
+
+
+  m_player1Attack = false;
+  m_player2Attack = false;
   update();
 }
 
@@ -263,11 +275,18 @@ void NGLScene::toggleFullScreen()
 
 void NGLScene::updateCamera()
 {
-  // camera follows player, but actually points inbetween player and origin, and is then offset to look down a bit
-  ngl::Vec3 look = m_player.getPos();
+  ngl::Vec3 look = (m_player1.getPos() + m_player2.getPos()) / 2.0;
 
+  // camera follows players, but actually points inbetween players and origin (hence dividing), and is then offset to look down a bit
   look /= 3.0;
   look.m_z +=5;
 
-  m_cam.set(m_camPos, look, ngl::Vec3::up());
+  // look at ground, so bouncing player doesn't affect camera
+  look.m_y = 0;
+
+  float playerDist = (m_player1.getPos() - m_player2.getPos()).length();
+
+  ngl::Vec3 eye = pow((playerDist/m_areaSize + 1.0), 0.3) * m_camPos;
+
+  m_cam.set(eye, look, ngl::Vec3::up());
 }

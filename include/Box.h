@@ -14,7 +14,7 @@ public :
   ~Box() = default;
 
   void update();
-  void draw();
+  void draw(GLuint _progID, ngl::Mat4 _VPMatrix);
 
 private :
   ngl::Vec3 m_rotSpeed = ngl::Vec3(0,0,0);

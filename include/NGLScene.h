@@ -50,7 +50,7 @@ public:
 
   void drawScene(GLuint _progID);
 
-  void loadGeoDataToShaderVariables(GLuint _progID);
+  void loadGeoDataToShader(GLuint _progID);
 
 private:
   //----------------------------------------------------------------------------------------------------------------------
@@ -98,7 +98,6 @@ private:
 
   void updateCamera();
 
-  void drawWalls(GLuint _progID);
   //----------------------------------------------------------------------------------------------------------------------
   /// @brief window width
   //----------------------------------------------------------------------------------------------------------------------
@@ -129,9 +128,16 @@ private:
 
   ngl::Transformation m_transform;
 
-  Player m_player;
+  float m_areaSize;
 
-  ngl::Vec3 m_playerCtrl;
+  Player m_player1;
+  Player m_player2;
+
+  ngl::Vec3 m_player1Ctrl;
+  ngl::Vec3 m_player2Ctrl;
+
+  bool m_player1Attack;
+  bool m_player2Attack;
 
   Box m_box;
 

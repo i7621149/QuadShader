@@ -10,14 +10,15 @@ public :
   Entity(ngl::Vec3 _pos);
   ~Entity() = default;
 
-  ngl::Transformation getTransform();
+  ngl::Mat4 getTransformMatrix();
   ngl::Vec3 getPos() {return m_pos;}
   ngl::Vec3 getVel() {return m_vel;}
   ngl::Vec3 getRot() {return m_rot;}
   bool isAlive() {return m_alive;}
 
   virtual void update() = 0;
-  virtual void draw() = 0;
+  virtual void draw(GLuint _progID, ngl::Mat4 VPMatrix) = 0;
+  void loadDataToShader(GLuint _progID, ngl::Mat4 _VPMatrix);
 
 protected :
   ngl::Vec3 m_pos;

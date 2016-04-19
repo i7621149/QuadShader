@@ -13,7 +13,7 @@ public :
   ~Wall();
 
   void update();
-  void draw();
+  void draw(GLuint _progID, ngl::Mat4 _VPMatrix);
 };
 
 #endif//WALL_H__

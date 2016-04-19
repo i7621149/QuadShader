@@ -32,7 +32,8 @@ void Box::update()
   m_rot += m_rotSpeed;
 }
 
-void Box::draw()
+void Box::draw(GLuint _progID, ngl::Mat4 _VPMatrix)
 {
+  loadDataToShader(_progID, _VPMatrix);
   ngl::VAOPrimitives::instance()->draw("cube");
 }
