@@ -19,16 +19,17 @@ NGLScene::NGLScene() :
   m_time(QTime::currentTime()),
   m_lastFrameTime(0),
   m_mouseData(0,0,0,0),
-  m_multiplayer(false),
+  m_multiplayer(true),
   m_camPos(0, 10, 30),
   m_cam(m_camPos ,ngl::Vec3::zero(), ngl::Vec3::up()),
   m_areaSize(20),
   m_wallWidth(1),
   m_wallHeight(2),
-  m_player1(ngl::Vec3(m_areaSize/2, 0, 0), m_areaSize-m_wallWidth),
-  m_player2(ngl::Vec3(-m_areaSize/2, 0, 0), m_areaSize-m_wallWidth),
+  m_player1(ngl::Vec3(-m_areaSize/2, 0, 0), m_areaSize-m_wallWidth),
+  m_player2(ngl::Vec3(m_areaSize/2, 0, 0), m_areaSize-m_wallWidth),
   m_player1Attack(false),
-  m_player2Attack(false)
+  m_player2Attack(false),
+  m_matchTime(60)
 {
   setTitle("Shader Splash");
 }
@@ -73,12 +74,12 @@ void NGLScene::initializeGL()
   // enable multisampling for smoother drawing
   glEnable(GL_MULTISAMPLE);
 
-  // enable nice cube maps, no seams
-  glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
-
   //ShaderLibPro::instance()->setShaderInfo("shaders/test.glll");
   //ShaderLibPro::instance()->setShaderInfo("shaders/buffertest/buffertest.glll");
   ShaderLibPro::instance()->setShaderInfo("shaders/geotest/geotest.glll");
+
+  m_text.reset(new ngl::Text(QFont("Arial",31)));
+  m_text->setScreenSize(width(),height());
 
   m_walls.push_back(Wall(ngl::Vec3(m_areaSize,0,m_wallWidth/2.0), ngl::Vec3(1,m_wallHeight,m_areaSize*2)));
   m_walls.push_back(Wall(ngl::Vec3(-m_areaSize,0,-m_wallWidth/2.0), ngl::Vec3(1,m_wallHeight,m_areaSize*2)));
@@ -97,6 +98,14 @@ void NGLScene::paintGL()
   ShaderVariables::instance()->frame++;
 
   ShaderLibPro::instance()->draw(this);
+
+  m_text->setScreenSize(width(),height());
+  m_text->setColour(1,1,0);
+  QString text=QString("%1 : %2").arg(m_player1.getScore()).arg(m_player2.getScore());
+  m_text->renderText(10,20,text);
+  text=QString("%1").arg(m_matchTime-(m_time.elapsed()/1000));
+  m_text->renderText(10,40,text);
+
 
   // calculate time taken to render the frame (time since last frame was rendered)
   float renderTime = (m_time.elapsed() - m_lastFrameTime) / 1000.0;
@@ -149,8 +158,8 @@ void NGLScene::mousePressEvent ( QMouseEvent * _event)
 {
   //if(_event->button() == Qt::LeftButton)
   //{
-    m_mouseData[2] = _event->x();
-    m_mouseData[3] = m_height-_event->y();
+    m_mouseData[2] = _event->x()*devicePixelRatio();
+    m_mouseData[3] = m_height-_event->y()*devicePixelRatio();
     m_mouseDown = true;
   //}
 }
@@ -193,11 +202,11 @@ void NGLScene::keyPressEvent(QKeyEvent *_event)
       case Qt::Key_F : toggleFullScreen(); break;
 
       // player 1 controls
-      case Qt::Key_Left : m_player1Ctrl[0] -= 1; break;
-      case Qt::Key_Right: m_player1Ctrl[0] += 1; break;
-      case Qt::Key_Up : m_player1Ctrl[2] -= 1; break;
-      case Qt::Key_Down : m_player1Ctrl[2] += 1; break;
-      case Qt::Key_Shift : m_player1Attack = true; break;
+      case Qt::Key_A : m_player1Ctrl[0] -= 1; break;
+      case Qt::Key_D: m_player1Ctrl[0] += 1; break;
+      case Qt::Key_W : m_player1Ctrl[2] -= 1; break;
+      case Qt::Key_S : m_player1Ctrl[2] += 1; break;
+      case Qt::Key_Space : m_player1Attack = true; break;
       default : break;
     }
     if(m_multiplayer)
@@ -205,11 +214,11 @@ void NGLScene::keyPressEvent(QKeyEvent *_event)
       switch(_event->key())
       {
         // player 2 controls
-        case Qt::Key_A : m_player2Ctrl[0] -= 1; break;
-        case Qt::Key_D: m_player2Ctrl[0] += 1; break;
-        case Qt::Key_W : m_player2Ctrl[2] -= 1; break;
-        case Qt::Key_S : m_player2Ctrl[2] += 1; break;
-        case Qt::Key_Space : m_player2Attack = true; break;
+        case Qt::Key_Left : m_player2Ctrl[0] -= 1; break;
+        case Qt::Key_Right: m_player2Ctrl[0] += 1; break;
+        case Qt::Key_Up : m_player2Ctrl[2] -= 1; break;
+        case Qt::Key_Down : m_player2Ctrl[2] += 1; break;
+        case Qt::Key_Shift : m_player2Attack = true; break;
         default : break;
       }
     }
@@ -223,24 +232,27 @@ void NGLScene::keyReleaseEvent(QKeyEvent *_event)
     switch (_event->key())
     {
       // player 1 controls
-      case Qt::Key_Left : m_player1Ctrl[0] += 1; break;
-      case Qt::Key_Right: m_player1Ctrl[0] -= 1; break;
-      case Qt::Key_Up : m_player1Ctrl[2] += 1; break;
-      case Qt::Key_Down : m_player1Ctrl[2] -= 1; break;
-      default : break;
-    }
-  }
-  if(m_multiplayer)
-    switch(_event->key())
-    {
-      // player 2 controls
-      case Qt::Key_A : m_player2Ctrl[0] += 1; break;
-      case Qt::Key_D: m_player2Ctrl[0] -= 1; break;
-      case Qt::Key_W : m_player2Ctrl[2] += 1; break;
-      case Qt::Key_S : m_player2Ctrl[2] -= 1; break;
+      case Qt::Key_A : m_player1Ctrl[0] += 1; break;
+      case Qt::Key_D: m_player1Ctrl[0] -= 1; break;
+      case Qt::Key_W : m_player1Ctrl[2] += 1; break;
+      case Qt::Key_S : m_player1Ctrl[2] -= 1; break;
+
       default : break;
     }
 
+    if(m_multiplayer)
+    {
+      switch(_event->key())
+      {
+        // player 2 controls
+        case Qt::Key_Left : m_player2Ctrl[0] += 1; break;
+        case Qt::Key_Right: m_player2Ctrl[0] -= 1; break;
+        case Qt::Key_Up : m_player2Ctrl[2] += 1; break;
+        case Qt::Key_Down : m_player2Ctrl[2] -= 1; break;
+        default : break;
+      }
+    }
+  }
 }
 
 void NGLScene::timerEvent(QTimerEvent *_event)
@@ -263,8 +275,8 @@ void NGLScene::timerEvent(QTimerEvent *_event)
   if(m_mouseDown)
   {
     QPoint p = this->mapFromGlobal(QCursor::pos());
-    m_mouseData[0] = p.x();
-    m_mouseData[1] = m_height-p.y();
+    m_mouseData[0] = p.x()*devicePixelRatio();
+    m_mouseData[1] = m_height-(p.y()*devicePixelRatio());
   }
 
   ShaderVariables::instance()->mouse = m_mouseData;

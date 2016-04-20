@@ -9,10 +9,12 @@
 #include <QOpenGLTexture>
 #include <QTime>
 #include <vector>
+#include <memory>
 #include "ngl/Transformation.h"
 #include "Player.h"
 #include "Box.h"
 #include "Wall.h"
+#include <QTime>
 
 //----------------------------------------------------------------------------------------------------------------------
 /// @file NGLScene.h
@@ -65,7 +67,6 @@ private:
   /// @param [in] _event the Qt event to query for size etc
   //----------------------------------------------------------------------------------------------------------------------
   void keyPressEvent(QKeyEvent *_event);
-
 
   void keyReleaseEvent(QKeyEvent *_event);
   //----------------------------------------------------------------------------------------------------------------------
@@ -145,6 +146,10 @@ private:
   Box m_box;
 
   std::vector<Wall> m_walls;
+
+  std::unique_ptr<ngl::Text>m_text;
+
+  int m_matchTime;
 };
 
 #endif
