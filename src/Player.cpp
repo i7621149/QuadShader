@@ -4,6 +4,9 @@
 #include "ngl/NGLStream.h"
 #include "ngl/Util.h"
 #include "ngl/VAOPrimitives.h"
+#include "ngl/Random.h"
+
+#include "ShaderLibPro.h"
 
 Player::Player(ngl::Vec3 _pos, float _areaSize) :
   Entity(_pos),
@@ -49,7 +52,7 @@ void Player::update(ngl::Vec3 _dir, bool _attack, Player *_otherPlayer)
       // stun means player cannot move in x or z
       m_vel.m_x = 0;
       m_vel.m_z = 0;
-      m_stunnedTime -= m_stunnedStep;
+      m_stunnedTime --;
     }
   }
   else
@@ -58,25 +61,37 @@ void Player::update(ngl::Vec3 _dir, bool _attack, Player *_otherPlayer)
     m_vel.m_y -= 0.09f;
   }
 
+  if(m_stunnedTime <= 0 || m_grounded)
+  {
+    m_rot.m_x = 0;
+    m_rot.m_z = 0;
+  }
+  else
+  {
+    // random rotation in air if not grounded
+    m_rot.m_x = ngl::Random::instance()->randomNumber(360);
+    m_rot.m_z = ngl::Random::instance()->randomNumber(360);
+  }
+
   // test to see if player goes out of bounds, if so, bounce back
   ngl::Vec3 newPos = m_pos + m_vel;
   if(newPos.m_x < -m_areaSize || newPos.m_x > m_areaSize)
   {
     m_vel.m_x *= -1.5f;
     m_vel.m_y = 0.7f;
-    m_stunnedTime = 0.5f;
+    m_stunnedTime = m_stunnedCooldown;
     m_grounded = false;
   }
   if(newPos.m_z < -m_areaSize || newPos.m_z > m_areaSize)
   {
     m_vel.m_z *= -1.5f;
     m_vel.m_y = 0.7f;
-    m_stunnedTime = 0.5f;
+    m_stunnedTime = m_stunnedCooldown;
     m_grounded = false;
   }
 
   // set attack if attacking is true
-  if(_attack)
+  if(_attack && m_attackTime <= 0)
   {
     m_attacking = true;
     m_prevYPos = m_rot.m_y;
@@ -87,6 +102,11 @@ void Player::update(ngl::Vec3 _dir, bool _attack, Player *_otherPlayer)
     {
       _otherPlayer->hit();
     }
+    m_attackTime = m_attackCooldown;
+  }
+  else
+  {
+    m_attackTime--;
   }
 
   // calculate rotations for attacking

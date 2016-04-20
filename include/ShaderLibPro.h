@@ -3,8 +3,9 @@
 
 #include "ngl/Singleton.h"
 #include <string>
+#include <memory>
 
-#include "ShaderPro.h"
+#include "ShaderSet.h"
 
 #ifndef NGLSCENE_H__
 #define NGLSCENE_H__
@@ -22,21 +23,22 @@ public :
 class ShaderLibPro : public ngl::Singleton<ShaderLibPro>
 {
   friend class ngl::Singleton<ShaderLibPro>;
-public :
 
-  void setShaderInfo(const std::string &_sourceFile);
+public :
+  void addShader(const std::string &_sourceFile);
 
   void draw(NGLScene *_scene);
 
-  void loadShaders();
+  void useShader(int _index);
 
-  ShaderPro *getShader(const std::string &_shaderName);
+  int getShaderSetAmount() {return m_shaderSets.size();}
 
 private :
   ShaderLibPro();
   ~ShaderLibPro();
 
-  std::vector<ShaderPro*> m_shaders;
+  std::vector<std::unique_ptr<ShaderSet>> m_shaderSets;
+  int m_currentShaderindex;
 };
 
 #endif//SHADERLIBPRO_H__

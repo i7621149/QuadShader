@@ -20,6 +20,7 @@ SOURCES+= src/main.cpp \
           src/NGLScene.cpp \
           src/ShaderLibPro.cpp \
           src/ShaderVariables.cpp \
+          src/ShaderSet.cpp \
           src/ShaderPro.cpp \
           src/Entity.cpp \
           src/Player.cpp \
@@ -30,6 +31,7 @@ SOURCES+= src/main.cpp \
 HEADERS+= include/NGLScene.h \
           include/ShaderLibPro.h \
           include/ShaderVariables.h \
+          include/ShaderSet.h \
           include/ShaderPro.h \
           include/TextureData.h \
           include/Entity.h \

@@ -52,8 +52,6 @@ public:
 
   void drawScene(GLuint _progID);
 
-  void loadGeoDataToShader(GLuint _progID);
-
 private:
   //----------------------------------------------------------------------------------------------------------------------
   /// @brief this is called everytime we resize the window
@@ -147,9 +145,13 @@ private:
 
   std::vector<Wall> m_walls;
 
-  std::unique_ptr<ngl::Text>m_text;
+  std::unique_ptr<ngl::Text> m_text;
 
   int m_matchTime;
+
+  enum GameMode {TITLE, MAIN, FINISHED};
+
+  GameMode m_mode;
 };
 
 #endif

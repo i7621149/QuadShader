@@ -37,3 +37,9 @@ uniform vec4 iDate;
 //uniform sampler2D iChannel1;
 //uniform sampler2D iChannel2;
 //uniform sampler2D iChannel3;
+
+//----------------------------------------------------------------------------------------------------------------//
+
+in vec3 fragPosition;
+in vec3 fragNormal;
+in vec3 fragUV;

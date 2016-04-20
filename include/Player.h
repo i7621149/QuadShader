@@ -25,11 +25,13 @@ private :
   float m_spin = 0.0f;
   float m_maxSpeed = 0.3f;
   float m_attackRad = 5.0f;
-  float m_stunnedTime = 0.0;
-  float m_stunnedStep = 0.1f;
+  float m_stunnedTime = 0.0f;
+  float m_stunnedCooldown = 10.0f;
   bool m_attacking = false;
   bool m_grounded = true;
   int m_score = 0;
+  float m_attackTime = 0.0f;
+  float m_attackCooldown = 30.0f;
 
   float m_areaSize;
 };

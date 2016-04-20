@@ -10,3 +10,7 @@ layout (location = 2) in vec3 inNormal;
 layout (location = 1) in vec2 inUV;
 
 uniform mat4 MVP;
+
+out vec3 fragPosition;
+out vec3 fragNormal;
+out vec3 fragUV;
