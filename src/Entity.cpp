@@ -18,14 +18,3 @@ ngl::Mat4 Entity::getTransformMatrix()
   t.setScale(m_scale);
   return t.getMatrix();
 }
-
-void Entity::loadDataToShader(GLuint _progID, ngl::Mat4 _VPMatrix)
-{
-  ShaderLibPro::instance()->useShader(m_shaderIndex);
-  ngl::Mat4 MVP;
-
-  MVP = getTransformMatrix()* _VPMatrix;
-
-  ShaderVariables::instance()->MVP = MVP;
-  ShaderVariables::instance()->loadToShader(_progID);
-}

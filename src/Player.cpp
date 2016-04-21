@@ -22,6 +22,7 @@ Player::~Player()
 
 void Player::update(ngl::Vec3 _dir, bool _attack, Player *_otherPlayer)
 {
+  // update function for user controlled player
   // if player is on ground then calculate movement
   if(m_grounded)
   {
@@ -79,14 +80,14 @@ void Player::update(ngl::Vec3 _dir, bool _attack, Player *_otherPlayer)
   {
     m_vel.m_x *= -1.5f;
     m_vel.m_y = 0.7f;
-    m_stunnedTime = m_stunnedCooldown;
+    m_stunnedTime = m_stunnedCooldown / 2.0;
     m_grounded = false;
   }
   if(newPos.m_z < -m_areaSize || newPos.m_z > m_areaSize)
   {
     m_vel.m_z *= -1.5f;
     m_vel.m_y = 0.7f;
-    m_stunnedTime = m_stunnedCooldown;
+    m_stunnedTime = m_stunnedCooldown / 2.0;
     m_grounded = false;
   }
 
@@ -138,9 +139,13 @@ void Player::update(ngl::Vec3 _dir, bool _attack, Player *_otherPlayer)
   }
 }
 
-void Player::draw(GLuint _progID, ngl::Mat4 _VPMatrix)
+void aiUpdate(const std::vector<std::unique_ptr<Entity>> &_pills, Player *_otherPlayer)
 {
-  loadDataToShader(_progID, _VPMatrix);
+
+}
+
+void Player::draw()
+{
   if(m_attacking)
   {
     ngl::VAOPrimitives::instance()->draw("cube");
@@ -156,7 +161,7 @@ void Player::hit()
   m_vel = ngl::Vec3(0,1,0);
   m_pos.m_y = 0.1f;
   m_grounded = false;
-  m_stunnedTime = 1.0f;
+  m_stunnedTime = m_stunnedCooldown;
 }
 
 void Player::pickUpBox()

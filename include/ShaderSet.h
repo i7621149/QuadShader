@@ -4,6 +4,7 @@
 #include <string>
 
 #include "ShaderPro.h"
+#include "Entity.h"
 
 #ifndef NGLSCENE_H__
 #define NGLSCENE_H__
@@ -25,7 +26,7 @@ public :
 
   void setShaderInfo(const std::string &_sourceFile);
 
-  void draw(NGLScene *_scene);
+  void draw(Entity *_entity, ngl::Mat4 _camVP);
 
   void loadShaders();
 

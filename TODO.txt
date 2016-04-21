@@ -17,7 +17,6 @@ shadows
 //
 NEW TODO:
 
-Reformat ShaderLib to shader sets owned by shaderlib
 Write 3 geo shaders
 
 add ai

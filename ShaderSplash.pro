@@ -24,7 +24,7 @@ SOURCES+= src/main.cpp \
           src/ShaderPro.cpp \
           src/Entity.cpp \
           src/Player.cpp \
-          src/Box.cpp \
+          src/Pill.cpp \
           src/Wall.cpp
 
 # same for the .h files
@@ -36,7 +36,7 @@ HEADERS+= include/NGLScene.h \
           include/TextureData.h \
           include/Entity.h \
           include/Player.h \
-          include/Box.h \
+          include/Pill.h \
           include/Wall.h
 
 # and add the include dir into the search path for Qt and make

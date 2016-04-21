@@ -225,7 +225,7 @@ void ShaderSet::setShaderInfo(const std::string &_sourceFile)
   loadShaders();
 }
 
-void ShaderSet::draw(NGLScene *_scene)
+void ShaderSet::draw(Entity *_entity, ngl::Mat4 _camVP)
 {
   for(ShaderPro *shader : m_shaders)
   {
@@ -236,6 +236,14 @@ void ShaderSet::draw(NGLScene *_scene)
 
     glUseProgram(shader->m_progID);
 
+    ngl::Mat4 MVP;
+
+    MVP = _entity->getTransformMatrix()* _camVP;
+
+    ShaderVariables::instance()->MVP = MVP;
+    ShaderVariables::instance()->loadToShader(shader->m_progID);
+
+
     shader->texturesToShader();
     //shader->printShaderData();
 
@@ -243,7 +251,7 @@ void ShaderSet::draw(NGLScene *_scene)
     //std::cout << "textureOut: " << shader->m_outTextureID << std::endl;
     //std::cout << "textureIn: " << shader->m_textures[1].id << std::endl;
 
-    _scene->drawScene(shader->m_progID);
+    _entity->draw();
   }
   //std::cout << std::endl;
 }

@@ -12,7 +12,7 @@
 #include <memory>
 #include "ngl/Transformation.h"
 #include "Player.h"
-#include "Box.h"
+#include "Pill.h"
 #include "Wall.h"
 #include <QTime>
 
@@ -50,7 +50,7 @@ public:
   //----------------------------------------------------------------------------------------------------------------------
   void paintGL();
 
-  void drawScene(GLuint _progID);
+  void drawScene();
 
 private:
   //----------------------------------------------------------------------------------------------------------------------
@@ -141,9 +141,9 @@ private:
   bool m_player1Attack;
   bool m_player2Attack;
 
-  Box m_box;
+  std::vector<std::unique_ptr<Pill>> m_pills;
 
-  std::vector<Wall> m_walls;
+  std::vector<std::unique_ptr<Wall>> m_walls;
 
   std::unique_ptr<ngl::Text> m_text;
 

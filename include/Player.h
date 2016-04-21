@@ -5,6 +5,7 @@
 
 #include "ngl/Vec3.h"
 #include "ngl/Transformation.h"
+#include <memory>
 
 class Player : public Entity
 {
@@ -14,7 +15,8 @@ public :
 
   void update() {std::cerr << "player needs direction to update with" << std::endl;}
   void update(ngl::Vec3 _dir, bool _attack, Player *_otherPlayer);
-  void draw(GLuint _progID, ngl::Mat4 _VPMatrix);
+  void aiUpdate(const std::vector<std::unique_ptr<Entity>> &_pills, Player *_otherPlayer);
+  void draw();
 
   void hit();
   void pickUpBox();

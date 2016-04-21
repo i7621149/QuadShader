@@ -46,9 +46,10 @@ void ShaderLibPro::addShader(const std::string &_sourceFile)
   m_shaderSets.push_back(std::unique_ptr<ShaderSet>(new ShaderSet(_sourceFile)));
 }
 
-void ShaderLibPro::draw(NGLScene *_scene)
+void ShaderLibPro::draw(Entity *_entity, ngl::Mat4 _camVP)
 {
-  m_shaderSets[m_currentShaderindex]->draw(_scene);
+  useShader(_entity->getShaderIndex());
+  m_shaderSets[m_currentShaderindex]->draw(_entity, _camVP);
 }
 
 //ShaderPro *ShaderLibPro::getShader(const std::string &_shaderName)

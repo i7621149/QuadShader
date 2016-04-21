@@ -1,4 +1,4 @@
-#include "Box.h"
+#include "Pill.h"
 #include <QTime>
 #include <iostream>
 #include <cmath>
@@ -6,14 +6,14 @@
 #include "ngl/VAOPrimitives.h"
 #include "ngl/Random.h"
 
-Box::Box() :
+Pill::Pill() :
   Entity(ngl::Vec3(0,0,0))
 {
   m_rotSpeed = ngl::Random::instance()->getRandomNormalizedVec3();
   m_rotSpeed *= 3.0;
 }
 
-Box::Box(ngl::Vec3 _pos) :
+Pill::Pill(ngl::Vec3 _pos) :
   Entity(_pos)
 {
   // set random rotation
@@ -21,7 +21,7 @@ Box::Box(ngl::Vec3 _pos) :
   m_rotSpeed *= 3.0;
 }
 
-void Box::update(Player *_player1, Player *_player2)
+void Pill::update(Player *_player1, Player *_player2)
 {
   int time = QTime::currentTime().msecsSinceStartOfDay();
 
@@ -47,13 +47,12 @@ void Box::update(Player *_player1, Player *_player2)
 
 }
 
-void Box::draw(GLuint _progID, ngl::Mat4 _VPMatrix)
+void Pill::draw()
 {
-  loadDataToShader(_progID, _VPMatrix);
   ngl::VAOPrimitives::instance()->draw("cube");
 }
 
-void Box::reset(ngl::Vec3 _pos)
+void Pill::reset(ngl::Vec3 _pos)
 {
   m_pos = _pos;
   update(nullptr, nullptr);

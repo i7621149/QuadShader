@@ -21,8 +21,7 @@ public :
   bool isAlive() {return m_alive;}
 
   virtual void update() = 0;
-  virtual void draw(GLuint _progID, ngl::Mat4 VPMatrix) = 0;
-  void loadDataToShader(GLuint _progID, ngl::Mat4 _VPMatrix);
+  virtual void draw() = 0;
 
 protected :
   ngl::Vec3 m_pos;

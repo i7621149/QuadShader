@@ -19,8 +19,7 @@ void Wall::update()
 }
 
 
-void Wall::draw(GLuint _progID, ngl::Mat4 _VPMatrix)
+void Wall::draw()
 {
-  loadDataToShader(_progID, _VPMatrix);
   ngl::VAOPrimitives::instance()->draw("cube");
 }

@@ -18,12 +18,12 @@ NGLScene::NGLScene() :
   m_time(QTime::currentTime()),
   m_lastFrameTime(0),
   m_mouseData(0,0,0,0),
-  m_multiplayer(true),
   m_camPos(0, 10, 30),
   m_cam(m_camPos ,ngl::Vec3::zero(), ngl::Vec3::up()),
   m_areaSize(20),
   m_wallWidth(1),
   m_wallHeight(2),
+  m_multiplayer(true),
   m_player1(ngl::Vec3(-m_areaSize/2, 0, 0), m_areaSize-m_wallWidth),
   m_player2(ngl::Vec3(m_areaSize/2, 0, 0), m_areaSize-m_wallWidth),
   m_player1Attack(false),
@@ -80,6 +80,13 @@ void NGLScene::initializeGL()
 
   m_text.reset(new ngl::Text(QFont("Arial",31)));
 
+  for(int i=0; i<3; i++)
+  {
+    ngl::Vec3 pos = ngl::Random::instance()->getRandomPoint(m_areaSize-m_wallWidth-1, 0, m_areaSize-m_wallWidth-1);
+    m_pills.push_back(Pill(pos));
+    m_pills[i].setShaderIndex(1);
+  }
+
   m_walls.push_back(Wall(ngl::Vec3(m_areaSize,0,m_wallWidth/2.0), ngl::Vec3(1,m_wallHeight,m_areaSize*2)));
   m_walls.push_back(Wall(ngl::Vec3(-m_areaSize,0,-m_wallWidth/2.0), ngl::Vec3(1,m_wallHeight,m_areaSize*2)));
   m_walls.push_back(Wall(ngl::Vec3(-m_wallWidth/2.0,0,m_areaSize), ngl::Vec3(m_areaSize*2,m_wallHeight,m_wallWidth)));
@@ -88,9 +95,8 @@ void NGLScene::initializeGL()
   m_player1Ctrl = ngl::Vec3::zero();
   m_player2Ctrl = ngl::Vec3::zero();
 
-
-  m_player1.setShaderIndex(1);
-  m_player2.setShaderIndex(1);
+  m_player1.setShaderIndex(0);
+  m_player2.setShaderIndex(0);
 
   // set up timer loop
   startTimer(16);
@@ -103,7 +109,7 @@ void NGLScene::paintGL()
 
   if(m_mode == MAIN)
   {
-    ShaderLibPro::instance()->draw(this);
+    drawScene();
   }
 
   m_text->setScreenSize(width()*devicePixelRatio(),height()*devicePixelRatio());
@@ -123,23 +129,26 @@ void NGLScene::paintGL()
 }
 
 // drawing scene takes programID
-void NGLScene::drawScene(GLuint _progID)
+void NGLScene::drawScene()
 {
+  ShaderLibPro *shader = ShaderLibPro::instance();
   // clear the screen and depth buffer
   glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   glViewport(0, 0, m_width, m_height);
 
-  ngl::Mat4 VP = m_cam.getVPMatrix();
-
+  ngl::Mat4 camVP = m_cam.getVPMatrix();
   for(Wall &wall : m_walls)
   {
-    wall.draw(_progID, VP);
+    shader->draw(&wall, camVP);
   }
-  m_box.draw(_progID, VP);
-  m_player1.draw(_progID, VP);
-  m_player2.draw(_progID, VP);
+  for(Pill &pill : m_pills)
+  {
+    shader->draw(&pill, camVP);
+  }
+  shader->draw(&m_player1, camVP);
+  shader->draw(&m_player2, camVP);
 
 }
 
@@ -303,15 +312,23 @@ void NGLScene::timerEvent(QTimerEvent *_event)
   m_player1.update(m_player1Ctrl, m_player1Attack, &m_player2);
   m_player2.update(m_player2Ctrl, m_player2Attack, &m_player1);
 
-  if(m_box.isAlive())
+  for(Pill &pill : m_pills)
   {
-    m_box.update(&m_player1, &m_player2);
+    if(pill.isAlive())
+    {
+      pill.update(&m_player1, &m_player2);
+    }
+    else
+    {
+      // box is hit
+
+      pill.reset(ngl::Random::instance()->getRandomPoint(m_areaSize-m_wallWidth-1, 0, m_areaSize-m_wallWidth-1));
+    }
   }
-  else
-  {
-    // box is hit
-    m_box.reset(ngl::Random::instance()->getRandomPoint(m_areaSize-m_wallWidth-1, 0, m_areaSize-m_wallWidth-1));
-  }
+
+
+
+
 
   updateCamera();
 
