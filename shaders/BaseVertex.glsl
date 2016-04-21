@@ -13,4 +13,11 @@ uniform mat4 MVP;
 
 out vec3 fragPosition;
 out vec3 fragNormal;
-out vec3 fragUV;
+out vec2 fragUV;
+
+void setFragVariables()
+{
+  fragPosition = inPosition;
+  fragNormal = inNormal;
+  fragUV = inUV;
+}

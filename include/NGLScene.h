@@ -14,6 +14,8 @@
 #include "Player.h"
 #include "Pill.h"
 #include "Wall.h"
+#include "Background.h"
+#include "Floor.h"
 #include <QTime>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -97,6 +99,8 @@ private:
 
   void updateCamera();
 
+  void remixShaders();
+
   //----------------------------------------------------------------------------------------------------------------------
   /// @brief window width
   //----------------------------------------------------------------------------------------------------------------------
@@ -122,6 +126,8 @@ private:
 
   ngl::Vec3 m_camPos;
 
+  float m_camLookHeight;
+
   ngl::Camera m_cam;
 
   ngl::Transformation m_transform;
@@ -141,9 +147,14 @@ private:
   bool m_player1Attack;
   bool m_player2Attack;
 
-  std::vector<std::unique_ptr<Pill>> m_pills;
+  float m_floorDepth;
+  Floor m_floor;
 
-  std::vector<std::unique_ptr<Wall>> m_walls;
+  std::vector<Pill> m_pills;
+
+  std::vector<Wall> m_walls;
+
+  Background m_background;
 
   std::unique_ptr<ngl::Text> m_text;
 

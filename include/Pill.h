@@ -14,7 +14,6 @@ public :
   Pill(ngl::Vec3 _pos);
   ~Pill() = default;
 
-
   void update() {std::cerr << "pill needs player positions to update" << std::endl;}
   void update(Player *_player1, Player *_player2);
   void draw();

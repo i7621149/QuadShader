@@ -1,13 +1,13 @@
-#include "Wall.h"
+#include "Floor.h"
 #include "ngl/VAOPrimitives.h"
 
-Wall::Wall(ngl::Vec3 _pos, ngl::Vec3 _size) :
+Floor::Floor(ngl::Vec3 _pos, ngl::Vec3 _size) :
   Entity(_pos)
 {
   m_scale = _size;
 }
 
-void Wall::draw()
+void Floor::draw()
 {
   ngl::VAOPrimitives::instance()->draw("cube");
 }

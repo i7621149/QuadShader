@@ -1,0 +1,12 @@
+SHADER MAIN
+  FRAGMENT   shaders/UniverseFragment.glsl
+  VERTEX     shaders/GeoVertex.glsl
+
+#comment like this
+
+  #TEXTURE 2D textures/tex01.png
+  #TEXTURE 2D textures/tex19.png
+  #TEXTURE 2D textures/tex09.png
+  #TEXTURE 2D textures/tex16.png
+END MAIN
+

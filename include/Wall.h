@@ -10,9 +10,9 @@ class Wall : public Entity
 {
 public :
   Wall(ngl::Vec3 _pos, ngl::Vec3 _size);
-  ~Wall();
+  ~Wall() = default;
 
-  void update();
+  void update() {}
   void draw();
 };
 

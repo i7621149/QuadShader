@@ -17,7 +17,13 @@ shadows
 //
 NEW TODO:
 
-Write 3 geo shaders
+
+WHY CANT I TURN OFF MIPMAPS
+
+get background shaders
+add hamster texture
+write geo shaders for hamsters
+write vertex shaders
 
 add ai
 change area size so that its the actual area

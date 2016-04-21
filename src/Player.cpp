@@ -12,7 +12,6 @@ Player::Player(ngl::Vec3 _pos, float _areaSize) :
   Entity(_pos),
   m_areaSize(_areaSize)
 {
-
 }
 
 Player::~Player()
@@ -139,7 +138,7 @@ void Player::update(ngl::Vec3 _dir, bool _attack, Player *_otherPlayer)
   }
 }
 
-void aiUpdate(const std::vector<std::unique_ptr<Entity>> &_pills, Player *_otherPlayer)
+void Player::aiUpdate(Player *_otherPlayer)
 {
 
 }
@@ -152,9 +151,16 @@ void Player::draw()
   }
   else
   {
-    ngl::VAOPrimitives::instance()->draw("teapot");
+    m_mesh->draw();
   }
 }
+
+void Player::loadMesh(const std::string &_modelName)
+{
+  m_mesh.reset(new ngl::Obj(_modelName));
+  m_mesh->createVAO();
+}
+
 
 void Player::hit()
 {
@@ -164,7 +170,7 @@ void Player::hit()
   m_stunnedTime = m_stunnedCooldown;
 }
 
-void Player::pickUpBox()
+void Player::pickUpPill()
 {
   m_score++;
 }

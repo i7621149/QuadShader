@@ -6,6 +6,8 @@
 #include "ngl/Vec3.h"
 #include "ngl/Transformation.h"
 #include <memory>
+#include <vector>
+#include "ngl/Obj.h"
 
 class Player : public Entity
 {
@@ -15,14 +17,16 @@ public :
 
   void update() {std::cerr << "player needs direction to update with" << std::endl;}
   void update(ngl::Vec3 _dir, bool _attack, Player *_otherPlayer);
-  void aiUpdate(const std::vector<std::unique_ptr<Entity>> &_pills, Player *_otherPlayer);
+  void aiUpdate(Player *_otherPlayer);
   void draw();
 
   void hit();
-  void pickUpBox();
+  void pickUpPill();
   int getScore() {return m_score;}
+  void loadMesh(const std::string &_modelName);
 
 private :
+  std::unique_ptr<ngl::Obj> m_mesh;
   float m_prevYPos = 0.0f;
   float m_spin = 0.0f;
   float m_maxSpeed = 0.3f;
@@ -34,7 +38,6 @@ private :
   int m_score = 0;
   float m_attackTime = 0.0f;
   float m_attackCooldown = 30.0f;
-
   float m_areaSize;
 };
 

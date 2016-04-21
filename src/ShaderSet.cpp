@@ -238,22 +238,16 @@ void ShaderSet::draw(Entity *_entity, ngl::Mat4 _camVP)
 
     ngl::Mat4 MVP;
 
-    MVP = _entity->getTransformMatrix()* _camVP;
+    MVP = _entity->getTransformMatrix() * _camVP;
 
     ShaderVariables::instance()->MVP = MVP;
     ShaderVariables::instance()->loadToShader(shader->m_progID);
 
-
     shader->texturesToShader();
     //shader->printShaderData();
 
-    //std::cout << "bufferID: " << shader->m_outBufferID << std::endl;
-    //std::cout << "textureOut: " << shader->m_outTextureID << std::endl;
-    //std::cout << "textureIn: " << shader->m_textures[1].id << std::endl;
-
     _entity->draw();
   }
-  //std::cout << std::endl;
 }
 
 void ShaderSet::loadShaders()

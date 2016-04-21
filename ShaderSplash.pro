@@ -25,7 +25,9 @@ SOURCES+= src/main.cpp \
           src/Entity.cpp \
           src/Player.cpp \
           src/Pill.cpp \
-          src/Wall.cpp
+          src/Wall.cpp \
+          src/Floor.cpp \
+          src/Background.cpp
 
 # same for the .h files
 HEADERS+= include/NGLScene.h \
@@ -37,7 +39,9 @@ HEADERS+= include/NGLScene.h \
           include/Entity.h \
           include/Player.h \
           include/Pill.h \
-          include/Wall.h
+          include/Wall.h \
+          include/Floor.h \
+          include/Background.h
 
 # and add the include dir into the search path for Qt and make
 INCLUDEPATH += include
@@ -47,9 +51,11 @@ DESTDIR=./
 # add the glsl shader files
 OTHER_FILES += README.md \
                TODO.txt \
-               ./shaders/* \
-               ./shaders/buffertest/* \
-               ./shaders/geotest/*
+               shaders/* \
+               shaders/buffertest/* \
+               shaders/geotest/* \
+               shaders/hamster/*
+
 # were are going to default to a console app
 CONFIG += console
 # note each command you add needs a ; as it will be run as a single line

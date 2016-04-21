@@ -35,12 +35,12 @@ void Pill::update(Player *_player1, Player *_player2)
   {
     if((_player1->getPos() - m_pos).lengthSquared() < 1)
     {
-      _player1->pickUpBox();
+      _player1->pickUpPill();
       m_alive = false;
     }
     else if((_player2->getPos() - m_pos).lengthSquared() < 1)
     {
-      _player2->pickUpBox();
+      _player2->pickUpPill();
       m_alive = false;
     }
   }
@@ -49,7 +49,7 @@ void Pill::update(Player *_player1, Player *_player2)
 
 void Pill::draw()
 {
-  ngl::VAOPrimitives::instance()->draw("cube");
+  ngl::VAOPrimitives::instance()->draw("pill");
 }
 
 void Pill::reset(ngl::Vec3 _pos)

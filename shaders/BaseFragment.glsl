@@ -42,4 +42,4 @@ uniform vec4 iDate;
 
 in vec3 fragPosition;
 in vec3 fragNormal;
-in vec3 fragUV;
+in vec2 fragUV;
