@@ -1,0 +1,7 @@
+SHADER MAIN
+  FRAGMENT   shaders/Background/CorridorFragment.glsl
+  VERTEX     shaders/GeoVertex.glsl
+
+  TEXTURE 2D textures/tex08.png
+  TEXTURE 2D textures/tex05.png
+END MAIN

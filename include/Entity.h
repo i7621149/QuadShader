@@ -17,6 +17,10 @@ public :
   ngl::Vec3 getScale() {return m_scale;}
   int getShaderIndex() {return m_shaderIndex;}
   void setShaderIndex(int _index) {m_shaderIndex = _index;}
+  void resetIndexRange(int _min, int _max);
+  int getMinIndex(){return m_minIndex;}
+  int getMaxIndex(){return m_maxIndex;}
+  void randomiseShaderIndex();
 
   bool isAlive() {return m_alive;}
 
@@ -30,6 +34,11 @@ protected :
   ngl::Vec3 m_scale = ngl::Vec3(1,1,1);
 
   int m_shaderIndex;
+
+  int m_minIndex;
+  int m_maxIndex; // true max
+
+  int m_currentMaxIndex; //current max
 
   bool m_alive;
 };

@@ -53,8 +53,11 @@ OTHER_FILES += README.md \
                TODO.txt \
                shaders/* \
                shaders/buffertest/* \
-               shaders/geotest/* \
-               shaders/hamster/*
+               shaders/Player/* \
+               shaders/Pill/* \
+               shaders/Wall/* \
+               shaders/Floor/* \
+               shaders/Background/*
 
 # were are going to default to a console app
 CONFIG += console

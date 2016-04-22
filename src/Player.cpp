@@ -96,12 +96,7 @@ void Player::update(ngl::Vec3 _dir, bool _attack, Player *_otherPlayer)
     m_attacking = true;
     m_prevYPos = m_rot.m_y;
 
-    ngl::Vec3 playerDistVec = m_pos - _otherPlayer->getPos();
-    // check distance to other player, for hit/miss
-    if(playerDistVec.lengthSquared() < m_attackRad*m_attackRad)
-    {
-      _otherPlayer->hit();
-    }
+
     m_attackTime = m_attackCooldown;
   }
   else
@@ -118,7 +113,20 @@ void Player::update(ngl::Vec3 _dir, bool _attack, Player *_otherPlayer)
     {
       m_spin = 0;
       m_attacking = false;
+      m_scale = ngl::Vec3(1,1,1);
     }
+    else
+    {
+
+      ngl::Vec3 playerDistVec = m_pos - _otherPlayer->getPos();
+      // check distance to other player, for hit/miss
+      if(playerDistVec.lengthSquared() < m_attackRad*m_attackRad)
+      {
+        _otherPlayer->hit();
+      }
+      m_scale = ngl::Vec3(m_attackRad, 1.0, m_attackRad);
+    }
+
   }
   else
   {
@@ -147,7 +155,7 @@ void Player::draw()
 {
   if(m_attacking)
   {
-    ngl::VAOPrimitives::instance()->draw("cube");
+    m_attackMesh->draw();
   }
   else
   {
@@ -155,10 +163,12 @@ void Player::draw()
   }
 }
 
-void Player::loadMesh(const std::string &_modelName)
+void Player::loadMeshes(const std::string &_modelName, const std::string &_attackModelName)
 {
   m_mesh.reset(new ngl::Obj(_modelName));
   m_mesh->createVAO();
+  m_attackMesh.reset(new ngl::Obj(_attackModelName));
+  m_attackMesh->createVAO();
 }
 
 

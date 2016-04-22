@@ -19,8 +19,11 @@ public :
   void draw();
   void reset(ngl::Vec3 _pos);
 
+  void setOffset(float _offset) {m_offset = _offset;}
+
 private :
   ngl::Vec3 m_rotSpeed = ngl::Vec3(0,0,0);
+  float m_offset;
 };
 
 #endif//PILL_H__

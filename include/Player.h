@@ -23,14 +23,15 @@ public :
   void hit();
   void pickUpPill();
   int getScore() {return m_score;}
-  void loadMesh(const std::string &_modelName);
+  void loadMeshes(const std::string &_modelName, const std::string &_attackModelName);
 
 private :
   std::unique_ptr<ngl::Obj> m_mesh;
+  std::unique_ptr<ngl::Obj> m_attackMesh;
   float m_prevYPos = 0.0f;
   float m_spin = 0.0f;
   float m_maxSpeed = 0.3f;
-  float m_attackRad = 5.0f;
+  float m_attackRad = 2.8f;
   float m_stunnedTime = 0.0f;
   float m_stunnedCooldown = 10.0f;
   bool m_attacking = false;

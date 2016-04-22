@@ -17,6 +17,7 @@
 #include "Background.h"
 #include "Floor.h"
 #include <QTime>
+#include <array>
 
 //----------------------------------------------------------------------------------------------------------------------
 /// @file NGLScene.h

@@ -25,5 +25,9 @@ add hamster texture
 write geo shaders for hamsters
 write vertex shaders
 
+BASICALLY WRITE A BUNCH OF SHADERS
+
+
 add ai
 change area size so that its the actual area
+add framebuffers

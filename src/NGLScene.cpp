@@ -18,10 +18,10 @@ NGLScene::NGLScene() :
   m_time(QTime::currentTime()),
   m_lastFrameTime(0),
   m_mouseData(0,0,0,0),
-  m_camPos(0, 10, 35),
-  m_camLookHeight(5),
+  m_camPos(0, 15, 35),
+  m_camLookHeight(10),
   m_cam(m_camPos , ngl::Vec3(0, m_camLookHeight, 0), ngl::Vec3::up()),
-  m_areaSize(15),
+  m_areaSize(13),
   m_wallWidth(1),
   m_wallHeight(2),
   m_multiplayer(true),
@@ -77,11 +77,8 @@ void NGLScene::initializeGL()
   // enable multisampling for smoother drawing
   glEnable(GL_MULTISAMPLE);
 
-  ShaderLibPro::instance()->addShader("shaders/geotest/geotest0.glll");
-  ShaderLibPro::instance()->addShader("shaders/geotest/geotest1.glll");
-  ShaderLibPro::instance()->addShader("shaders/geotest/geotest2.glll");
-  ShaderLibPro::instance()->addShader("shaders/geotest/geotest3.glll");
-  ShaderLibPro::instance()->addShader("shaders/hamster/hamster1.txt");
+  ShaderLibPro *shader = ShaderLibPro::instance();
+
 
   m_text.reset(new ngl::Text(QFont("Arial",31)));
 
@@ -93,6 +90,7 @@ void NGLScene::initializeGL()
   {
     ngl::Vec3 pos = ngl::Random::instance()->getRandomPoint(m_areaSize-m_wallWidth-1, 0, m_areaSize-m_wallWidth-1);
     m_pills.push_back(Pill(pos));
+    m_pills[i].setOffset(ngl::Random::instance()->randomPositiveNumber());
     m_pills[i].setShaderIndex(1);
   }
 
@@ -104,16 +102,35 @@ void NGLScene::initializeGL()
   m_player1Ctrl = ngl::Vec3::zero();
   m_player2Ctrl = ngl::Vec3::zero();
 
+  int minIndex = 0;
+  int maxIndex = 0;
+  shader->addShader("shaders/Background/background1.txt");
+  shader->addShader("shaders/Background/background2.txt");
+  shader->addShader("shaders/Background/background3.txt");
+  shader->addShader("shaders/Background/background4.txt");
+  shader->addShader("shaders/Background/background5.txt");
+  maxIndex = shader->getShaderSetAmount() - 1;
+  m_background.resetIndexRange(minIndex, maxIndex);
+  m_background.setShaderIndex(minIndex);
+
+  minIndex = maxIndex+1;
+  shader->addShader("shaders/Player/hamster1.txt");
+  maxIndex = shader->getShaderSetAmount() - 1;
+  m_player1.resetIndexRange(minIndex, maxIndex);
+  m_player2.resetIndexRange(minIndex, maxIndex);
+  m_player1.setShaderIndex(minIndex);
+  m_player2.setShaderIndex(minIndex);
+
+
   for(Wall &wall : m_walls)
   {
     wall.setShaderIndex(2);
   }
   m_floor.setShaderIndex(0);
-  m_player1.setShaderIndex(4);
-  m_player2.setShaderIndex(4);
 
-  m_player1.loadMesh("models/hamster.obj");
-  m_player2.loadMesh("models/hamster.obj");
+  // pretty unneccessary to have 2 at the moment but could have two player models
+  m_player1.loadMeshes("models/hamster.obj", "models/attack.obj");
+  m_player2.loadMeshes("models/hamster.obj", "models/attack.obj");
 
   // set up timer loop
   startTimer(16);
@@ -349,9 +366,10 @@ void NGLScene::timerEvent(QTimerEvent *_event)
     }
     else
     {
-      // box is hit
+      // pill is hit
       remixShaders();
       pill.reset(ngl::Random::instance()->getRandomPoint(m_areaSize-m_wallWidth-1, 0, m_areaSize-m_wallWidth-1));
+      pill.setOffset(ngl::Random::instance()->randomPositiveNumber());
     }
   }
 
@@ -379,7 +397,7 @@ void NGLScene::updateCamera()
   look.m_z +=5;
 
   // look at ground, so bouncing player doesn't affect camera
-  look.m_y = 5;
+  look.m_y = m_camLookHeight;
 
   float playerDist = (m_player1.getPos() - m_player2.getPos()).length();
 
@@ -390,22 +408,25 @@ void NGLScene::updateCamera()
 
 void NGLScene::remixShaders()
 {
-  int maxIndex = ShaderLibPro::instance()->getShaderSetAmount();
+  m_background.randomiseShaderIndex();
 
-  ngl::Random *rng = ngl::Random::instance();
+//  int maxIndex = ShaderLibPro::instance()->getShaderSetAmount();
 
-  int wallIndex = (int)rng->randomPositiveNumber(maxIndex);
-  for(Wall &wall : m_walls)
-  {
-    wall.setShaderIndex(wallIndex);
-  }
-  m_floor.setShaderIndex((int)rng->randomPositiveNumber(maxIndex));
+//  ngl::Random *rng = ngl::Random::instance();
 
-  int pillIndex = (int)rng->randomPositiveNumber(maxIndex);
-  for(Pill &pill: m_pills)
-  {
-    pill.setShaderIndex(pillIndex);
-  }
-  m_player1.setShaderIndex((int)rng->randomPositiveNumber(maxIndex));
-  m_player2.setShaderIndex((int)rng->randomPositiveNumber(maxIndex));
+
+//  int wallIndex = (int)rng->randomPositiveNumber(maxIndex);
+//  for(Wall &wall : m_walls)
+//  {
+//    wall.setShaderIndex(wallIndex);
+//  }
+//  m_floor.setShaderIndex((int)rng->randomPositiveNumber(maxIndex));
+
+//  int pillIndex = (int)rng->randomPositiveNumber(maxIndex);
+//  for(Pill &pill: m_pills)
+//  {
+//    pill.setShaderIndex(pillIndex);
+//  }
+//  m_player1.setShaderIndex((int)rng->randomPositiveNumber(maxIndex));
+//  m_player2.setShaderIndex((int)rng->randomPositiveNumber(maxIndex));
 }

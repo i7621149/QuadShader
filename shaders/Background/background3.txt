@@ -1,0 +1,5 @@
+SHADER MAIN
+  FRAGMENT   shaders/Background/DefaultQuadFragment.glsl
+  VERTEX     shaders/GeoVertex.glsl
+END MAIN
+

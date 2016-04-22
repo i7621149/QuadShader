@@ -67,7 +67,6 @@ void ShaderPro::loadFragSource()
   std::string fragSource = fragBase + loadSource(m_fragFile) + "\0";
 
   boost::replace_all(fragSource, "texture2D", "texture");
-  boost::replace_all(fragSource, "textureCube", "texture");
 
   // print out final fragSource
   //std::cout << fragSource << std::endl;
@@ -113,10 +112,6 @@ std::string ShaderPro::getFragBase()
     {
       fragBase += "uniform sampler2D iChannel" + textureString + ";\n";
     }
-    else if(texture.type == TEXTURECUBE)
-    {
-      fragBase += "uniform samplerCube iChannel" + textureString + ";\n";
-    }
     else if(texture.type == BUFFER)
     {
       fragBase += "uniform sampler2D iChannel" + textureString + ";\n";
@@ -132,16 +127,11 @@ void ShaderPro::loadTextures()
   int textureUnit = 0;
   for(TextureData texture : m_textures)
   {
-    // load texturefile if it is 2d or cube
+    // load texturefile
     if(texture.type == TEXTURE2D)
     {
       std::cout << std::endl << "loading 2D texture" << std::endl;
       loadImage(textureUnit, texture, GL_TEXTURE_2D);
-    }
-    else if(texture.type == TEXTURECUBE)
-    {
-      std::cout << std::endl << "loading CUBE texture" << std::endl;
-      loadImage(textureUnit, texture, GL_TEXTURE_CUBE_MAP);
     }
     textureUnit++;
   }
@@ -158,10 +148,6 @@ void ShaderPro::texturesToShader()
     {
       // is this the right place??
       glBindTexture(GL_TEXTURE_2D, texture.id);
-    }
-    else if(texture.type == TEXTURECUBE)
-    {
-      glBindTexture(GL_TEXTURE_CUBE_MAP, texture.id);
     }
     else if(texture.type == BUFFER)
     {

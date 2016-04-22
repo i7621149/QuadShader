@@ -166,17 +166,6 @@ void ShaderSet::setShaderInfo(const std::string &_sourceFile)
             texture.type = TEXTURE2D;
             texture.textureSource = splitString[2];
           }
-          else if(splitString[1] == "CUBE")
-          {
-            std::cout << "cube!" << std::endl;
-
-            glGenTextures(1, &texID);
-
-            texture.id = texID;
-
-            texture.type = TEXTURECUBE;
-            texture.textureSource = splitString[2];
-          }
           else if(splitString[1] == "BUFFER")
           {
             std::cout << "buffer!" << std::endl;
