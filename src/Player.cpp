@@ -8,8 +8,8 @@
 
 #include "ShaderLibPro.h"
 
-Player::Player(ngl::Vec3 _pos, float _areaSize) :
-  Entity(_pos),
+Player::Player(int _playerNum, ngl::Vec3 _pos, float _areaSize) :
+  Entity(_playerNum, _pos),
   m_areaSize(_areaSize)
 {
 }

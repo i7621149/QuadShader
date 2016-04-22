@@ -2,7 +2,7 @@
 #include "ngl/VAOPrimitives.h"
 
 Wall::Wall(ngl::Vec3 _pos, ngl::Vec3 _size) :
-  Entity(_pos)
+  Entity(5, _pos)
 {
   m_scale = _size;
 }

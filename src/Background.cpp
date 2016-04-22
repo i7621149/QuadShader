@@ -4,7 +4,7 @@
 #include "ShaderVariables.h"
 
 Background::Background() :
-  Entity(ngl::Vec3::zero())
+  Entity(0, ngl::Vec3::zero())
 {
 
 }

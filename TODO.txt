@@ -27,7 +27,7 @@ write vertex shaders
 
 BASICALLY WRITE A BUNCH OF SHADERS
 
-
+switch pill to obj
 add ai
 change area size so that its the actual area
 add framebuffers

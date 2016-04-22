@@ -4,7 +4,8 @@
 #include "ngl/Random.h"
 #include "ngl/Obj.h"
 
-Entity::Entity(ngl::Vec3 _pos) :
+Entity::Entity(int _id, ngl::Vec3 _pos) :
+  m_matID(_id),
   m_pos(_pos),
   m_shaderIndex(0),
   m_alive(true)

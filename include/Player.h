@@ -12,7 +12,7 @@
 class Player : public Entity
 {
 public :
-  Player(ngl::Vec3 _pos, float _areaSize);
+  Player(int _playerNum, ngl::Vec3 _pos, float _areaSize);
   ~Player();
 
   void update() {std::cerr << "player needs direction to update with" << std::endl;}

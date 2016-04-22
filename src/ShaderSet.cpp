@@ -230,6 +230,7 @@ void ShaderSet::draw(Entity *_entity, ngl::Mat4 _camVP)
     MVP = _entity->getTransformMatrix() * _camVP;
 
     ShaderVariables::instance()->MVP = MVP;
+    ShaderVariables::instance()->matID = _entity->getMatID();
     ShaderVariables::instance()->loadToShader(shader->m_progID);
 
     shader->texturesToShader();

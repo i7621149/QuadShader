@@ -7,7 +7,7 @@
 class Entity
 {
 public :
-  Entity(ngl::Vec3 _pos);
+  Entity(int _id, ngl::Vec3 _pos);
   ~Entity() = default;
 
   ngl::Mat4 getTransformMatrix();
@@ -22,12 +22,15 @@ public :
   int getMaxIndex(){return m_maxIndex;}
   void randomiseShaderIndex();
 
+  int getMatID() {return m_matID;}
+
   bool isAlive() {return m_alive;}
 
   virtual void update() = 0;
   virtual void draw() = 0;
 
 protected :
+  int m_matID;
   ngl::Vec3 m_pos;
   ngl::Vec3 m_vel = ngl::Vec3(0,0,0);
   ngl::Vec3 m_rot = ngl::Vec3(0,0,0);

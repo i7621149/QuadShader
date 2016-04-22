@@ -2,7 +2,7 @@
 #include "ngl/VAOPrimitives.h"
 
 Floor::Floor(ngl::Vec3 _pos, ngl::Vec3 _size) :
-  Entity(_pos)
+  Entity(4, _pos)
 {
   m_scale = _size;
 }

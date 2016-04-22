@@ -4,7 +4,8 @@ SHADER MAIN
 
 #comment like this
 
-  TEXTURE 2D textures/hamster.png
+  TEXTURE 2D textures/hamsterRed.png
+  TEXTURE 2D textures/tex10.png
 
 END MAIN
 

@@ -7,14 +7,14 @@
 #include "ngl/Random.h"
 
 Pill::Pill() :
-  Entity(ngl::Vec3(0,0,0))
+  Entity(3, ngl::Vec3(0,0,0))
 {
   m_rotSpeed = ngl::Random::instance()->getRandomNormalizedVec3();
   m_rotSpeed *= 3.0;
 }
 
 Pill::Pill(ngl::Vec3 _pos) :
-  Entity(_pos)
+  Entity(3, _pos)
 {
   // set random rotation
   m_rotSpeed = ngl::Random::instance()->getRandomNormalizedVec3();

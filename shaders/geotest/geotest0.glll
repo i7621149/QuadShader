@@ -1,9 +1,0 @@
-SHADER MAIN
-  FRAGMENT   shaders/FurFragment.glsl
-  VERTEX     shaders/GeoVertex.glsl
-
-#comment like this
-
-  TEXTURE 2D textures/tex16.png
-END MAIN
-

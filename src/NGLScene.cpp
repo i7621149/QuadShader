@@ -25,8 +25,8 @@ NGLScene::NGLScene() :
   m_wallWidth(1),
   m_wallHeight(2),
   m_multiplayer(true),
-  m_player1(ngl::Vec3(-m_areaSize/2, 0, 0), m_areaSize-m_wallWidth),
-  m_player2(ngl::Vec3(m_areaSize/2, 0, 0), m_areaSize-m_wallWidth),
+  m_player1(1, ngl::Vec3(-m_areaSize/2, 0, 0), m_areaSize-m_wallWidth),
+  m_player2(2, ngl::Vec3(m_areaSize/2, 0, 0), m_areaSize-m_wallWidth),
   m_player1Attack(false),
   m_player2Attack(false),
   m_floorDepth(100),
@@ -113,13 +113,22 @@ void NGLScene::initializeGL()
   m_background.resetIndexRange(minIndex, maxIndex);
   m_background.setShaderIndex(minIndex);
 
-  minIndex = maxIndex+1;
+  minIndex = maxIndex + 1;
   shader->addShader("shaders/Player/hamster1.txt");
   maxIndex = shader->getShaderSetAmount() - 1;
   m_player1.resetIndexRange(minIndex, maxIndex);
   m_player2.resetIndexRange(minIndex, maxIndex);
   m_player1.setShaderIndex(minIndex);
   m_player2.setShaderIndex(minIndex);
+
+  minIndex = maxIndex + 1;
+  shader->addShader("shaders/Pill/pill1.txt");
+  maxIndex = shader->getShaderSetAmount() - 1;
+  for(Pill &pill : m_pills)
+  {
+    pill.resetIndexRange(minIndex, maxIndex);
+    pill.setShaderIndex(minIndex);
+  }
 
 
   for(Wall &wall : m_walls)

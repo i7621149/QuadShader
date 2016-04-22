@@ -40,6 +40,8 @@ uniform vec4 iDate;
 
 //----------------------------------------------------------------------------------------------------------------//
 
+uniform int iMatID;
+
 in vec3 fragPosition;
 in vec3 fragNormal;
 in vec2 fragUV;
