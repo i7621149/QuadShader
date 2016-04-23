@@ -14,7 +14,6 @@ uniform mat4 MVP;
 uniform mat3 normalMatrix;
 uniform mat4 M;
 
-
 uniform int matID;
 
 // inputs are uniforms set in correct format for shadertoy to interface with
@@ -47,6 +46,6 @@ out vec2 fragUV;
 void setFragVariables()
 {
   fragPosition = inPosition;
-  fragNormal = inNormal;
+  fragNormal = normalize(normalMatrix*inNormal);
   fragUV = inUV;
 }

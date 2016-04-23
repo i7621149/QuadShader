@@ -21,9 +21,13 @@ public :
 
   void setOffset(float _offset) {m_offset = _offset;}
 
+  void loadMesh(ngl::Obj *_mesh);
+
 private :
   ngl::Vec3 m_rotSpeed = ngl::Vec3(0,0,0);
   float m_offset;
+  // using an obj since ngl capsule does not have UVs
+  ngl::Obj *m_mesh;
 };
 
 #endif//PILL_H__

@@ -102,6 +102,10 @@ private:
 
   void remixShaders();
 
+  void createQuad();
+
+  void startGame();
+
   //----------------------------------------------------------------------------------------------------------------------
   /// @brief window width
   //----------------------------------------------------------------------------------------------------------------------
@@ -113,7 +117,6 @@ private:
 
   GLuint m_vaoID;
 
-  void createQuad();
 
   bool m_fullScreen;
 
@@ -127,7 +130,7 @@ private:
 
   ngl::Vec3 m_camPos;
 
-  float m_camLookHeight;
+  float m_camBounce;
 
   ngl::Camera m_cam;
 
@@ -164,6 +167,13 @@ private:
   enum GameMode {TITLE, MAIN, FINISHED};
 
   GameMode m_mode;
+
+  bool m_playing;
+
+  std::unique_ptr<ngl::Obj> m_playerMesh;
+  std::unique_ptr<ngl::Obj> m_playerAttackMesh;
+  std::unique_ptr<ngl::Obj> m_pillMesh;
+  std::unique_ptr<ngl::Obj> m_boxMesh;
 };
 
 #endif

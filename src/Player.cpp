@@ -91,7 +91,7 @@ void Player::update(ngl::Vec3 _dir, bool _attack, Player *_otherPlayer)
   }
 
   // set attack if attacking is true
-  if(_attack && m_attackTime <= 0)
+  if(_attack && m_attackTime <= 0 && m_stunnedTime <= 0)
   {
     m_attacking = true;
     m_prevYPos = m_rot.m_y;
@@ -146,11 +146,6 @@ void Player::update(ngl::Vec3 _dir, bool _attack, Player *_otherPlayer)
   }
 }
 
-void Player::aiUpdate(Player *_otherPlayer)
-{
-
-}
-
 void Player::draw()
 {
   if(m_attacking)
@@ -163,12 +158,10 @@ void Player::draw()
   }
 }
 
-void Player::loadMeshes(const std::string &_modelName, const std::string &_attackModelName)
+void Player::loadMeshes(ngl::Obj *_mesh, ngl::Obj *_attackMesh)
 {
-  m_mesh.reset(new ngl::Obj(_modelName));
-  m_mesh->createVAO();
-  m_attackMesh.reset(new ngl::Obj(_attackModelName));
-  m_attackMesh->createVAO();
+  m_mesh = _mesh;
+  m_attackMesh = _attackMesh;
 }
 
 
@@ -183,4 +176,17 @@ void Player::hit()
 void Player::pickUpPill()
 {
   m_score++;
+}
+
+float Player::getPickUpRad()
+{
+  // if the player is attacking their pickup radius is larger
+  if(m_attacking)
+  {
+    return m_attackRad + 1.0;
+  }
+  else
+  {
+    return 1.0;
+  }
 }

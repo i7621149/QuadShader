@@ -214,8 +214,14 @@ void ShaderSet::setShaderInfo(const std::string &_sourceFile)
   loadShaders();
 }
 
-void ShaderSet::draw(Entity *_entity, ngl::Mat4 _camVP)
+void ShaderSet::draw(Entity *_entity, ngl::Camera *_cam)
 {
+  ngl::Mat4 M;
+  ngl::Mat4 MVP;
+  ngl::Mat4 MV;
+  ngl::Mat3 normalMatrix;
+
+
   for(ShaderPro *shader : m_shaders)
   {
     // debug print
@@ -223,16 +229,34 @@ void ShaderSet::draw(Entity *_entity, ngl::Mat4 _camVP)
 
     glBindFramebuffer(GL_FRAMEBUFFER, shader->m_outBufferID);
 
-    glUseProgram(shader->m_progID);
 
-    ngl::Mat4 MVP;
+    M = _entity->getTransformMatrix();
+    if(_cam)
+    {
+      MVP = M * _cam->getVPMatrix();
+      MV = M * _cam->getViewMatrix();
+    }
+    else
+    {
+      MVP = M;
+      MV = M;
+    }
 
-    MVP = _entity->getTransformMatrix() * _camVP;
 
+    normalMatrix = MV;
+    normalMatrix.inverse();
+
+    ShaderVariables::instance()->M = M;
     ShaderVariables::instance()->MVP = MVP;
+    ShaderVariables::instance()->MV = MV;
+    ShaderVariables::instance()->normalMatrix = normalMatrix;
+
     ShaderVariables::instance()->matID = _entity->getMatID();
+
+    glUseProgram(shader->m_progID);
     ShaderVariables::instance()->loadToShader(shader->m_progID);
 
+    // multiple textures are slow?
     shader->texturesToShader();
     //shader->printShaderData();
 

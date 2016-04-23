@@ -55,8 +55,7 @@ OTHER_FILES += README.md \
                shaders/buffertest/* \
                shaders/Player/* \
                shaders/Pill/* \
-               shaders/Wall/* \
-               shaders/Floor/* \
+               shaders/WallFloor/* \
                shaders/Background/*
 
 # were are going to default to a console app

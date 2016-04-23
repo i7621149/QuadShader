@@ -2,12 +2,17 @@
 #include "ngl/VAOPrimitives.h"
 
 Wall::Wall(ngl::Vec3 _pos, ngl::Vec3 _size) :
-  Entity(5, _pos)
+  Entity(4, _pos)
 {
   m_scale = _size;
 }
 
 void Wall::draw()
 {
-  ngl::VAOPrimitives::instance()->draw("cube");
+  m_mesh->draw();
+}
+
+void Wall::loadMesh(ngl::Obj *_mesh)
+{
+  m_mesh = _mesh;
 }

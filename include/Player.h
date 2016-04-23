@@ -17,17 +17,18 @@ public :
 
   void update() {std::cerr << "player needs direction to update with" << std::endl;}
   void update(ngl::Vec3 _dir, bool _attack, Player *_otherPlayer);
-  void aiUpdate(Player *_otherPlayer);
   void draw();
 
   void hit();
   void pickUpPill();
   int getScore() {return m_score;}
-  void loadMeshes(const std::string &_modelName, const std::string &_attackModelName);
+  void loadMeshes(ngl::Obj *_mesh, ngl::Obj *_attackMesh);
+
+  float getPickUpRad();
 
 private :
-  std::unique_ptr<ngl::Obj> m_mesh;
-  std::unique_ptr<ngl::Obj> m_attackMesh;
+  ngl::Obj *m_mesh;
+  ngl::Obj *m_attackMesh;
   float m_prevYPos = 0.0f;
   float m_spin = 0.0f;
   float m_maxSpeed = 0.3f;

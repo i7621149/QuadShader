@@ -4,4 +4,3 @@ SHADER MAIN
 
   TEXTURE 2D textures/tex16.png
 END MAIN
-

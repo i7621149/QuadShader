@@ -36,12 +36,12 @@ void Pill::update(Player *_player1, Player *_player2)
 
   if(_player1 && _player2)
   {
-    if((_player1->getPos() - collisionPos).lengthSquared() < 1)
+    if((_player1->getPos() - collisionPos).lengthSquared() < _player1->getPickUpRad())
     {
       _player1->pickUpPill();
       m_alive = false;
     }
-    else if((_player2->getPos() - collisionPos).lengthSquared() < 1)
+    else if((_player2->getPos() - collisionPos).lengthSquared() < _player2->getPickUpRad())
     {
       _player2->pickUpPill();
       m_alive = false;
@@ -52,7 +52,7 @@ void Pill::update(Player *_player1, Player *_player2)
 
 void Pill::draw()
 {
-  ngl::VAOPrimitives::instance()->draw("pill");
+  m_mesh->draw();
 }
 
 void Pill::reset(ngl::Vec3 _pos)
@@ -62,4 +62,8 @@ void Pill::reset(ngl::Vec3 _pos)
   m_alive = true;
 }
 
+void Pill::loadMesh(ngl::Obj *_mesh)
+{
+  m_mesh = _mesh;
+}
 

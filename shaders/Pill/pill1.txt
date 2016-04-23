@@ -4,7 +4,6 @@ SHADER MAIN
 
 #comment like this
 
-  TEXTURE 2D textures/test.png
+  TEXTURE 2D textures/pill.png
 
 END MAIN
-

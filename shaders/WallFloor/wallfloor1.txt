@@ -1,0 +1,6 @@
+SHADER MAIN
+  FRAGMENT   shaders/WallFloor/WallFloorFragment.glsl
+  VERTEX     shaders/GeoVertex.glsl
+
+  TEXTURE 2D textures/tex08.png
+END MAIN

@@ -5,18 +5,7 @@
 
 #include "ShaderPro.h"
 #include "Entity.h"
-
-#ifndef NGLSCENE_H__
-#define NGLSCENE_H__
-
-// define NGLScene drawScene function, as this is called in ShaderLibPro draw
-class NGLScene
-{
-public :
-  void drawScene(GLuint _progID);
-};
-
-#endif//NGLSCENE_H__
+#include "ngl/Camera.h"
 
 class ShaderSet
 {
@@ -26,7 +15,7 @@ public :
 
   void setShaderInfo(const std::string &_sourceFile);
 
-  void draw(Entity *_entity, ngl::Mat4 _camVP);
+  void draw(Entity *_entity, ngl::Camera *_cam);
 
   void loadShaders();
 

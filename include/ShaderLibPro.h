@@ -3,6 +3,7 @@
 
 #include "ngl/Singleton.h"
 #include "ngl/Mat4.h"
+#include "ngl/Camera.h"
 #include <string>
 #include <memory>
 #include "Entity.h"
@@ -29,7 +30,7 @@ class ShaderLibPro : public ngl::Singleton<ShaderLibPro>
 public :
   void addShader(const std::string &_sourceFile);
 
-  void draw(Entity *_entity, ngl::Mat4 _camVP);
+  void draw(Entity *_entity, ngl::Camera *_cam);
 
   void useShader(int _index);
 
