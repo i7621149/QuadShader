@@ -20,19 +20,22 @@ NGLScene::NGLScene() :
   m_mouseData(0,0,0,0),
   m_camPos(0, 15, 35),
   m_camBounce(0),
-  m_cam(m_camPos , ngl::Vec3(0, 7.5, 0), ngl::Vec3::up()),
+  m_cam(m_camPos, ngl::Vec3(0, 7.5, 0), ngl::Vec3::up()),
   m_areaSize(13),
   m_wallWidth(1),
   m_wallHeight(2),
-  m_multiplayer(true),
+  m_multiplayer(false),
+  m_remixStep(5),
   m_player1(1, ngl::Vec3(-m_areaSize/2, 0, 0), m_areaSize-m_wallWidth),
   m_player2(2, ngl::Vec3(m_areaSize/2, 0, 0), m_areaSize-m_wallWidth),
   m_player1Attack(false),
   m_player2Attack(false),
   m_floorDepth(1),
-  m_floor(ngl::Vec3(0,-m_floorDepth/2,0), ngl::Vec3((m_areaSize)*2, m_floorDepth, (m_areaSize)*2)),
+  m_floor(5, ngl::Vec3(0,-m_floorDepth/2,0), ngl::Vec3((m_areaSize)*2, m_floorDepth, (m_areaSize)*2)),
   m_matchTime(60),
-  m_mode(MAIN)
+  m_mode(TITLE),
+  m_textHeight(32),
+  m_tripping(false)
 {
   setTitle("Shader Splash");
 }
@@ -83,14 +86,15 @@ void NGLScene::initializeGL()
   ShaderLibPro *shader = ShaderLibPro::instance();
 
 
-  m_text.reset(new ngl::Text(QFont("Arial", 31)));
+  m_text.reset(new ngl::Text(QFont("Ariel", 32, 100)));
+  m_instructText.reset(new ngl::Text(QFont("Ariel", 18)));
 
   m_background.createQuad();
 
-  m_walls.push_back(Wall(ngl::Vec3(m_areaSize, -m_floorDepth/2.0, m_wallWidth/2.0), ngl::Vec3(1, m_wallHeight+m_floorDepth, m_areaSize*2)));
-  m_walls.push_back(Wall(ngl::Vec3(-m_areaSize, -m_floorDepth/2.0, -m_wallWidth/2.0), ngl::Vec3(1, m_wallHeight+m_floorDepth, m_areaSize*2)));
-  m_walls.push_back(Wall(ngl::Vec3(-m_wallWidth/2.0, -m_floorDepth/2.0, m_areaSize), ngl::Vec3(m_areaSize*2, m_wallHeight+m_floorDepth, m_wallWidth)));
-  m_walls.push_back(Wall(ngl::Vec3(m_wallWidth/2.0, -m_floorDepth/2.0, -m_areaSize), ngl::Vec3(m_areaSize*2, m_wallHeight+m_floorDepth, m_wallWidth)));
+  m_walls.push_back(Block(4, ngl::Vec3(m_areaSize, -m_floorDepth/2.0, m_wallWidth/2.0), ngl::Vec3(1, m_wallHeight+m_floorDepth, m_areaSize*2)));
+  m_walls.push_back(Block(4, ngl::Vec3(-m_areaSize, -m_floorDepth/2.0, -m_wallWidth/2.0), ngl::Vec3(1, m_wallHeight+m_floorDepth, m_areaSize*2)));
+  m_walls.push_back(Block(4, ngl::Vec3(-m_wallWidth/2.0, -m_floorDepth/2.0, m_areaSize), ngl::Vec3(m_areaSize*2, m_wallHeight+m_floorDepth, m_wallWidth)));
+  m_walls.push_back(Block(4, ngl::Vec3(m_wallWidth/2.0, -m_floorDepth/2.0, -m_areaSize), ngl::Vec3(m_areaSize*2, m_wallHeight+m_floorDepth, m_wallWidth)));
 
   m_player1Ctrl = ngl::Vec3::zero();
   m_player2Ctrl = ngl::Vec3::zero();
@@ -117,49 +121,61 @@ void NGLScene::initializeGL()
     m_pills[i].loadMesh(m_pillMesh.get());
   }
 
-  for(Wall &wall : m_walls)
+  for(Block &wall : m_walls)
   {
     wall.loadMesh(m_boxMesh.get());
   }
+  m_floor.loadMesh(m_boxMesh.get());
 
   int minIndex = 0;
   int maxIndex = 0;
-  shader->addShader("shaders/Background/background1.txt");
-  shader->addShader("shaders/Background/background2.txt");
-  shader->addShader("shaders/Background/background3.txt");
-  shader->addShader("shaders/Background/background4.txt");
-  shader->addShader("shaders/Background/background5.txt");
+  shader->addShader("shaders/Background/background01.txt");
+  shader->addShader("shaders/Background/background02.txt");
+  shader->addShader("shaders/Background/background03.txt");
+  shader->addShader("shaders/Background/background04.txt");
+  shader->addShader("shaders/Background/background05.txt");
+  shader->addShader("shaders/Background/background06.txt");
+  shader->addShader("shaders/Background/background07.txt");
+  shader->addShader("shaders/Background/background08.txt");
   maxIndex = shader->getShaderSetAmount() - 1;
   m_background.resetIndexRange(minIndex, maxIndex);
-  m_background.setShaderIndex(minIndex);
+  m_background.setCurrentIndex(0);
 
   minIndex = maxIndex + 1;
-  shader->addShader("shaders/Player/hamster1.txt");
+  shader->addShader("shaders/Player/hamster01.txt");
+  shader->addShader("shaders/Player/hamster02.txt");
+  shader->addShader("shaders/Player/hamster03.txt");
   maxIndex = shader->getShaderSetAmount() - 1;
   m_player1.resetIndexRange(minIndex, maxIndex);
   m_player2.resetIndexRange(minIndex, maxIndex);
-  m_player1.setShaderIndex(minIndex);
-  m_player2.setShaderIndex(minIndex);
+  m_player1.setCurrentIndex(0);
+  m_player2.setCurrentIndex(0);
 
   minIndex = maxIndex + 1;
-  shader->addShader("shaders/Pill/pill1.txt");
+  shader->addShader("shaders/Pill/pill01.txt");
+  shader->addShader("shaders/Pill/pill02.txt");
+  shader->addShader("shaders/Pill/pill03.txt");
   maxIndex = shader->getShaderSetAmount() - 1;
   for(Pill &pill : m_pills)
   {
     pill.resetIndexRange(minIndex, maxIndex);
-    pill.setShaderIndex(minIndex);
+    pill.setCurrentIndex(0);
   }
 
   minIndex = maxIndex +1;
-  shader->addShader("shaders/WallFloor/wallfloor2.txt");
+  shader->addShader("shaders/Block/block01.txt");
+  shader->addShader("shaders/Block/block02.txt");
+  shader->addShader("shaders/Block/block03.txt");
   maxIndex = shader->getShaderSetAmount() - 1;
-  for(Wall &wall : m_walls)
+  for(Block &wall : m_walls)
   {
     wall.resetIndexRange(minIndex, maxIndex);
-    wall.setShaderIndex(minIndex);
+    wall.setCurrentIndex(0);
   }
   m_floor.resetIndexRange(minIndex, maxIndex);
-  m_floor.setShaderIndex(minIndex);
+  m_floor.setCurrentIndex(0);
+
+  m_geoShaderNum = 3;
 
   // set up timer loop
   startTimer(16);
@@ -176,20 +192,17 @@ void NGLScene::paintGL()
 
   glViewport(0, 0, m_width, m_height);
 
-  // draw background quad
-  shader->draw(&m_background, nullptr);
 
   if(m_mode == MAIN)
   {
     drawScene();
   }
 
-  m_text->setScreenSize(width()*devicePixelRatio(), height()*devicePixelRatio());
-  m_text->setColour(1, 1, 0);
-  QString text=QString("%1 : %2").arg(m_player1.getScore()).arg(m_player2.getScore());
-  m_text->renderText(10, 20, text);
-  text=QString("%1").arg(m_matchTime-(m_time.elapsed()/1000));
-  m_text->renderText(m_width-100, 20, text);
+  // draw background quad
+  shader->draw(&m_background, nullptr);
+
+  renderText(ngl::Vec2(2, 2), ngl::Colour(0.0, 0.0, 0.0));
+  renderText(ngl::Vec2(0, 0), ngl::Colour(1.0, 1.0, 0.0));
 
   // calculate time taken to render the frame (time since last frame was rendered)
   float renderTime = (m_time.elapsed() - m_lastFrameTime) / 1000.0;
@@ -204,10 +217,7 @@ void NGLScene::drawScene()
 {
   ShaderLibPro *shader = ShaderLibPro::instance();
 
-  // clear buffer so everything draws over background
-  glClear(GL_DEPTH_BUFFER_BIT);
-
-  for(Wall &wall : m_walls)
+  for(Block &wall : m_walls)
   {
     shader->draw(&wall, &m_cam);
   }
@@ -218,7 +228,141 @@ void NGLScene::drawScene()
     shader->draw(&pill, &m_cam);
   }
   shader->draw(&m_player1, &m_cam);
-  shader->draw(&m_player2, &m_cam);
+
+  if(m_multiplayer)
+  {
+    shader->draw(&m_player2, &m_cam);
+  }
+}
+
+void NGLScene::renderText(ngl::Vec2 _startPos, ngl::Colour _col)
+{
+  QString text;
+
+  ngl::Vec2 textPos = _startPos + ngl::Vec2(30, 30);
+
+  m_text->setScreenSize(width()*devicePixelRatio(), height()*devicePixelRatio());
+  m_text->setColour(_col);
+
+  switch(m_mode)
+  {
+    case MAIN :
+      text=QString("SCORE");
+      m_text->renderText(textPos.m_x, textPos.m_y, text);
+
+      textPos.m_x += m_width-180;
+      text=QString("TIME");
+      m_text->renderText(textPos.m_x, textPos.m_y, text);
+
+      textPos.m_x -= m_width-180;
+      textPos.m_y += m_textHeight + 10;
+      if(m_multiplayer)
+      {
+        text=QString("%1 : %2").arg(m_player1.getScore()).arg(m_player2.getScore());
+      }
+      else
+      {
+        text=QString("%1!").arg(m_player1.getScore());
+      }
+      m_text->renderText(textPos.m_x, textPos.m_y, text);
+
+      textPos.m_x += m_width-180;
+      text=QString("%1%2").arg(m_matchTime-(m_time.elapsed()/1000)).arg(m_matchTime-(m_time.elapsed()/1000) > 9 ? "" : "!");
+      m_text->renderText(textPos.m_x, textPos.m_y, text);
+    break;
+    case TITLE :
+      text=QString("SHADER SMASH");
+      m_text->renderText(textPos.m_x, textPos.m_y, text);
+
+      textPos.m_y += m_textHeight + 30;
+      text=QString("Someone left some pills in the hamster cage!");
+      m_instructText->renderText(textPos.m_x, textPos.m_y, text);
+      textPos.m_y += m_textHeight + 5;
+      text=QString("Play as a hamster and eat as many as you can!");
+      m_instructText->renderText(textPos.m_x, textPos.m_y, text);
+      textPos.m_y += m_textHeight + 5;
+      text=QString("You've got 60 seconds to grab those pills!");
+      m_instructText->renderText(textPos.m_x, textPos.m_y, text);
+      textPos.m_y += m_textHeight + 5;
+      text=QString("Player1:");
+      m_instructText->renderText(textPos.m_x, textPos.m_y, text);
+      textPos.m_x += 20;
+      textPos.m_y += m_textHeight + 5;
+      text=QString("WASD: move");
+      m_instructText->renderText(textPos.m_x, textPos.m_y, text);
+      textPos.m_y += m_textHeight + 5;
+      text=QString("Space: attack");
+      m_instructText->renderText(textPos.m_x, textPos.m_y, text);
+
+      textPos.m_x -= 20;
+      textPos.m_y += m_textHeight + 5;
+      text=QString("Player2:");
+      m_instructText->renderText(textPos.m_x, textPos.m_y, text);
+      textPos.m_x += 20;
+      textPos.m_y += m_textHeight + 5;
+      text=QString("Arrow Keys: move");
+      m_instructText->renderText(textPos.m_x, textPos.m_y, text);
+      textPos.m_y += m_textHeight + 5;
+      text=QString("Shift: attack");
+      m_instructText->renderText(textPos.m_x, textPos.m_y, text);
+
+      textPos.m_y += m_textHeight + 10;
+      text=QString("Attacking will also let you grab farther away pills!");
+      m_instructText->renderText(textPos.m_x, textPos.m_y, text);
+
+
+      textPos.m_y += m_textHeight + 10;
+      text=QString("PLAY?");
+      m_text->renderText(textPos.m_x, textPos.m_y, text);
+
+      textPos.m_y += m_textHeight + 30;
+      text=QString("SPACE: SINGLE PLAYER");
+      m_text->renderText(textPos.m_x, textPos.m_y, text);
+
+      textPos.m_y += m_textHeight + 30;
+      text=QString("SHIFT: TWO PLAYER");
+      m_text->renderText(textPos.m_x, textPos.m_y, text);
+    break;
+    case FINISHED :
+      textPos.m_x = 60;
+      textPos.m_y += 20;
+      text=QString("FINAL SCORE");
+      m_text->renderText(textPos.m_x, textPos.m_y, text);
+
+      textPos.m_y += m_textHeight + 30;
+      if(m_multiplayer)
+      {
+        text=QString("%1 : %2").arg(m_player1.getScore()).arg(m_player2.getScore());
+      }
+      else
+      {
+        text=QString("%1!").arg(m_player1.getScore());
+      }
+      m_text->renderText(textPos.m_x, textPos.m_y, text);
+
+      textPos.m_y += m_textHeight + 100;
+      text=QString("PLAY AGAIN?");
+      m_text->renderText(textPos.m_x, textPos.m_y, text);
+
+      textPos.m_y += m_textHeight + 30;
+      text=QString("SPACE: SINGLE PLAYER");
+      m_text->renderText(textPos.m_x, textPos.m_y, text);
+
+      textPos.m_y += m_textHeight + 100;
+      text=QString("SHIFT: TWO PLAYER");
+      m_text->renderText(textPos.m_x, textPos.m_y, text);
+
+      textPos.m_y += m_textHeight + 10;
+      text=QString("Remember:");
+      m_instructText->renderText(textPos.m_x, textPos.m_y, text);
+      textPos.m_y += m_textHeight + 10;
+      text=QString("Attacking will also let you grab farther away pills!");
+      m_instructText->renderText(textPos.m_x, textPos.m_y, text);
+
+    break;
+    default : break;
+  }
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -265,11 +409,6 @@ void NGLScene::keyPressEvent(QKeyEvent *_event)
   {
     switch(m_mode)
     {
-      case TITLE :
-      {
-
-      }
-      break;
       case MAIN :
       {
         switch (_event->key())
@@ -278,29 +417,20 @@ void NGLScene::keyPressEvent(QKeyEvent *_event)
           case Qt::Key_Escape : QGuiApplication::exit(EXIT_SUCCESS); break;
 
           // render wireframe or shaded, mostly for bugfixing
-          //case Qt::Key_Z : glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); break;
-          //case Qt::Key_X : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); break;
+          // wireframe makes things fast and look broken
+          case Qt::Key_Z : glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); break;
+          case Qt::Key_X : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); break;
 
           // toggle fullscreen because who has time for two buttons for this
-          case Qt::Key_F : toggleFullScreen(); break;
+          // can make things very slow
+          case Qt::Key_F11 : toggleFullScreen(); break;
 
           // player 1 controls
           case Qt::Key_A : m_player1Ctrl[0] -= 1; break;
           case Qt::Key_D: m_player1Ctrl[0] += 1; break;
           case Qt::Key_W : m_player1Ctrl[2] -= 1; break;
           case Qt::Key_S : m_player1Ctrl[2] += 1; break;
-          case Qt::Key_Space :
-          {
-            if(m_mode == MAIN)
-            {
-              m_player1Attack = true;
-            }
-            else
-            {
-              startGame();
-            }
-          }
-          break;
+          case Qt::Key_Space : m_player1Attack = true; break;
           default : break;
         }
         if(m_multiplayer)
@@ -312,25 +442,40 @@ void NGLScene::keyPressEvent(QKeyEvent *_event)
             case Qt::Key_Right: m_player2Ctrl[0] += 1; break;
             case Qt::Key_Up : m_player2Ctrl[2] -= 1; break;
             case Qt::Key_Down : m_player2Ctrl[2] += 1; break;
-            case Qt::Key_Shift :
-            if(m_mode == MAIN)
-            {
-              m_player2Attack = true;
-            }
-            else
-            {
-              startGame();
-            }
-            break;
+            case Qt::Key_Shift : m_player2Attack = true; break;
             default : break;
           }
         }
       }
       break;
+      case TITLE :
       case FINISHED :
-      {
+        switch (_event->key())
+        {
+          // escape key to quite
+          case Qt::Key_Escape : QGuiApplication::exit(EXIT_SUCCESS); break;
 
-      }
+          // render wireframe or shaded, mostly for bugfixing
+          // wireframe makes things fast and look broken
+          case Qt::Key_F9 : glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); break;
+          case Qt::Key_F10 : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); break;
+
+          // toggle fullscreen because who has time for two buttons for this
+          // can make things very slow
+          case Qt::Key_F11 : toggleFullScreen(); break;
+          case Qt::Key_Space :
+            m_multiplayer = false;
+            m_player1Ctrl = ngl::Vec3::zero();
+            m_player2Ctrl = ngl::Vec3::zero();
+            startGame();
+          break;
+          case Qt::Key_Shift :
+            m_multiplayer = true;
+            m_player1Ctrl = ngl::Vec3::zero();
+            m_player2Ctrl = ngl::Vec3::zero();
+            startGame();
+          default : break;
+        }
       break;
       default :
       break;
@@ -412,23 +557,45 @@ void NGLScene::timerEvent(QTimerEvent *_event)
   {
     if(pill.isAlive())
     {
-      pill.update(&m_player1, &m_player2);
+      if(m_multiplayer)
+      {
+        pill.update(&m_player1, &m_player2);
+      }
+      else
+      {
+        pill.update(&m_player1, nullptr);
+      }
     }
     else
     {
       // pill is hit
-      remixShaders();
+      int totalScore = m_player1.getScore()+m_player2.getScore();
+      if(totalScore % m_remixStep == 0)
+      {
+        m_tripping = true;
+        remixShaders();
+      }
+
       pill.reset(ngl::Random::instance()->getRandomPoint(m_areaSize-m_wallWidth-1, 0, m_areaSize-m_wallWidth-1));
       pill.setOffset(ngl::Random::instance()->randomPositiveNumber());
     }
   }
 
-  updateCamera();
+  // only update camera after collecting inital pills
+  if(m_player1.getScore()+m_player2.getScore() >= m_remixStep)
+  {
+    updateCamera();
+  }
 
   m_player1Attack = false;
   m_player2Attack = false;
 
   m_camBounce /= 1.09;
+
+  if(m_mode == MAIN && m_time.elapsed()/1000 >= m_matchTime)
+  {
+    m_mode = FINISHED;
+  }
 
   update();
 }
@@ -458,39 +625,43 @@ void NGLScene::updateCamera()
 
 void NGLScene::remixShaders()
 {
-  int totalScore = m_player1.getScore()+m_player2.getScore();
-  if(totalScore % 5 == 0)
+
+  m_camBounce = 1.0;
+  int backgroundShaderIndex = m_background.getCurrentIndex() + 1;
+  m_background.setCurrentIndex(backgroundShaderIndex);
+
+  int geoShaderIndex = (int)ngl::Random::instance()->randomPositiveNumber(m_geoShaderNum);
+
+  m_player1.setCurrentIndex(geoShaderIndex);
+  m_player2.setCurrentIndex(geoShaderIndex);
+
+  for(Pill &pill : m_pills)
   {
-    m_camBounce = 1.0;
-    int bShader = m_background.getShaderIndex();
-    m_background.setShaderIndex(bShader+1);
+    pill.setCurrentIndex(geoShaderIndex);
   }
 
-//  int maxIndex = ShaderLibPro::instance()->getShaderSetAmount();
-
-//  ngl::Random *rng = ngl::Random::instance();
-
-//  int wallIndex = (int)rng->randomPositiveNumber(maxIndex);
-//  for(Wall &wall : m_walls)
-//  {
-//    wall.setShaderIndex(wallIndex);
-//  }
-//  m_floor.setShaderIndex((int)rng->randomPositiveNumber(maxIndex));
-
-//  int pillIndex = (int)rng->randomPositiveNumber(maxIndex);
-//  for(Pill &pill: m_pills)
-//  {
-//    pill.setShaderIndex(pillIndex);
-//  }
-//  m_player1.setShaderIndex((int)rng->randomPositiveNumber(maxIndex));
-//  m_player2.setShaderIndex((int)rng->randomPositiveNumber(maxIndex));
+  for(Block &wall : m_walls)
+  {
+    wall.setCurrentIndex(geoShaderIndex);
+  }
+  m_floor.setCurrentIndex(geoShaderIndex);
 }
 
 void NGLScene::startGame()
 {
   // cooldown on end screen so that it isn't just skipped immediately if the player is spamming attack at the end
-  if(m_time.elapsed() < m_matchTime + 5)
+  if(m_mode == TITLE || m_time.elapsed()/1000 > m_matchTime + 2)
   {
+    m_time.restart();
 
+    m_player1.setPos(ngl::Vec3(-m_areaSize/2, 0, 0));
+    m_player2.setPos(ngl::Vec3(m_areaSize/2, 0, 0));
+
+    m_player1.setScore(0);
+    m_player2.setScore(0);
+
+    m_player1Ctrl = ngl::Vec3::zero();
+    m_player2Ctrl = ngl::Vec3::zero();
+    m_mode = MAIN;
   }
 }

@@ -1,0 +1,6 @@
+SHADER MAIN
+  FRAGMENT   shaders/Background/DigestingFragment.glsl
+  VERTEX     shaders/GeoVertex.glsl
+
+  TEXTURE 2D textures/tex16.png
+END MAIN

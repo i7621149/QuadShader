@@ -1,0 +1,4 @@
+SHADER MAIN
+  FRAGMENT   shaders/Background/CrazyEyeFragment.glsl
+  VERTEX     shaders/GeoVertex.glsl
+END MAIN

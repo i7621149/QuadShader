@@ -25,8 +25,7 @@ SOURCES+= src/main.cpp \
           src/Entity.cpp \
           src/Player.cpp \
           src/Pill.cpp \
-          src/Wall.cpp \
-          src/Floor.cpp \
+          src/Block.cpp \
           src/Background.cpp
 
 # same for the .h files
@@ -39,8 +38,7 @@ HEADERS+= include/NGLScene.h \
           include/Entity.h \
           include/Player.h \
           include/Pill.h \
-          include/Wall.h \
-          include/Floor.h \
+          include/Block.h \
           include/Background.h
 
 # and add the include dir into the search path for Qt and make
@@ -55,7 +53,7 @@ OTHER_FILES += README.md \
                shaders/buffertest/* \
                shaders/Player/* \
                shaders/Pill/* \
-               shaders/WallFloor/* \
+               shaders/Block/* \
                shaders/Background/*
 
 # were are going to default to a console app

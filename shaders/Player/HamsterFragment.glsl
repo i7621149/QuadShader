@@ -11,8 +11,8 @@ void main()
     fragColor = texture(iChannel1, fragUV/2.0);
     if(iMatID == 1) // player1
     {
-      fragColor.r += 0.5;
-      fragColor.g += 0.3;
+      fragColor.r += 1.0;
+      fragColor.g += 0.5;
       fragColor *= 0.7;
     }
     else if(iMatID == 2) // player2

@@ -1,6 +1,6 @@
 SHADER MAIN
   FRAGMENT   shaders/Player/HamsterFragment.glsl
-  VERTEX     shaders/GeoVertex.glsl
+  VERTEX     shaders/GeoRandDistortVertex.glsl
 
 #comment like this
 

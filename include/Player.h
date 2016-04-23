@@ -21,8 +21,11 @@ public :
 
   void hit();
   void pickUpPill();
+  void setScore(int _score) {m_score = _score;}
   int getScore() {return m_score;}
   void loadMeshes(ngl::Obj *_mesh, ngl::Obj *_attackMesh);
+
+  void setPos(ngl::Vec3 _pos) {m_pos = _pos;}
 
   float getPickUpRad();
 

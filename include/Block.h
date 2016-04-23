@@ -7,11 +7,11 @@
 #include "ngl/Transformation.h"
 #include "ngl/Obj.h"
 
-class Wall : public Entity
+class Block : public Entity
 {
 public :
-  Wall(ngl::Vec3 _pos, ngl::Vec3 _size);
-  ~Wall() = default;
+  Block(int _id, ngl::Vec3 _pos, ngl::Vec3 _size);
+  ~Block() = default;
 
   void update() {}
   void draw();

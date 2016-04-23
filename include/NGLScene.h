@@ -13,9 +13,8 @@
 #include "ngl/Transformation.h"
 #include "Player.h"
 #include "Pill.h"
-#include "Wall.h"
+#include "Block.h"
 #include "Background.h"
-#include "Floor.h"
 #include <QTime>
 #include <array>
 
@@ -54,6 +53,8 @@ public:
   void paintGL();
 
   void drawScene();
+
+  void renderText(ngl::Vec2 _startPos, ngl::Colour _col);
 
 private:
   //----------------------------------------------------------------------------------------------------------------------
@@ -117,7 +118,6 @@ private:
 
   GLuint m_vaoID;
 
-
   bool m_fullScreen;
 
   bool m_mouseDown;
@@ -142,6 +142,8 @@ private:
 
   bool m_multiplayer;
 
+  int m_remixStep;
+
   Player m_player1;
   Player m_player2;
 
@@ -152,28 +154,33 @@ private:
   bool m_player2Attack;
 
   float m_floorDepth;
-  Floor m_floor;
+  Block m_floor;
 
   std::vector<Pill> m_pills;
 
-  std::vector<Wall> m_walls;
+  std::vector<Block> m_walls;
 
   Background m_background;
 
   std::unique_ptr<ngl::Text> m_text;
+  std::unique_ptr<ngl::Text> m_instructText;
 
   int m_matchTime;
 
-  enum GameMode {TITLE, MAIN, FINISHED};
+  enum GameMode {MAIN, TITLE, FINISHED};
 
   GameMode m_mode;
 
-  bool m_playing;
+  int m_textHeight;
 
   std::unique_ptr<ngl::Obj> m_playerMesh;
   std::unique_ptr<ngl::Obj> m_playerAttackMesh;
   std::unique_ptr<ngl::Obj> m_pillMesh;
   std::unique_ptr<ngl::Obj> m_boxMesh;
+
+  int m_geoShaderNum;
+
+  bool m_tripping;
 };
 
 #endif

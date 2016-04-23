@@ -15,12 +15,12 @@ public :
   ngl::Vec3 getVel() {return m_vel;}
   ngl::Vec3 getRot() {return m_rot;}
   ngl::Vec3 getScale() {return m_scale;}
-  int getShaderIndex() {return m_shaderIndex;}
-  void setShaderIndex(int _index) {m_shaderIndex = _index;}
+  int getShaderLibIndex() {return m_currentIndex + m_minIndex;}
+  int getCurrentIndex(){ return m_currentIndex;}
+  void setCurrentIndex(int _index);
   void resetIndexRange(int _min, int _max);
   int getMinIndex(){return m_minIndex;}
   int getMaxIndex(){return m_maxIndex;}
-  void randomiseShaderIndex();
 
   int getMatID() {return m_matID;}
 
@@ -36,12 +36,10 @@ protected :
   ngl::Vec3 m_rot = ngl::Vec3(0,0,0);
   ngl::Vec3 m_scale = ngl::Vec3(1,1,1);
 
-  int m_shaderIndex;
+  int m_currentIndex;
 
   int m_minIndex;
-  int m_maxIndex; // true max
-
-  int m_currentMaxIndex; //current max
+  int m_maxIndex;
 
   bool m_alive;
 };

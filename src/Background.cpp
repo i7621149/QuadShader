@@ -28,13 +28,18 @@ void Background::createQuad()
   // a simple quad object which fills the screen, from Jon's code
   float* vert = new float[18];
   const static float s=1.0;
-  vert[0] =-s; vert[1] =  s; vert[2] =-1.0;
-  vert[3] = s; vert[4] =  s; vert[5] =-1.0;
-  vert[6] = -s; vert[7] = -s; vert[8]= -1.0;
+  // make depth real big so hopefully nothing will be drawn over
+  // not elegant but means that i don't need to draw the background first
+  // because it can be expensive depending on shader, so drawing geo first
+  // will usually speed things up
+  const static float depth = 0.999999;
+  vert[0] =-s; vert[1] =  s; vert[2] = depth;
+  vert[3] = s; vert[4] =  s; vert[5] = depth;
+  vert[6] = -s; vert[7] = -s; vert[8]= depth;
 
-  vert[9] =-s; vert[10]= -s; vert[11]=-1.0;
-  vert[12] =s; vert[13]= -s; vert[14]=-1.0;
-  vert[15] =s; vert[16]= s; vert[17]=-1.0;
+  vert[9] =-s; vert[10]= -s; vert[11]=depth;
+  vert[12] =s; vert[13]= -s; vert[14]=depth;
+  vert[15] =s; vert[16]= s; vert[17]=depth;
   // allocate a VertexArray
   glGenVertexArrays(1, &m_vaoID);
   // now bind a vertex array object for our verts

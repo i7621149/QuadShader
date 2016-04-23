@@ -1,0 +1,10 @@
+SHADER MAIN
+  FRAGMENT   shaders/Player/HamsterFragment.glsl
+  VERTEX     shaders/GeoVertex.glsl
+
+#comment like this
+
+  TEXTURE 2D textures/hamsterRed.png
+  TEXTURE 2D textures/tex10.png
+
+END MAIN

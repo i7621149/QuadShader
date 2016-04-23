@@ -1,0 +1,8 @@
+SHADER MAIN
+  FRAGMENT   shaders/Background/RoomFragment.glsl
+  VERTEX     shaders/GeoVertex.glsl
+
+# texture from http://shophouseofhardwood.com/wp-content/uploads/2013/04/morrison-table-top.jpg and http://www.homexdecor.net/wp-content/uploads/2016/01/the-living-room-2.jpg
+# i photoshopped the two together
+  TEXTURE 2D textures/room.png
+END MAIN

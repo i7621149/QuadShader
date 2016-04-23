@@ -34,19 +34,17 @@ void Pill::update(Player *_player1, Player *_player2)
   ngl::Vec3 collisionPos = m_pos;
   collisionPos.m_y = 0;
 
-  if(_player1 && _player2)
+  if(_player1 && (_player1->getPos() - collisionPos).lengthSquared() < _player1->getPickUpRad())
   {
-    if((_player1->getPos() - collisionPos).lengthSquared() < _player1->getPickUpRad())
-    {
-      _player1->pickUpPill();
-      m_alive = false;
-    }
-    else if((_player2->getPos() - collisionPos).lengthSquared() < _player2->getPickUpRad())
-    {
-      _player2->pickUpPill();
-      m_alive = false;
-    }
+    _player1->pickUpPill();
+    m_alive = false;
   }
+  else if(_player2 && (_player2->getPos() - collisionPos).lengthSquared() < _player2->getPickUpRad())
+  {
+    _player2->pickUpPill();
+    m_alive = false;
+  }
+
 
 }
 

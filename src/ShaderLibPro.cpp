@@ -48,7 +48,7 @@ void ShaderLibPro::addShader(const std::string &_sourceFile)
 
 void ShaderLibPro::draw(Entity *_entity, ngl::Camera *_cam)
 {
-  useShader(_entity->getShaderIndex());
+  useShader(_entity->getShaderLibIndex());
   m_shaderSets[m_currentShaderindex]->draw(_entity, _cam);
 }
 

@@ -1,4 +1,4 @@
-// https://www.shadertoy.com/view/ll2SWc
+// from https://www.shadertoy.com/view/ll2SWc
 
 float aspect = iResolution.y / iResolution.x;
 vec2 center = iResolution.xy / 2.0;

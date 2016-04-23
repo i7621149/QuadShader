@@ -42,7 +42,7 @@ void Player::update(ngl::Vec3 _dir, bool _attack, Player *_otherPlayer)
 
       if(m_vel.lengthSquared() > 0)
       {
-        m_vel.m_y = 0.2f;
+        m_vel.m_y = 0.15f;
       }
       m_grounded = false;
     }
@@ -52,7 +52,7 @@ void Player::update(ngl::Vec3 _dir, bool _attack, Player *_otherPlayer)
       // stun means player cannot move in x or z
       m_vel.m_x = 0;
       m_vel.m_z = 0;
-      m_stunnedTime --;
+      m_stunnedTime--;
     }
   }
   else
@@ -183,10 +183,11 @@ float Player::getPickUpRad()
   // if the player is attacking their pickup radius is larger
   if(m_attacking)
   {
-    return m_attackRad + 1.0;
+    // pretty generous here to reward players who are using advanced "attack to pill up pills"
+    return m_attackRad + 3.0;
   }
   else
   {
-    return 1.0;
+    return 2.0;
   }
 }

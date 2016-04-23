@@ -1,29 +1,25 @@
 Buffers
--TexturesToShader function is breaking shit
 
 You should destroy the vbo http://www.open.gl
 
 Compile shaders at runtime // use a button to load and compile textures to channels and switch to new compiled shader
 UI switch
 
-un-hardcode the width and height in loading frame buffer shit
 
 add TextureCube function
 
-GEO shader
 shadows
 
 
 //
 NEW TODO:
 
+switch sky for cheaper
 
-WHY CANT I TURN OFF MIPMAPS
+change m_tripping to float, have combo, with extra text, m_tripping should decrease over time
 
-write geo shaders for hamsters
-write vertex shaders
+un-hardcode the width and height in loading frame buffer shit
 
-BASICALLY WRITE A BUNCH OF SHADERS
+rewrite shader remixing
 
-change area size so that its the actual area
 add framebuffers
