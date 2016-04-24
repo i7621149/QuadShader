@@ -1,134 +1,66 @@
-// from https://www.shadertoy.com/view/XsVGz3
+// from https://www.shadertoy.com/view/XlsXDB
 // uses tex16
 
-#define MIN_HEIGHT 2.0
-#define MAX_HEIGHT 4.5
-#define WIND vec2(0.2, 0.1)
+#define saturate(x) clamp(x,0.,1.)
+#define rgb(r,g,b) (vec3(r,g,b)/255.)
 
-vec3 sundir = normalize(vec3(1.0,0.75,1.0));
+float rand(float x) { return fract(sin(x) * 71523.5413291); }
 
-float noise( in vec3 x )
+float rand(vec2 x) { return rand(dot(x, vec2(13.4251, 15.5128))); }
+
+float noise(vec2 x)
 {
-    vec3 f = fract(x);
-    vec3 p = floor(x);
-    f = f * f * (3.0 - 2.0 * f);
-    
-    p.xz += WIND * iGlobalTime;
-    vec2 uv = (p.xz + vec2(37.0, 17.0) * p.y) + f.xz;
-    vec2 rg = texture2D(iChannel0, (uv + 0.5)/256.0, -100.0).yx;
-    return mix(rg.x, rg.y, f.y);
+    vec2 i = floor(x);
+    vec2 f = x - i;
+    f *= f*(3.-2.*f);
+    return mix(mix(rand(i), rand(i+vec2(1,0)), f.x),
+               mix(rand(i+vec2(0,1)), rand(i+vec2(1,1)), f.x), f.y);
 }
 
-float fractal_noise(vec3 p)
+float fbm(vec2 x)
 {
-    float f = 0.0;
-    // add animation
-    //p = p - vec3(1.0, 1.0, 0.0) * iGlobalTime * 0.1;
-    p = p * 3.0;
-    f += 0.50000 * noise(p); p = 2.0 * p;
-	f += 0.25000 * noise(p); p = 2.0 * p;
-	f += 0.12500 * noise(p); p = 2.0 * p;
-	f += 0.06250 * noise(p); p = 2.0 * p;
-    f += 0.03125 * noise(p);
-    
-    return f;
-}
-
-float density(vec3 pos)
-{    
-    float den = 3.0 * fractal_noise(pos * 0.3) - 2.0 + (pos.y - MIN_HEIGHT);
-    float edge = 1.0 - smoothstep(MIN_HEIGHT, MAX_HEIGHT, pos.y);
-    edge *= edge;
-    den *= edge;
-    den = clamp(den, 0.0, 1.0);
-    
-    return den;
-}
-
-vec3 raymarching(vec3 ro, vec3 rd, float t, vec3 backCol)
-{   
-    vec4 sum = vec4(0.0);
-    vec3 pos = ro + rd * t;
-    for (int i = 0; i < 40; i++) {
-        if (sum.a > 0.99 || 
-            pos.y < (MIN_HEIGHT-1.0) || 
-            pos.y > (MAX_HEIGHT+1.0)) break;
-        
-        float den = density(pos);
-        
-        if (den > 0.01) {
-            float dif = clamp((den - density(pos+0.3*sundir))/0.6, 0.0, 1.0);
-
-            vec3 lin = vec3(0.65,0.7,0.75)*1.5 + vec3(1.0, 0.6, 0.3)*dif;        
-            vec4 col = vec4( mix( vec3(1.0,0.95,0.8)*1.1, vec3(0.35,0.4,0.45), den), den);
-            col.rgb *= lin;
-
-            // front to back blending    
-            col.a *= 0.5;
-            col.rgb *= col.a;
-
-            sum = sum + col*(1.0 - sum.a); 
-        }
-        
-        t += max(0.05, 0.02 * t);
-        pos = ro + rd * t;
+    float r = 0.0, s = 1.0, w = 1.0;
+    for (int i=0; i<5; i++)
+    {
+        s *= 2.0;
+        w *= 0.5;
+        r += w * noise(s * x);
     }
-    
-    sum = clamp(sum, 0.0, 1.0);
-    
-    float h = rd.y;
-    sum.rgb = mix(sum.rgb, backCol, exp(-20.*h*h) );
-    
-    return mix(backCol, sum.xyz, sum.a);
+    return r;
 }
 
-float planeIntersect( vec3 ro, vec3 rd, float plane)
+float cloud(vec2 uv, float scalex, float scaley, float density, float sharpness, float speed)
 {
-    float h = plane - ro.y;
-    return h/rd.y;
+    return pow(saturate(fbm(vec2(scalex,scaley)*(uv+vec2(speed,0)*iGlobalTime))-(1.0-density)), 1.0-sharpness);
 }
 
-mat3 setCamera(vec3 ro, vec3 ta, float cr)
+vec3 render(vec2 uv)
 {
-	vec3 cw = normalize(ta-ro);
-	vec3 cp = vec3(sin(cr), cos(cr),0.0);
-	vec3 cu = normalize( cross(cw,cp) );
-	vec3 cv = normalize( cross(cu,cw) );
-    return mat3( cu, cv, cw );
+    // sky
+    vec3 color = mix(rgb(255,212,166), rgb(204,235,255), uv.y);
+    // sun
+    vec2 spos = uv - vec2(0., 0.4);
+    float sun = exp(-20.*dot(spos,spos));
+    vec3 scol = rgb(255,155,102) * sun * 0.7;
+    color += scol;
+    // clouds
+    vec3 cl1 = mix(rgb(151,138,153), rgb(166,191,224),uv.y);
+    float d1 = mix(0.9,0.1,pow(uv.y, 0.7));
+    color = mix(color, cl1, cloud(uv,2.,8.,d1,0.4,0.04));
+    color = mix(color, vec3(0.9), 8.*cloud(uv,14.,18.,0.9,0.75,0.02) * cloud(uv,2.,5.,0.6,0.15,0.01)*uv.y);
+    color = mix(color, vec3(0.8), 5.*cloud(uv,12.,15.,0.9,0.75,0.03) * cloud(uv,2.,8.,0.5,0.0,0.02)*uv.y);
+    // post
+    color *= vec3(1.0,0.93,0.81)*1.04;
+    color = mix(0.75*rgb(255,205,161), color, smoothstep(-0.1,0.3,uv.y));
+    color = pow(color,vec3(1.3));
+    return color;
 }
 
 void mainImage( out vec4 fragColor, in vec2 fragCoord )
 {
-	vec2 p = (2.0 * fragCoord.xy - iResolution.xy) / iResolution.yy;
-    vec2 mo = vec2(0.0);
-    if (iMouse.z > 0.0) 
-    {
-        mo += (2.0 * iMouse.xy - iResolution.xy) / iResolution.yy;
-    }
-    
-    vec3 ro = vec3(0.0, 0.0, -2.0);
-    
-    // Rotate the camera
-    vec3 target = vec3(ro.x+10., 1.0+mo.y*3.0, ro.z);
-    
-    vec2 cossin = vec2(cos(mo.x), sin(mo.x));
-    mat3 rot = mat3(cossin.x, 0.0, -cossin.y,
-                   	0.0, 1.0, 0.0,
-                   	cossin.y, 0.0, cossin.x);
-    target = rot * (target - ro) + ro;
-    
-    // Compute the ray
-    vec3 rd = setCamera(ro, target, 0.0) * normalize(vec3(p.xy, 1.5));
-    
-    float dist = planeIntersect(ro, rd, MIN_HEIGHT);
-    
-    float sun = clamp(dot(sundir, rd), 0.0, 1.0);
-	vec3 col = mix(vec3(0.78,0.78,0.7), vec3(0.3,0.4,0.5), p.y * 0.5 + 0.5);
-	col += 0.5*vec3(1.0,0.5,0.1)*pow(sun, 8.0);
-    
-    if (dist > 0.0) {
-        col = raymarching(ro, rd, dist, col);
-    }
-    
-    fragColor = vec4(col, 1.0);
+  vec2 uv = fragCoord.xy / iResolution.xy;
+    uv.x -= 0.5;
+    uv.x *= iResolution.x / iResolution.y;
+
+  fragColor = vec4(render(uv),1.0);
 }

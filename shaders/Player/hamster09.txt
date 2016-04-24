@@ -1,6 +1,6 @@
 SHADER MAIN
   FRAGMENT   shaders/Player/HamsterFragment.glsl
-  VERTEX     shaders/GeoSinDistortVertex.glsl
+  VERTEX     shaders/Player/HamsterScaleVertex.glsl
 
 #comment like this
 
@@ -8,4 +8,3 @@ SHADER MAIN
   TEXTURE 2D textures/tex10.png
 
 END MAIN
-

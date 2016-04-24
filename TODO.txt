@@ -1,25 +1,12 @@
-Buffers
-
-You should destroy the vbo http://www.open.gl
-
-Compile shaders at runtime // use a button to load and compile textures to channels and switch to new compiled shader
-UI switch
-
-
-add TextureCube function
-
-shadows
-
-
 //
 NEW TODO:
 
-switch sky for cheaper
+add block09 and block10
 
-change m_tripping to float, have combo, with extra text, m_tripping should decrease over time
-
-un-hardcode the width and height in loading frame buffer shit
-
-rewrite shader remixing
+fix texture duplication
 
 add framebuffers
+
+rename
+
+could clean up

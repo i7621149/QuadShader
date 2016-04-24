@@ -3,8 +3,12 @@ void main()
 {
   setFragVariables();
 
-  float scale = vGlobalTime / 12.0;
-  vec4 vertPos = vec4(inPosition, 1.0);
+  float scale = 1.5*abs(sin(vGlobalTime)) + 0.1;
+  scale *= scale;
+  vec3 pos = inPosition * scale;
+
+  scale = vGlobalTime / 12.0;
+  vec4 vertPos = vec4(pos, 1.0);
 
   float xDistort = 0.5*sin(0.2*vGlobalTime);
   float zDistort = 0.5*cos(0.2*vGlobalTime);

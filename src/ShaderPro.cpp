@@ -6,6 +6,7 @@
 #include <memory>
 #include <boost/algorithm/string/replace.hpp>
 #include <QImage>
+#include "ShaderVariables.h"
 
 ShaderPro::ShaderPro() :
   m_progID(0),
@@ -308,27 +309,30 @@ void ShaderPro::printInfoLog(GLuint _id, DebugMode _mode)
 
 void ShaderPro::setUpFramebuffer()
 {
+  int width = ShaderVariables::instance()->resolution.m_x;
+  int height = ShaderVariables::instance()->resolution.m_y;
+
   glBindFramebuffer(GL_FRAMEBUFFER, m_outBufferID);
 
   glBindTexture(GL_TEXTURE_2D, m_outTextureID);
 
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 512, 288, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 
-  //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
   // set wrapping parameters for textures
-  //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
   // dont think this works here?
-  //glGenerateMipmap(GL_TEXTURE_2D);
+  glGenerateMipmap(GL_TEXTURE_2D);
 
   // color attachment0?
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_outTextureID, 0);
 
   glBindRenderbuffer(GL_RENDERBUFFER, m_outDepthStencilID);
-  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 512, 288);
+  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
 
   glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_outDepthStencilID);
 }

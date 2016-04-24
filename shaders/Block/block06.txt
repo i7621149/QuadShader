@@ -1,6 +1,6 @@
 SHADER MAIN
   FRAGMENT   shaders/Block/BlockDanceFragment.glsl
-  VERTEX     shaders/GeoVertex.glsl
+  VERTEX     shaders/GeoSinDistortVertex.glsl
 
   TEXTURE 2D textures/dancefloor.png
 END MAIN

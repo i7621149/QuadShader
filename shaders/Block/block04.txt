@@ -1,0 +1,4 @@
+SHADER MAIN
+  FRAGMENT   shaders/Block/BlockSeaFragment.glsl
+  VERTEX     shaders/GeoSinDistortVertex.glsl
+END MAIN

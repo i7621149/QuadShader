@@ -1,4 +1,4 @@
 SHADER MAIN
-  FRAGMENT   shaders/Background/ScenarioFragment.glsl
+  FRAGMENT   shaders/Background/VoronoiseFragment.glsl
   VERTEX     shaders/GeoVertex.glsl
 END MAIN

@@ -1,6 +1,4 @@
 SHADER MAIN
-  FRAGMENT   shaders/Block/BlockSinFragment.glsl
+  FRAGMENT   shaders/Block/BlockSeaFragment.glsl
   VERTEX     shaders/GeoVertex.glsl
-
-  TEXTURE 2D textures/tex08.png
 END MAIN

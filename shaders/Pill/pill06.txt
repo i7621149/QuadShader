@@ -1,6 +1,6 @@
 SHADER MAIN
   FRAGMENT   shaders/Pill/PillHueFragment.glsl
-  VERTEX     shaders/GeoSinRandDistortVertex.glsl
+  VERTEX     shaders/GeoSinDistortVertex.glsl
 
 #comment like this
 

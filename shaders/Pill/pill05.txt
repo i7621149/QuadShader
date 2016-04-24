@@ -1,0 +1,9 @@
+SHADER MAIN
+  FRAGMENT   shaders/Pill/PillHueFragment.glsl
+  VERTEX     shaders/GeoVertex.glsl
+
+#comment like this
+
+  TEXTURE 2D textures/pill.png
+
+END MAIN

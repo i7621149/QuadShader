@@ -107,6 +107,8 @@ private:
 
   void startGame();
 
+  void setComboText();
+
   //----------------------------------------------------------------------------------------------------------------------
   /// @brief window width
   //----------------------------------------------------------------------------------------------------------------------
@@ -167,9 +169,7 @@ private:
 
   int m_matchTime;
 
-  enum GameMode {MAIN, TITLE, FINISHED};
-
-  GameMode m_mode;
+  enum GameMode {MAIN, TITLE, FINISHED} m_mode;
 
   int m_textHeight;
 
@@ -178,9 +178,12 @@ private:
   std::unique_ptr<ngl::Obj> m_pillMesh;
   std::unique_ptr<ngl::Obj> m_boxMesh;
 
+  int m_backgroundShaderNum;
   int m_geoShaderNum;
 
-  bool m_tripping;
+  enum CamMode {NORMAL, FLIPPED, RANDOM, CONTROLFLIP, ROLL} m_camMode;
+  std::vector<int> m_normalShaderIndexes;
+  std::vector<int> m_sinShaderIndexes;
 };
 
 #endif

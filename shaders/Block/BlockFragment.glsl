@@ -8,6 +8,7 @@ void main()
 
   if(iMatID == 4) // wall
   {
+
   }
   else if(iMatID == 5) // floor
   {

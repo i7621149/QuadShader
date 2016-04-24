@@ -35,7 +35,9 @@ NGLScene::NGLScene() :
   m_matchTime(60),
   m_mode(TITLE),
   m_textHeight(32),
-  m_tripping(false)
+  m_camMode(CONTROLFLIP),
+  m_normalShaderIndexes(),
+  m_sinShaderIndexes()
 {
   setTitle("Shader Splash");
 }
@@ -137,6 +139,18 @@ void NGLScene::initializeGL()
   shader->addShader("shaders/Background/background06.txt");
   shader->addShader("shaders/Background/background07.txt");
   shader->addShader("shaders/Background/background08.txt");
+  shader->addShader("shaders/Background/background09.txt");
+  shader->addShader("shaders/Background/background10.txt");
+  shader->addShader("shaders/Background/background11.txt");
+  shader->addShader("shaders/Background/background12.txt");
+  shader->addShader("shaders/Background/background13.txt");
+  shader->addShader("shaders/Background/background14.txt");
+  shader->addShader("shaders/Background/background15.txt");
+  shader->addShader("shaders/Background/background16.txt");
+  shader->addShader("shaders/Background/background17.txt");
+  shader->addShader("shaders/Background/background18.txt");
+  shader->addShader("shaders/Background/background19.txt");
+  shader->addShader("shaders/Background/background20.txt");
   maxIndex = shader->getShaderSetAmount() - 1;
   m_background.resetIndexRange(minIndex, maxIndex);
   m_background.setCurrentIndex(0);
@@ -145,6 +159,13 @@ void NGLScene::initializeGL()
   shader->addShader("shaders/Player/hamster01.txt");
   shader->addShader("shaders/Player/hamster02.txt");
   shader->addShader("shaders/Player/hamster03.txt");
+  shader->addShader("shaders/Player/hamster04.txt");
+  shader->addShader("shaders/Player/hamster05.txt");
+  shader->addShader("shaders/Player/hamster06.txt");
+  shader->addShader("shaders/Player/hamster07.txt");
+  shader->addShader("shaders/Player/hamster08.txt");
+  shader->addShader("shaders/Player/hamster09.txt");
+  shader->addShader("shaders/Player/hamster10.txt");
   maxIndex = shader->getShaderSetAmount() - 1;
   m_player1.resetIndexRange(minIndex, maxIndex);
   m_player2.resetIndexRange(minIndex, maxIndex);
@@ -155,6 +176,13 @@ void NGLScene::initializeGL()
   shader->addShader("shaders/Pill/pill01.txt");
   shader->addShader("shaders/Pill/pill02.txt");
   shader->addShader("shaders/Pill/pill03.txt");
+  shader->addShader("shaders/Pill/pill04.txt");
+  shader->addShader("shaders/Pill/pill05.txt");
+  shader->addShader("shaders/Pill/pill06.txt");
+  shader->addShader("shaders/Pill/pill07.txt");
+  shader->addShader("shaders/Pill/pill08.txt");
+  shader->addShader("shaders/Pill/pill09.txt");
+  shader->addShader("shaders/Pill/pill10.txt");
   maxIndex = shader->getShaderSetAmount() - 1;
   for(Pill &pill : m_pills)
   {
@@ -166,6 +194,13 @@ void NGLScene::initializeGL()
   shader->addShader("shaders/Block/block01.txt");
   shader->addShader("shaders/Block/block02.txt");
   shader->addShader("shaders/Block/block03.txt");
+  shader->addShader("shaders/Block/block04.txt");
+  shader->addShader("shaders/Block/block05.txt");
+  shader->addShader("shaders/Block/block06.txt");
+  shader->addShader("shaders/Block/block07.txt");
+  shader->addShader("shaders/Block/block08.txt");
+  shader->addShader("shaders/Block/block09.txt");
+  shader->addShader("shaders/Block/block10.txt");
   maxIndex = shader->getShaderSetAmount() - 1;
   for(Block &wall : m_walls)
   {
@@ -175,7 +210,11 @@ void NGLScene::initializeGL()
   m_floor.resetIndexRange(minIndex, maxIndex);
   m_floor.setCurrentIndex(0);
 
-  m_geoShaderNum = 3;
+  m_normalShaderIndexes = {0, 2, 4, 6, 8, 9};
+  m_sinShaderIndexes = {1, 3, 5, 7};
+
+  m_backgroundShaderNum = 20;
+  m_geoShaderNum = m_normalShaderIndexes.size() + m_sinShaderIndexes.size();
 
   // set up timer loop
   startTimer(16);
@@ -307,11 +346,6 @@ void NGLScene::renderText(ngl::Vec2 _startPos, ngl::Colour _col)
       m_instructText->renderText(textPos.m_x, textPos.m_y, text);
 
       textPos.m_y += m_textHeight + 10;
-      text=QString("Attacking will also let you grab farther away pills!");
-      m_instructText->renderText(textPos.m_x, textPos.m_y, text);
-
-
-      textPos.m_y += m_textHeight + 10;
       text=QString("PLAY?");
       m_text->renderText(textPos.m_x, textPos.m_y, text);
 
@@ -322,6 +356,10 @@ void NGLScene::renderText(ngl::Vec2 _startPos, ngl::Colour _col)
       textPos.m_y += m_textHeight + 30;
       text=QString("SHIFT: TWO PLAYER");
       m_text->renderText(textPos.m_x, textPos.m_y, text);
+
+      textPos.m_y += m_textHeight + 20;
+      text=QString("Attacking will also let you grab farther away pills!");
+      m_instructText->renderText(textPos.m_x, textPos.m_y, text);
     break;
     case FINISHED :
       textPos.m_x = 60;
@@ -348,11 +386,11 @@ void NGLScene::renderText(ngl::Vec2 _startPos, ngl::Colour _col)
       text=QString("SPACE: SINGLE PLAYER");
       m_text->renderText(textPos.m_x, textPos.m_y, text);
 
-      textPos.m_y += m_textHeight + 100;
+      textPos.m_y += m_textHeight + 30;
       text=QString("SHIFT: TWO PLAYER");
       m_text->renderText(textPos.m_x, textPos.m_y, text);
 
-      textPos.m_y += m_textHeight + 10;
+      textPos.m_y += m_textHeight + 100;
       text=QString("Remember:");
       m_instructText->renderText(textPos.m_x, textPos.m_y, text);
       textPos.m_y += m_textHeight + 10;
@@ -519,7 +557,6 @@ void NGLScene::keyReleaseEvent(QKeyEvent *_event)
 
 void NGLScene::timerEvent(QTimerEvent *_event)
 {
-
   //getting seconds by dividing milliseconds by 1000
   float globalSeconds = m_time.elapsed()/1000.0;
   //shaderLib->setRegisteredUniform("iGlobalTime", globalSeconds);
@@ -572,7 +609,6 @@ void NGLScene::timerEvent(QTimerEvent *_event)
       int totalScore = m_player1.getScore()+m_player2.getScore();
       if(totalScore % m_remixStep == 0)
       {
-        m_tripping = true;
         remixShaders();
       }
 
@@ -620,31 +656,98 @@ void NGLScene::updateCamera()
   // look towards ground
   look.m_y = (eye.m_y) / 2;
 
-  m_cam.set(eye, look, ngl::Vec3::up());
+  ngl::Vec3 wiggle;
+  switch(m_camMode)
+  {
+    case NORMAL :
+      m_cam.set(eye, look, ngl::Vec3::up());
+    break;
+    case FLIPPED :
+      // actually sets camera to other side
+      m_cam.set(eye.reflect(ngl::Vec3(0,0,-1)), look, -ngl::Vec3::up());
+    break;
+    case RANDOM :
+      wiggle = ngl::Random::instance()->getRandomNormalizedVec3() * 0.03;
+      m_cam.set(eye, look + wiggle, ngl::Vec3::up());
+    break;
+    case CONTROLFLIP :
+      m_cam.set(eye.reflect(ngl::Vec3(0,0,-1)), look, ngl::Vec3::up());
+    break;
+    case ROLL :
+      m_cam.set(eye, look, ngl::Vec3::up());
+      m_cam.roll(30*sin(m_time.elapsed()/1000.0));
+    break;
+    default : break;
+  }
 }
 
 void NGLScene::remixShaders()
 {
-
+  ngl::Random *rng = ngl::Random::instance();
+  // screen shake
   m_camBounce = 1.0;
-  int backgroundShaderIndex = m_background.getCurrentIndex() + 1;
+  // generate random shader index for background, not 0
+  int backgroundShaderIndex = (int)rng->randomPositiveNumber(m_backgroundShaderNum-1) + 1;
   m_background.setCurrentIndex(backgroundShaderIndex);
 
-  int geoShaderIndex = (int)ngl::Random::instance()->randomPositiveNumber(m_geoShaderNum);
+  int normOrSin = (int)rng->randomPositiveNumber(2);
+  int player1ShaderIndex;
+  int player2ShaderIndex;
+  int pillShaderIndex;
+  int blockShaderIndex;
 
-  m_player1.setCurrentIndex(geoShaderIndex);
-  m_player2.setCurrentIndex(geoShaderIndex);
+  if(normOrSin == 0)
+  {
+    // normal shader
+    player1ShaderIndex = m_normalShaderIndexes[(int)rng->randomPositiveNumber(m_normalShaderIndexes.size())];
+    player2ShaderIndex = m_normalShaderIndexes[(int)rng->randomPositiveNumber(m_normalShaderIndexes.size())];
+    pillShaderIndex = m_normalShaderIndexes[(int)rng->randomPositiveNumber(m_normalShaderIndexes.size())];
+    blockShaderIndex = m_normalShaderIndexes[(int)rng->randomPositiveNumber(m_normalShaderIndexes.size())];
+  }
+  else
+  {
+    // sin shader
+    player1ShaderIndex = m_sinShaderIndexes[(int)rng->randomPositiveNumber(m_sinShaderIndexes.size())];
+    player2ShaderIndex = m_sinShaderIndexes[(int)rng->randomPositiveNumber(m_sinShaderIndexes.size())];
+    pillShaderIndex = m_sinShaderIndexes[(int)rng->randomPositiveNumber(m_sinShaderIndexes.size())];
+    blockShaderIndex = m_sinShaderIndexes[(int)rng->randomPositiveNumber(m_sinShaderIndexes.size())];
+  }
+
+  m_player1.setCurrentIndex(player1ShaderIndex);
+  m_player2.setCurrentIndex(player2ShaderIndex);
 
   for(Pill &pill : m_pills)
   {
-    pill.setCurrentIndex(geoShaderIndex);
+    pill.setCurrentIndex(pillShaderIndex);
   }
 
   for(Block &wall : m_walls)
   {
-    wall.setCurrentIndex(geoShaderIndex);
+    wall.setCurrentIndex(blockShaderIndex);
   }
-  m_floor.setCurrentIndex(geoShaderIndex);
+  m_floor.setCurrentIndex(blockShaderIndex);
+
+  int camMode = (int)ngl::Random::instance()->randomPositiveNumber(100);
+  if(camMode < 40)
+  {
+    m_camMode = NORMAL;
+  }
+  else if(camMode < 60)
+  {
+    m_camMode = FLIPPED;
+  }
+  else if(camMode < 70)
+  {
+    m_camMode = RANDOM;
+  }
+  else if(camMode < 80)
+  {
+    m_camMode = CONTROLFLIP;
+  }
+  else
+  {
+    m_camMode = ROLL;
+  }
 }
 
 void NGLScene::startGame()
@@ -663,5 +766,22 @@ void NGLScene::startGame()
     m_player1Ctrl = ngl::Vec3::zero();
     m_player2Ctrl = ngl::Vec3::zero();
     m_mode = MAIN;
+
+    m_background.setCurrentIndex(0);
+    m_player1.setCurrentIndex(0);
+    m_player2.setCurrentIndex(0);
+
+    for(Pill &pill : m_pills)
+    {
+      pill.setCurrentIndex(0);
+    }
+
+    for(Block &wall : m_walls)
+    {
+      wall.setCurrentIndex(0);
+    }
+    m_floor.setCurrentIndex(0);
+
+    m_camMode = NORMAL;
   }
 }
