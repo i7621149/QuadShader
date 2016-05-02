@@ -32,7 +32,7 @@ NGLScene::NGLScene() :
   m_floor(5, ngl::Vec3(0,-m_floorDepth/2,0), ngl::Vec3((m_areaSize)*2, m_floorDepth, (m_areaSize)*2)),
   m_matchTime(60),
   m_mode(TITLE),
-  m_textHeight(32),
+  m_textHeight(32*devicePixelRatio()),
   m_camMode(CONTROLFLIP),
   m_normalShaderIndexes(),
   m_sinShaderIndexes()
@@ -86,8 +86,8 @@ void NGLScene::initializeGL()
   ShaderLibPro *shader = ShaderLibPro::instance();
 
 
-  m_text.reset(new ngl::Text(QFont("Ariel", 32, 100)));
-  m_instructText.reset(new ngl::Text(QFont("Ariel", 18)));
+  m_text.reset(new ngl::Text(QFont("Ariel", m_textHeight, 100)));
+  m_instructText.reset(new ngl::Text(QFont("Ariel", m_textHeight/2)));
 
   m_background.createQuad();
 
@@ -148,7 +148,7 @@ void NGLScene::initializeGL()
   shader->addShader("shaders/Background/background20.txt");
   maxIndex = shader->getShaderSetAmount() - 1;
   m_background.resetIndexRange(minIndex, maxIndex);
-  m_background.setCurrentIndex(0);
+  m_background.setCurrentIndex(4);
   m_backgroundShaderNum = shader->getShaderSetAmount();
 
   minIndex = maxIndex + 1;
@@ -282,7 +282,9 @@ void NGLScene::renderText(ngl::Vec2 _startPos, ngl::Colour _col)
 {
   QString text;
 
-  ngl::Vec2 textPos = _startPos + ngl::Vec2(30, 30);
+  float dpr = devicePixelRatio();
+
+  ngl::Vec2 textPos = _startPos + ngl::Vec2(30*dpr, 30*dpr);
 
   m_text->setScreenSize(width()*devicePixelRatio(), height()*devicePixelRatio());
   m_text->setColour(_col);
@@ -293,12 +295,12 @@ void NGLScene::renderText(ngl::Vec2 _startPos, ngl::Colour _col)
       text=QString("SCORE");
       m_text->renderText(textPos.m_x, textPos.m_y, text);
 
-      textPos.m_x += m_width-180;
+      textPos.m_x += m_width-180*dpr;
       text=QString("TIME");
       m_text->renderText(textPos.m_x, textPos.m_y, text);
 
-      textPos.m_x -= m_width-180;
-      textPos.m_y += m_textHeight + 10;
+      textPos.m_x -= m_width-180*dpr;
+      textPos.m_y += m_textHeight + 10*dpr;
       if(m_multiplayer)
       {
         text=QString("%1 : %2").arg(m_player1.getScore()).arg(m_player2.getScore());
@@ -309,7 +311,7 @@ void NGLScene::renderText(ngl::Vec2 _startPos, ngl::Colour _col)
       }
       m_text->renderText(textPos.m_x, textPos.m_y, text);
 
-      textPos.m_x += m_width-180;
+      textPos.m_x += m_width-180*dpr;
       text=QString("%1%2").arg(m_matchTime-(m_time.elapsed()/1000)).arg(m_matchTime-(m_time.elapsed()/1000) > 9 ? "" : "!");
       m_text->renderText(textPos.m_x, textPos.m_y, text);
     break;
