@@ -49,11 +49,10 @@ void NGLScene::resizeGL(QResizeEvent *_event)
 {
   m_width=_event->size().width()*devicePixelRatio();
   m_height=_event->size().height()*devicePixelRatio();
+  
   // set resolution in shader
   // uses a Vec3 to be compatible with Shadertoy
-  //ngl::ShaderLib::instance()->setRegisteredUniform("iResolution", ngl::Vec3(m_width, m_height, 1.0));
   ShaderVariables::instance()->resolution = ngl::Vec3(m_width, m_height, 1.0);
-
   m_cam.setShape(45.0f,(float)width()/height(),0.05f,350.0f);
 }
 
@@ -61,11 +60,10 @@ void NGLScene::resizeGL(int _w , int _h)
 {
   m_width=_w*devicePixelRatio();
   m_height=_h*devicePixelRatio();
+  
   // set resolution in shader
   // uses a Vec3 to be compatible with Shadertoy, even though resolution is (x,y)
-  //ngl::ShaderLib::instance()->setRegisteredUniform("iResolution", ngl::Vec3(m_width, m_height, 1.0));
   ShaderVariables::instance()->resolution = ngl::Vec3(m_width, m_height, 1.0);
-
   m_cam.setShape(45.0f,(float)width()/height(),0.05f,350.0f);
 }
 
@@ -255,7 +253,6 @@ void NGLScene::paintGL()
   m_lastFrameTime = m_time.elapsed();
 }
 
-// drawing scene takes programID
 void NGLScene::drawScene()
 {
   ShaderLibPro *shader = ShaderLibPro::instance();
@@ -420,23 +417,17 @@ void NGLScene::mouseMoveEvent (QMouseEvent * _event)
 //----------------------------------------------------------------------------------------------------------------------
 void NGLScene::mousePressEvent ( QMouseEvent * _event)
 {
-  //if(_event->button() == Qt::LeftButton)
-  //{
-    m_mouseData[2] = _event->x()*devicePixelRatio();
-    m_mouseData[3] = m_height-_event->y()*devicePixelRatio();
-    m_mouseDown = true;
-  //}
+  m_mouseData[2] = _event->x()*devicePixelRatio();
+  m_mouseData[3] = m_height-_event->y()*devicePixelRatio();
+  m_mouseDown = true;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 void NGLScene::mouseReleaseEvent ( QMouseEvent * _event )
 {
-  //if(_event->button() == Qt::LeftButton)
-  //{
-    m_mouseData[2] *= -1;
-    m_mouseData[3] *= -1;
-    m_mouseDown = false;
-  //}
+  m_mouseData[2] *= -1;
+  m_mouseData[3] *= -1;
+  m_mouseDown = false;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -16,7 +16,7 @@ public :
   ~Player();
 
   void update() {std::cerr << "player needs direction to update with" << std::endl;}
-  void update(ngl::Vec3 _dir, bool _attack, Player *_otherPlayer);
+  void update(Player *_otherPlayer);
   void draw();
 
   void hit();
@@ -25,11 +25,24 @@ public :
   int getScore() {return m_score;}
   void loadMeshes(ngl::Obj *_mesh, ngl::Obj *_attackMesh);
 
-  void setPos(ngl::Vec3 _pos) {m_pos = _pos;}
+  void reset(ngl::Vec3 _startPos);
 
   float getPickUpRad();
 
+  void resetControls();
+
+
+  struct Control
+  {
+    bool left;
+    bool right;
+    bool up;
+    bool down;
+    bool attack;
+  } m_control;
+
 private :
+
   ngl::Obj *m_mesh;
   ngl::Obj *m_attackMesh;
   float m_prevYPos = 0.0f;

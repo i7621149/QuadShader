@@ -149,12 +149,6 @@ private:
   Player m_player1;
   Player m_player2;
 
-  ngl::Vec3 m_player1Ctrl;
-  ngl::Vec3 m_player2Ctrl;
-
-  bool m_player1Attack;
-  bool m_player2Attack;
-
   float m_floorDepth;
   Block m_floor;
 

@@ -12,6 +12,7 @@ Player::Player(int _playerNum, ngl::Vec3 _pos, float _areaSize) :
   Entity(_playerNum, _pos),
   m_areaSize(_areaSize)
 {
+  resetControls();
 }
 
 Player::~Player()
@@ -19,20 +20,27 @@ Player::~Player()
 
 }
 
-void Player::update(ngl::Vec3 _dir, bool _attack, Player *_otherPlayer)
+void Player::update(Player *_otherPlayer)
 {
   // update function for user controlled player
+
+  ngl::Vec3 dir;
+  if(m_control.left) dir.m_x -= 1;
+  if(m_control.right) dir.m_x += 1;
+  if(m_control.up) dir.m_z -= 1;
+  if(m_control.down) dir.m_z += 1;
+
   // if player is on ground then calculate movement
   if(m_grounded)
   {
     if(m_stunnedTime <= 0)
     {
-      if(_dir.lengthSquared() > 0)
+      if(dir.lengthSquared() > 0)
       {
-        _dir.normalize();
+        dir.normalize();
       }
 
-      m_vel = _dir;
+      m_vel = dir;
 
       if(m_vel.lengthSquared() > m_maxSpeed*m_maxSpeed)
       {
@@ -91,11 +99,11 @@ void Player::update(ngl::Vec3 _dir, bool _attack, Player *_otherPlayer)
   }
 
   // set attack if attacking is true
-  if(_attack && m_attackTime <= 0 && m_stunnedTime <= 0)
+  if(m_control.attack && m_attackTime <= 0 && m_stunnedTime <= 0)
   {
+    m_control.attack = false;
     m_attacking = true;
     m_prevYPos = m_rot.m_y;
-
 
     m_attackTime = m_attackCooldown;
   }
@@ -131,10 +139,17 @@ void Player::update(ngl::Vec3 _dir, bool _attack, Player *_otherPlayer)
   else
   {
     // rotation depends on input direction rather than vel
-    if(_dir.lengthSquared() > 0)
+    if(dir.lengthSquared() > 0)
     {
-      m_rot.m_y = ngl::degrees(atan2(_dir.m_x, _dir.m_z))-90;
+      m_rot.m_y = ngl::degrees(atan2(dir.m_x, dir.m_z))-90;
     }
+  }
+
+  // control is snappier with this, in which momentum is not conserved in the air if the player is not stunned
+  if(m_stunnedTime <= 0 && !(dir.length() > 0))
+  {
+    m_vel.m_x = 0;
+    m_vel.m_z = 0;
   }
 
   m_pos += m_vel;
@@ -178,6 +193,14 @@ void Player::pickUpPill()
   m_score++;
 }
 
+void Player::reset(ngl::Vec3 _startPos)
+{
+  m_pos = _startPos;
+  m_vel = ngl::Vec3(0,0,0);
+  m_score = 0;
+  resetControls();
+}
+
 float Player::getPickUpRad()
 {
   // if the player is attacking their pickup radius is larger
@@ -191,3 +214,13 @@ float Player::getPickUpRad()
     return 2.0;
   }
 }
+
+void Player::resetControls()
+{
+  m_control.left = false;
+  m_control.right = false;
+  m_control.up = false;
+  m_control.down = false;
+  m_control.attack = false;
+}
+
