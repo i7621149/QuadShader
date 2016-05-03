@@ -16,7 +16,7 @@ int main(int argc, char **argv)
   QSurfaceFormat format;
 
   // setting samples for better quality image
-  format.setSamples(1);
+  format.setSamples(4);
   // set gl version
   #if defined( __APPLE__)
     format.setMajorVersion(4);

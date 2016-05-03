@@ -71,9 +71,7 @@ void NGLScene::resizeGL(int _w , int _h)
 
 void NGLScene::initializeGL()
 {
-  // we need to initialise the NGL lib which will load all of the OpenGL functions, this must
-  // be done once we have a valid GL context but before we call any GL commands. If we dont do
-  // this everything will crash
+  // init ngl
   ngl::NGLInit::instance();
 
   // set random seed
@@ -148,7 +146,7 @@ void NGLScene::initializeGL()
   shader->addShader("shaders/Background/background20.txt");
   maxIndex = shader->getShaderSetAmount() - 1;
   m_background.resetIndexRange(minIndex, maxIndex);
-  m_background.setCurrentIndex(4);
+  m_background.setCurrentIndex(0);
   m_backgroundShaderNum = shader->getShaderSetAmount();
 
   minIndex = maxIndex + 1;
@@ -748,7 +746,7 @@ void NGLScene::remixShaders()
   {
     m_camMode = FLIPPED;
   }
-  else if(camMode < 70)
+  else if(camMode < 65)
   {
     m_camMode = RANDOM;
   }

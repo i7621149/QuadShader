@@ -1,4 +1,4 @@
 SHADER MAIN
-  FRAGMENT   shaders/Background/VoronoiseFragment.glsl
+  FRAGMENT   shaders/Background/GlectricSheepFragment.glsl
   VERTEX     shaders/GeoVertex.glsl
 END MAIN

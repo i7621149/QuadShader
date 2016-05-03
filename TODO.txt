@@ -1,12 +1,18 @@
 //
 NEW TODO:
 
-add block09 and block10
+Coment, clean up
 
+Remove unnecessary files
+
+Documentation
+
+Separate Shader files
+
+Test quad shader program
+
+
+// extra
 fix texture duplication
 
 add framebuffers
-
-rename
-
-could clean up
