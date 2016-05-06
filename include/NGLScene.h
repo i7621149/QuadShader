@@ -173,7 +173,6 @@ private:
   std::unique_ptr<ngl::Obj> m_boxMesh;
 
   int m_backgroundShaderNum;
-  int m_geoShaderNum;
 
   enum CamMode {NORMAL, FLIPPED, RANDOM, CONTROLFLIP, ROLL} m_camMode;
   std::vector<int> m_normalShaderIndexes;

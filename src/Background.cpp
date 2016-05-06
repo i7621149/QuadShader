@@ -11,12 +11,6 @@ Background::Background() :
 
 void Background::draw()
 {
-  // create new identity matrix
-  ngl::Mat4 identityMat4;
-  ngl::Mat3 identityMat3;
-
-  ShaderVariables::instance()->MVP = identityMat4;
-
   // bind and draw our quad
   glBindVertexArray(m_vaoID);
 
@@ -28,6 +22,7 @@ void Background::createQuad()
   // a simple quad object which fills the screen, from Jon's code
   float* vert = new float[18];
   const static float s=1.0;
+
   // make depth real big so hopefully nothing will be drawn over
   // not elegant but means that i don't need to draw the background first
   // because it can be expensive depending on shader, so drawing geo first

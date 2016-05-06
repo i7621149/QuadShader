@@ -15,6 +15,12 @@ public :
   ngl::Vec3 getVel() {return m_vel;}
   ngl::Vec3 getRot() {return m_rot;}
   ngl::Vec3 getScale() {return m_scale;}
+
+  void setPos(ngl::Vec3 _pos) {m_pos = _pos;}
+  void setVel(ngl::Vec3 _vel) {m_vel = _vel;}
+  void setRot(ngl::Vec3 _rot) {m_rot = _rot;}
+  void setScale(ngl::Vec3 _scale) {m_scale = _scale;}
+
   int getShaderLibIndex() {return m_currentIndex + m_minIndex;}
   int getCurrentIndex(){ return m_currentIndex;}
   void setCurrentIndex(int _index);

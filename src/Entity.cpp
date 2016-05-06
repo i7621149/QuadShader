@@ -14,6 +14,7 @@ Entity::Entity(int _id, ngl::Vec3 _pos) :
 
 ngl::Mat4 Entity::getTransformMatrix()
 {
+  // return transform of entity
   ngl::Transformation t;
   t.setPosition(m_pos);
   t.setRotation(m_rot);
@@ -23,6 +24,8 @@ ngl::Mat4 Entity::getTransformMatrix()
 
 void Entity::resetIndexRange(int _min, int _max)
 {
+  // set minimum and maximum shader index for shader
+  // if this range is broken a warning will be printed when assigning a shader index too big
   m_minIndex = _min;
   m_maxIndex = _max;
 }

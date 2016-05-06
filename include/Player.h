@@ -31,7 +31,6 @@ public :
 
   void resetControls();
 
-
   struct Control
   {
     bool left;
@@ -48,14 +47,14 @@ private :
   float m_prevYPos = 0.0f;
   float m_spin = 0.0f;
   float m_maxSpeed = 0.3f;
-  float m_attackRad = 2.8f;
+  float m_attackRad = 3.3f;
   float m_stunnedTime = 0.0f;
   float m_stunnedCooldown = 10.0f;
   bool m_attacking = false;
   bool m_grounded = true;
   int m_score = 0;
   float m_attackTime = 0.0f;
-  float m_attackCooldown = 30.0f;
+  float m_attackCooldown = 45.0f;
   float m_areaSize;
 };
 

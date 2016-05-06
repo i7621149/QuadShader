@@ -5,6 +5,8 @@ Coment, clean up
 
 Remove unnecessary files
 
+Change slow shader (or two)
+
 Documentation
 
 Separate Shader files

@@ -30,6 +30,13 @@ void Player::update(Player *_otherPlayer)
   if(m_control.up) dir.m_z -= 1;
   if(m_control.down) dir.m_z += 1;
 
+  // if player attack or stun has not cooled down, cancel queued attack
+  // this means that hitting attack while the player is stunned or attacking won't result in a delayed attack
+  if(m_attackTime > 0 || m_stunnedTime > 0)
+  {
+    m_control.attack = false;
+  }
+
   // if player is on ground then calculate movement
   if(m_grounded)
   {
@@ -69,6 +76,7 @@ void Player::update(Player *_otherPlayer)
     m_vel.m_y -= 0.09f;
   }
 
+  // if the player is on the ground, flip them the right way up
   if(m_stunnedTime <= 0 || m_grounded)
   {
     m_rot.m_x = 0;
@@ -82,7 +90,11 @@ void Player::update(Player *_otherPlayer)
   }
 
   // test to see if player goes out of bounds, if so, bounce back
+  // very limited form of checking, but enough to work for the square arena
+  // a proper collision system would need to be added if the arena shape could change
+  // but this works for the current game
   ngl::Vec3 newPos = m_pos + m_vel;
+  // x walls
   if(newPos.m_x < -m_areaSize || newPos.m_x > m_areaSize)
   {
     m_vel.m_x *= -1.5f;
@@ -90,6 +102,7 @@ void Player::update(Player *_otherPlayer)
     m_stunnedTime = m_stunnedCooldown / 2.0;
     m_grounded = false;
   }
+  // z walls
   if(newPos.m_z < -m_areaSize || newPos.m_z > m_areaSize)
   {
     m_vel.m_z *= -1.5f;
@@ -125,13 +138,13 @@ void Player::update(Player *_otherPlayer)
     }
     else
     {
-
-      ngl::Vec3 playerDistVec = m_pos - _otherPlayer->getPos();
       // check distance to other player, for hit/miss
+      ngl::Vec3 playerDistVec = m_pos - _otherPlayer->getPos();
       if(playerDistVec.lengthSquared() < m_attackRad*m_attackRad)
       {
         _otherPlayer->hit();
       }
+      // scale the player to show farther reach while attacking
       m_scale = ngl::Vec3(m_attackRad, 1.0, m_attackRad);
     }
 
@@ -163,6 +176,7 @@ void Player::update(Player *_otherPlayer)
 
 void Player::draw()
 {
+  // draw either normal mesh or attack mesh
   if(m_attacking)
   {
     m_attackMesh->draw();
@@ -175,6 +189,7 @@ void Player::draw()
 
 void Player::loadMeshes(ngl::Obj *_mesh, ngl::Obj *_attackMesh)
 {
+  // two meshes, one for regular, one on attack
   m_mesh = _mesh;
   m_attackMesh = _attackMesh;
 }
@@ -182,6 +197,7 @@ void Player::loadMeshes(ngl::Obj *_mesh, ngl::Obj *_attackMesh)
 
 void Player::hit()
 {
+  // fly into the air, and stun the player
   m_vel = ngl::Vec3(0,1,0);
   m_pos.m_y = 0.1f;
   m_grounded = false;
@@ -190,13 +206,21 @@ void Player::hit()
 
 void Player::pickUpPill()
 {
+  // simply increase score when player picks up pill
   m_score++;
 }
 
 void Player::reset(ngl::Vec3 _startPos)
 {
+  // set position, reset velocity
   m_pos = _startPos;
   m_vel = ngl::Vec3(0,0,0);
+
+  // rotate to face center
+  ngl::Vec3 aim = ngl::Vec3(0,0,0) - m_pos;
+  m_rot = ngl::Vec3(0, ngl::degrees(atan2(aim.m_x, aim.m_z))-90, 0);
+
+  //reset score and controls
   m_score = 0;
   resetControls();
 }
@@ -206,17 +230,19 @@ float Player::getPickUpRad()
   // if the player is attacking their pickup radius is larger
   if(m_attacking)
   {
-    // pretty generous here to reward players who are using advanced "attack to pill up pills"
-    return m_attackRad + 3.0;
+    // pretty generous here to reward players who are using advanced skill, "attack to pick up pills"
+    return m_attackRad + 2.5;
   }
   else
   {
+    // relatively generous radius here as well
     return 2.0;
   }
 }
 
 void Player::resetControls()
 {
+  // set all of control structure to false, useful in case player is holding direction before game start
   m_control.left = false;
   m_control.right = false;
   m_control.up = false;
